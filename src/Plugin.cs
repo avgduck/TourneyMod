@@ -14,8 +14,6 @@ public class Plugin : BaseUnityPlugin
     private void Awake()
     {
         LogGlobal = this.Logger;
-
-        Harmony harmony = new Harmony(GUID);
-        harmony.PatchAll(typeof(ScreenPlayersStage_Patch));
+        HarmonyPatches.PatchAll();
     }
 }
