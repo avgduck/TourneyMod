@@ -2,21 +2,20 @@
 using BepInEx.Logging;
 using HarmonyLib;
 
-namespace TourneyMod
-{
-    [BepInPlugin(GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-    [BepInProcess("LLBlaze.exe")]
-    public class Plugin : BaseUnityPlugin
-    {
-        public const string GUID = "avgduck.plugins.llb.tourneymod";
-        internal static new ManualLogSource Logger;
-        Harmony harmony = new Harmony(GUID);
+namespace TourneyMod;
 
-        private void Awake()
-        {
-            Logger = base.Logger;
-            Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
-            harmony.PatchAll();
-        }
+[BepInPlugin(GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+[BepInProcess("LLBlaze.exe")]
+public class Plugin : BaseUnityPlugin
+{
+    public const string GUID = "avgduck.plugins.llb.tourneymod";
+    internal static ManualLogSource LogGlobal;
+
+    private void Awake()
+    {
+        LogGlobal = this.Logger;
+
+        Harmony harmony = new Harmony(GUID);
+        harmony.PatchAll(typeof(ScreenPlayersStage_Patch));
     }
 }
