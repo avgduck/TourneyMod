@@ -19,18 +19,23 @@ public static class HarmonyPatches
     {
         // GameStatesLobby.OpenStageSelect(bool canGoBack, bool localSpectator = false, ScreenType = ScreenType.PLAYERS_STAGE)
         [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.KOLLNKIKIKM))]
+        [HarmonyPrefix]
+        private static void OpenStageSelect_Prefix(HPNLMFHPHFD __instance)
+        {
+            IJDANPONMLL localLobby = __instance as IJDANPONMLL;
+            if (localLobby == null) return;
+            
+            ScreenStageStrike.Open(); // ScreenPlayersStage screenStage
+        }
+        // GameStatesLobby.OpenStageSelect(bool canGoBack, bool localSpectator = false, ScreenType = ScreenType.PLAYERS_STAGE)
+        [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.KOLLNKIKIKM))]
         [HarmonyPostfix]
         private static void OpenStageSelect_Postfix(HPNLMFHPHFD __instance)
         {
-            Plugin.LogGlobal.LogWarning($"OpenStageSelect: {__instance.GetType()}");
             IJDANPONMLL localLobby = __instance as IJDANPONMLL;
-            if (localLobby == null)
-            {
-                Plugin.LogGlobal.LogInfo("Not in a local lobby");
-                return;
-            }
+            if (localLobby == null) return;
+
             localLobby.GFHABHIBKHK(); // GameStatesLobbyLocal.ShowActiveCursors()
-            ScreenStageStrike.Open(__instance.CFKCIJCEILI); // ScreenPlayersStage screenStage
         }
         
         // GameStatesLobby.CloseStageSelect()
@@ -38,14 +43,20 @@ public static class HarmonyPatches
         [HarmonyPostfix]
         private static void CloseStageSelect_Postfix(HPNLMFHPHFD __instance)
         {
-            Plugin.LogGlobal.LogWarning($"CloseStageSelect: {__instance.GetType()}");
             IJDANPONMLL localLobby = __instance as IJDANPONMLL;
-            if (localLobby == null)
-            {
-                Plugin.LogGlobal.LogInfo("Not in a local lobby");
-                return;
-            }
+            if (localLobby == null) return;
+            
             ScreenStageStrike.Close();
+        }
+
+        [HarmonyPatch(typeof(ScreenPlayersStage), nameof(ScreenPlayersStage.OnOpen))]
+        [HarmonyPrefix]
+        private static bool OnOpen_Prefix(ScreenPlayersStage __instance)
+        {
+            if (!ScreenStageStrike.IsOpen) return true;
+            
+            ScreenStageStrike.Instance.OnOpen(__instance);
+            return false;
         }
     }
 }
