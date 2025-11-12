@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace StageSelect
+namespace TourneyMod
 {
     [HarmonyPatch]
     internal class ScreenPlayersStage_Patch

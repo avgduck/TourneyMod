@@ -1,22 +1,19 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using System;
-using System.IO;
-using UnityEngine;
 
-namespace StageSelect
+namespace TourneyMod
 {
-    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+    [BepInPlugin(GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     [BepInProcess("LLBlaze.exe")]
     public class Plugin : BaseUnityPlugin
     {
+        public const string GUID = "avgduck.plugins.llb.tourneymod";
         internal static new ManualLogSource Logger;
-        Harmony harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
+        Harmony harmony = new Harmony(GUID);
 
         private void Awake()
         {
-            // Plugin startup logic
             Logger = base.Logger;
             Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
             harmony.PatchAll();
