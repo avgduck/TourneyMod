@@ -189,8 +189,12 @@ internal class ScreenStageStrike
 
     private void OnClickStage(int playerNumber, Stage stage)
     {
-        screenStage.SelectStage(playerNumber, (int)stage);
-        UIScreen.blockGlobalInput = false;
+        if (!SetTracker.Instance.CheckPlayerInteraction(stage, playerNumber)) return;
+        
+        //screenStage.SelectStage(playerNumber, (int)stage);
+        //UIScreen.blockGlobalInput = false;
+        SetTracker.Instance.BanStage(stage, playerNumber);
+        UpdateStageBans();
     }
 
     internal TMP_Text CreateNewText(string name, Transform parent)
@@ -249,7 +253,10 @@ internal class ScreenStageStrike
             Button = StageButton.CreateStageButton(ScreenStageStrike.Instance.screenStage.stageButtonsContainer, stage);
             Button.SetActive(true);
             Button.onClick = (playerNumber) =>
+            {
                 Instance.OnClickStage(playerNumber, StoredStage);
+                Button.UpdateDisplay();
+            };
 
             lbStageName = ScreenStageStrike.Instance.CreateNewText("lbStageName", Button.transform);
             lbStageName.fontSize = 42;
@@ -265,26 +272,36 @@ internal class ScreenStageStrike
 
     private class StageButton : LLButton
     {
-        private static readonly Color COLOR_BANNED = Color.white * 0.3f;
+        private static readonly Color COLOR_BANNED = Color.white * 0.25f;
         private static readonly Color COLOR_UNFOCUSED = Color.white * 0.6f;
         private static readonly Color COLOR_FOCUSED = Color.white;
 
         private static readonly Color COLOR_LOCK = Color.white;
-
+        
         private static readonly Color[] COLOR_LOCK_PLAYER =
         [
-            new Color(1f, 0f, 0f, 1f),
-            new Color(0f, 0f, 1f, 1f),
+            new Color(255/255f, 64/255f, 22/255f),
+            new Color(13/255f, 136/255f, 255/255f),
+            new Color(255/255f, 255/255f, 61/255f),
+            new Color(90/255f, 244/255f, 90/255f)
+        ];
+        private static readonly Color[] COLOR_SOFTLOCK_PLAYER =
+        [
+            new Color(255/255f, 64/255f, 22/255f, 0.3f),
+            new Color(13/255f, 136/255f, 255/255f, 0.3f),
+            new Color(255/255f, 255/255f, 61/255f, 0.3f),
+            new Color(90/255f, 244/255f, 90/255f, 0.3f)
         ];
 
         private bool[] playersHovering = [false, false, false, false];
         private SetTracker.StageBan stageBan;
 
         private bool IsBeingHovered =>
-            !playersHovering[0] && !playersHovering[1] && !playersHovering[2] && !playersHovering[3];
+            playersHovering[0] || playersHovering[1] || playersHovering[2] || playersHovering[3];
 
         private Image stageImage;
         private Image lockedImage;
+        private TMP_Text lbBanReason;
 
         internal static StageButton CreateStageButton(Transform parent, Stage stage)
         {
@@ -294,6 +311,11 @@ internal class ScreenStageStrike
             stageButton.stageImage = LLControl.CreateImage(rect, stageSprite);
             Sprite lockedSprite = JPLELOFJOOH.BNFIDCAPPDK($"_spritePreviewLOCKED"); // Assets.GetMenuSprite()
             stageButton.lockedImage = LLControl.CreateImage(rect, lockedSprite);
+            stageButton.lbBanReason = ScreenStageStrike.Instance.CreateNewText("lbBanReason", stageButton.transform);
+            stageButton.lbBanReason.color = Color.white;
+            stageButton.lbBanReason.fontSize = 22;
+            stageButton.lbBanReason.rectTransform.localPosition = new Vector2(0f, 13f);
+            TextHandler.SetText(stageButton.lbBanReason, "");
             stageButton.Init();
             return stageButton;
         }
@@ -306,42 +328,68 @@ internal class ScreenStageStrike
         public void SetBan(SetTracker.StageBan ban)
         {
             stageBan = ban;
-            catchHover = stageBan == null;
-            UpdateImage();
+            OnHoverOut(stageBan.banPlayer);
+            UpdateDisplay();
         }
 
         public override void OnHover(int playerNumber)
         {
-            if (stageBan != null) return;
             if (playerNumber == -1) return;
-            playersHovering[playerNumber] = true;
-            UpdateImage();
+            playersHovering[playerNumber] = SetTracker.Instance.CheckPlayerInteraction(stageBan, playerNumber);
+            UpdateDisplay();
         }
 
         public override void OnHoverOut(int playerNumber)
         {
-            if (stageBan != null) return;
             if (playerNumber == -1) playersHovering = [false, false, false, false];
             else playersHovering[playerNumber] = false;
-            UpdateImage();
+            UpdateDisplay();
         }
 
-        private void UpdateImage()
+        internal void UpdateDisplay()
         {
-            stageImage.color = stageBan != null ? COLOR_BANNED : (IsBeingHovered ? COLOR_UNFOCUSED : COLOR_FOCUSED);
+            if (IsBeingHovered)
+            {
+                stageImage.color = COLOR_FOCUSED;
+            }
+            else if (stageBan != null)
+            {
+                if (stageBan.reason == SetTracker.StageBan.BanReason.DSR && stageBan.banPlayer != -1)
+                {
+                    stageImage.color = COLOR_UNFOCUSED;
+                }
+                else
+                {
+                    stageImage.color = COLOR_BANNED;
+                }
+            }
+            else
+            {
+                stageImage.color = COLOR_UNFOCUSED;
+            }
             lockedImage.gameObject.SetActive(stageBan != null);
-            if (stageBan == null) return;
+            if (stageBan == null)
+            {
+                TextHandler.SetText(lbBanReason, "");
+                return;
+            }
 
             switch (stageBan.reason)
             {
                 case SetTracker.StageBan.BanReason.COUNTERPICK:
                     lockedImage.color = COLOR_LOCK;
+                    lbBanReason.color = COLOR_LOCK;
+                    TextHandler.SetText(lbBanReason, "Counterpick");
                     break;
                 case SetTracker.StageBan.BanReason.BAN:
                     lockedImage.color = COLOR_LOCK_PLAYER[stageBan.banPlayer];
+                    lbBanReason.color = COLOR_LOCK_PLAYER[stageBan.banPlayer];
+                    TextHandler.SetText(lbBanReason, $"P{stageBan.banPlayer+1} Ban");
                     break;
                 case SetTracker.StageBan.BanReason.DSR:
-                    lockedImage.color = COLOR_LOCK_PLAYER[stageBan.banPlayer];
+                    lockedImage.color = (stageBan.banPlayer == -1) ? COLOR_LOCK : COLOR_SOFTLOCK_PLAYER[stageBan.banPlayer];
+                    lbBanReason.color = (stageBan.banPlayer == -1) ? COLOR_LOCK : COLOR_SOFTLOCK_PLAYER[stageBan.banPlayer];
+                    TextHandler.SetText(lbBanReason, (stageBan.banPlayer == -1) ? "Both DSR" : $"P{stageBan.banPlayer+1} DSR");
                     break;
             }
         }

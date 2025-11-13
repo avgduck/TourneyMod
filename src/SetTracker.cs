@@ -10,14 +10,14 @@ internal class SetTracker
         Stage.JUNKTOWN,
         Stage.ROOM21,
         (Plugin.USE_SEWERS ? Stage.SEWERS : Stage.OUTSKIRTS),
-        Stage.SUBWAY,
+        Stage.STADIUM,
         Stage.STREETS,
     ];
 
     internal Stage[] StagesCounterpick =
     [
         Stage.POOL,
-        Stage.STADIUM,
+        Stage.SUBWAY,
         Stage.FACTORY,
         Stage.CONSTRUCTION,
     ];
@@ -45,6 +45,18 @@ internal class SetTracker
     {
         matches = new List<Match>();
         matchCount = 0;
+        
+        stageBans = new List<StageBan>();
+        if (matchCount == 0)
+        {
+            foreach (Stage stage in StagesCounterpick)
+            {
+                stageBans.Add(new StageBan(stage, StageBan.BanReason.COUNTERPICK));
+            }
+        }
+        stageBans.Add(new StageBan(Stage.OUTSKIRTS, StageBan.BanReason.DSR, 0));
+        stageBans.Add(new StageBan(Stage.ROOM21, StageBan.BanReason.DSR, -1));
+        stageBans.Add(new StageBan(Stage.STADIUM, StageBan.BanReason.DSR, 1));
     }
 
     internal void StartMatch()
@@ -63,17 +75,32 @@ internal class SetTracker
 
     internal List<StageBan> GetStageBans()
     {
-        stageBans = new List<StageBan>();
-
-        if (matchCount == 0)
-        {
-            foreach (Stage stage in StagesCounterpick)
-            {
-                stageBans.Add(new StageBan(stage, StageBan.BanReason.COUNTERPICK));
-            }
-        }
-        
         return stageBans;
+    }
+
+    internal void BanStage(Stage stage, int playerNumber)
+    {
+        StageBan existingBan = stageBans.Find((ban) => ban.stage == stage);
+        StageBan newBan = new StageBan(stage, StageBan.BanReason.BAN, playerNumber);
+        if (existingBan != null)
+        {
+            stageBans.Remove(existingBan);
+        }
+        stageBans.Add(newBan);
+    }
+
+    internal bool CheckPlayerInteraction(Stage stage, int playerNumber)
+    {
+        StageBan stageBan = stageBans.Find((ban) => ban.stage == stage);
+        return CheckPlayerInteraction(stageBan, playerNumber);
+    }
+
+    internal bool CheckPlayerInteraction(StageBan stageBan, int playerNumber)
+    {
+        if (stageBan == null) return true;
+        if (stageBan.reason != SetTracker.StageBan.BanReason.DSR) return false;
+        if (stageBan.banPlayer == playerNumber || stageBan.banPlayer == -1) return false;
+        return true;
     }
 
     private class Match
