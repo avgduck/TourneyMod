@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LLBML.Players;
 using LLBML.States;
 using LLGUI;
 using LLHandlers;
@@ -35,6 +36,21 @@ internal class ScreenStageStrike
     private static readonly Vector2 STAGES_POSITION = new Vector2(0f, 0f);
     private static readonly Vector2 STAGES_SPACING = new Vector2(6f, 6f);
     private const float STAGE_CATEGORY_SPACING = 20f;
+    
+    private static readonly Color[] COLOR_PLAYER =
+    [
+        new Color(255/255f, 64/255f, 22/255f),
+        new Color(13/255f, 136/255f, 255/255f),
+        new Color(255/255f, 255/255f, 61/255f),
+        new Color(90/255f, 244/255f, 90/255f)
+    ];
+
+    private static readonly Color COLOR_CURSOR_ACTIVE = Color.white;
+    private static readonly Color COLOR_CURSOR_INACTIVE = Color.white * 0.6f;
+
+    private TMP_Text lbSetCount;
+    private TMP_Text lbBansRemaining;
+    private TMP_Text lbBanStatus;
 
     internal static void Open()
     {
@@ -82,9 +98,26 @@ internal class ScreenStageStrike
         lbBack.localScale = new Vector2(1f / BACK_SCALE.x, 1f / BACK_SCALE.y);
         TMP_Text backText = lbBack.GetComponent<TMP_Text>();
         backText.fontSize = BACK_FONT_SIZE;
+        
+        lbSetCount = ScreenStageStrike.Instance.CreateNewText("lbSetCount", screenStage.transform);
+        lbSetCount.fontSize = 32;
+        lbSetCount.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1000f);
+        lbSetCount.rectTransform.localPosition = new Vector2(0f, 270f);
+        TextHandler.SetText(lbSetCount, "");
+        lbBansRemaining = ScreenStageStrike.Instance.CreateNewText("lbBansRemaining", screenStage.transform);
+        lbBansRemaining.fontSize = 18;
+        lbBansRemaining.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1000f);
+        lbBansRemaining.rectTransform.localPosition = new Vector2(0f, -276f);
+        TextHandler.SetText(lbBansRemaining, "");
+        lbBanStatus = ScreenStageStrike.Instance.CreateNewText("lbBanStatus", screenStage.transform);
+        lbBanStatus.fontSize = 42;
+        lbBanStatus.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1000f);
+        lbBanStatus.rectTransform.localPosition = new Vector2(0f, -310f);
+        TextHandler.SetText(lbBanStatus, "");
 
         CreateStageButtons();
         UpdateStageBans();
+        UpdateSetInfo();
     }
 
     private float GetRowWidth(int rowLength)
@@ -105,8 +138,8 @@ internal class ScreenStageStrike
 
     private void CreateStageButtons()
     {
-        int[] rowLengthsNeutral = GetRowLengths(SetTracker.Instance.StagesNeutral.Length);
-        int[] rowLengthsCounterpick = GetRowLengths(SetTracker.Instance.StagesCounterpick.Length);
+        int[] rowLengthsNeutral = GetRowLengths(SetTracker.Instance.ruleset.stagesNeutral.Length);
+        int[] rowLengthsCounterpick = GetRowLengths(SetTracker.Instance.ruleset.stagesCounterpick.Length);
         int numRows = rowLengthsNeutral.Length + rowLengthsCounterpick.Length;
         bool bothCategories = rowLengthsNeutral.Length > 0 && rowLengthsCounterpick.Length > 0;
         
@@ -114,7 +147,7 @@ internal class ScreenStageStrike
         if (bothCategories) totalHeight += STAGE_CATEGORY_SPACING;
         float startPositionY = STAGES_POSITION.y + totalHeight / 2f - STAGE_SIZE.y / 2f;
 
-        screenStage.nButtons = SetTracker.Instance.StagesNeutral.Length + SetTracker.Instance.StagesCounterpick.Length;
+        screenStage.nButtons = SetTracker.Instance.ruleset.stagesNeutral.Length + SetTracker.Instance.ruleset.stagesCounterpick.Length;
         screenStage.btStages = new LLButton[screenStage.nButtons];
 
         int stageIndex = 0;
@@ -122,7 +155,7 @@ internal class ScreenStageStrike
         int colIndex = 0;
         stageContainers = new List<StageContainer>();
         stageContainersNeutral = new List<StageContainer>();
-        foreach (Stage stage in SetTracker.Instance.StagesNeutral)
+        foreach (Stage stage in SetTracker.Instance.ruleset.stagesNeutral)
         {
             float startPositionX = STAGES_POSITION.x - GetRowWidth(rowLengthsNeutral[rowIndex]) / 2f + STAGE_SIZE.x / 2f;
             
@@ -150,7 +183,7 @@ internal class ScreenStageStrike
         rowIndex = 0;
         colIndex = 0;
         stageContainersCounterpick = new List<StageContainer>();
-        foreach (Stage stage in SetTracker.Instance.StagesCounterpick)
+        foreach (Stage stage in SetTracker.Instance.ruleset.stagesCounterpick)
         {
             float startPositionX = STAGES_POSITION.x - GetRowWidth(rowLengthsCounterpick[rowIndex]) / 2f+ STAGE_SIZE.x / 2f;
             
@@ -186,14 +219,106 @@ internal class ScreenStageStrike
         }
     }
 
+    private void UpdateSetInfo()
+    {
+        int gameNumber = SetTracker.Instance.GetGameNumber();
+        int[] winCounts = SetTracker.Instance.GetWinCounts();
+        TextHandler.SetText(lbSetCount, $"Game {gameNumber} ({winCounts[0]}-{winCounts[1]})");
+        
+        TextHandler.SetText(lbBansRemaining, $"Bans remaining: P1 {SetTracker.Instance.TotalBansRemaining[0]}, P2 {SetTracker.Instance.TotalBansRemaining[1]}");
+
+        int controllingPlayer = SetTracker.Instance.ControllingPlayer;
+        lbBanStatus.color = COLOR_PLAYER[controllingPlayer];
+        TextHandler.SetText(lbBanStatus, SetTracker.Instance.CurrentInteractMode == SetTracker.InteractMode.BAN
+            ? $"P{controllingPlayer+1} banning {SetTracker.Instance.CurrentBansRemaining}..."
+            : $"P{controllingPlayer+1} picking...");
+    }
+
+    // texture editing code from ColorSwap
+    private static void SetTextureCopy(ref Texture2D destination, Texture2D source)
+    {
+        RenderTexture temp = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
+        
+        Graphics.Blit(source, temp);
+        
+        RenderTexture prev = RenderTexture.active;
+        RenderTexture.active = temp;
+        destination = new Texture2D(source.width, source.height, source.format, false);
+        destination.ReadPixels(new Rect(0, 0, temp.width, temp.height), 0, 0);
+        destination.Apply();
+        RenderTexture.active = prev;
+        RenderTexture.ReleaseTemporary(temp);
+    }
+    private static void SetTextureColor(ref Texture2D texture, Color color)
+    {
+        Color[] pixels = texture.GetPixels();
+        for (int pixelIndex = 0; pixelIndex < pixels.Length; pixelIndex++)
+        {
+            Color imgColor = pixels[pixelIndex];
+            pixels[pixelIndex] = new Color(imgColor.r * color.r, imgColor.g * color.g, imgColor.b * color.b, imgColor.a * color.a);
+        }
+        texture.SetPixels(pixels);
+        texture.Apply();
+    }
+
+    internal static readonly Texture2D[] cursorImagesActive = new Texture2D[4];
+    internal static readonly Texture2D[] cursorImagesInactive = new Texture2D[4];
+    internal static void GenerateCursorImages(LLCursor cursor)
+    {
+        Texture2D source = cursor.texCursor;
+        Texture2D cursorActive = new Texture2D(0, 0);
+        Texture2D cursorInactive = new Texture2D(0, 0);
+        SetTextureCopy(ref cursorActive, source);
+        SetTextureCopy(ref cursorInactive, source);
+        SetTextureColor(ref cursorInactive, COLOR_CURSOR_INACTIVE);
+        Player player = cursor.player;
+        cursorImagesActive[player.nr] = cursorActive;
+        cursorImagesInactive[player.nr] = cursorInactive;
+    }
+
+    internal static void UpdateCursorColors(int controllingPlayer)
+    {
+        if (!IsOpen) ResetCursorColors();
+        
+        Player.ForAll((Player player) =>
+        {
+            player.cursor.image.color = player.nr == controllingPlayer ? COLOR_CURSOR_ACTIVE : COLOR_CURSOR_INACTIVE;
+            
+            if (player.cursor.state != CursorState.POINTER_HW) return;
+            Texture2D activeCursor = cursorImagesActive[player.nr];
+            Texture2D inactiveCursor = cursorImagesInactive[player.nr];
+            Cursor.SetCursor(player.nr == controllingPlayer ? activeCursor : inactiveCursor, new Vector2(0f, 0f), CursorMode.ForceSoftware);
+        });
+    }
+
+    internal static void ResetCursorColors()
+    {
+        Player.ForAll((Player player) =>
+        {
+            player.cursor.image.color = COLOR_CURSOR_ACTIVE;
+            
+            if (player.cursor.state != CursorState.POINTER_HW) return;
+            Texture2D activeCursor = cursorImagesActive[player.nr];
+            Cursor.SetCursor(activeCursor, new Vector2(0f, 0f), CursorMode.ForceSoftware);
+        });
+    }
+
     private void OnClickStage(int playerNumber, Stage stage)
     {
         if (!SetTracker.Instance.CheckPlayerInteraction(stage, playerNumber)) return;
+
+        if (SetTracker.Instance.CurrentInteractMode == SetTracker.InteractMode.PICK)
+        {
+            UIScreen.blockGlobalInput = false;
+            screenStage.SelectStage(playerNumber, (int)stage);
+        }
+        else
+        {
+            SetTracker.Instance.BanStage(stage, playerNumber);
+            UpdateStageBans();
+        }
         
-        screenStage.SelectStage(playerNumber, (int)stage);
-        UIScreen.blockGlobalInput = false;
-        //SetTracker.Instance.BanStage(stage, playerNumber);
-        UpdateStageBans();
+        UpdateSetInfo();
     }
 
     internal TMP_Text CreateNewText(string name, Transform parent)

@@ -1,33 +1,32 @@
 using System.Collections.Generic;
 using LLHandlers;
+using UnityEngine;
+using UnityEngine.Experimental.PlayerLoop;
 
 namespace TourneyMod;
 
 internal class SetTracker
 {
-    internal Stage[] StagesNeutral =
-    [
-        Stage.JUNKTOWN,
-        Stage.ROOM21,
-        (Plugin.USE_SEWERS ? Stage.SEWERS : Stage.OUTSKIRTS),
-        Stage.STADIUM,
-        Stage.STREETS,
-    ];
-
-    internal Stage[] StagesCounterpick =
-    [
-        Stage.POOL,
-        Stage.SUBWAY,
-        Stage.FACTORY,
-        Stage.CONSTRUCTION,
-    ];
-
     internal static SetTracker Instance { get; private set; }
     internal static bool IsTrackingSet => Instance != null;
+
+    internal Ruleset ruleset;
     private List<Match> completedMatches;
     private int matchCount;
     private Match currentMatch;
     private List<StageBan> stageBans;
+    internal int controlStartPlayer;
+    internal int ControllingPlayer { get; private set; }
+
+    internal enum InteractMode
+    {
+        PICK,
+        BAN
+    }
+    internal InteractMode CurrentInteractMode { get; private set; }
+    internal int[] TotalBansRemaining { get; private set; }
+    internal int CurrentBansRemaining { get; private set; }
+    private int banIndex = 0;
 
     internal static void StartSet()
     {
@@ -45,6 +44,10 @@ internal class SetTracker
     {
         completedMatches = new List<Match>();
         matchCount = 0;
+        ruleset = Ruleset.RULES_UK;
+        controlStartPlayer = ruleset.firstBanPlayer;
+        banIndex = 0;
+        CurrentInteractMode = UpdateInteractMode();
         
         RecalculateStageBans();
     }
@@ -60,12 +63,18 @@ internal class SetTracker
         currentMatch.SetScores(scores);
         Plugin.LogGlobal.LogInfo($"Ending match with stocks {string.Join(", ", [scores[0].ToString(), scores[1].ToString(), scores[2].ToString(), scores[3].ToString()])}");
 
-        if (currentMatch.GetWinner() == -1) return;
+        int winner = currentMatch.GetWinner();
+        if (winner == -1) return;
         
-        Plugin.LogGlobal.LogInfo($"Match ended with winner P{currentMatch.GetWinner()+1}");
+        Plugin.LogGlobal.LogInfo($"Match ended with winner P{winner+1}");
         completedMatches.Add(currentMatch);
         matchCount++;
         currentMatch = null;
+
+        int loser = winner == 0 ? 1 : 0;
+        controlStartPlayer = ruleset.banOrder == Ruleset.BanOrder.WINNER_BANS ? winner : loser;
+        banIndex = 0;
+        CurrentInteractMode = UpdateInteractMode();
         
         RecalculateStageBans();
     }
@@ -75,7 +84,7 @@ internal class SetTracker
         stageBans = new List<StageBan>();
         if (matchCount == 0)
         {
-            foreach (Stage stage in StagesCounterpick)
+            foreach (Stage stage in ruleset.stagesCounterpick)
             {
                 stageBans.Add(new StageBan(stage, StageBan.BanReason.COUNTERPICK));
             }
@@ -114,6 +123,55 @@ internal class SetTracker
             stageBans.Remove(existingBan);
         }
         stageBans.Add(newBan);
+
+        banIndex++;
+        CurrentInteractMode = UpdateInteractMode();
+    }
+
+    private void SwapControllingPlayer()
+    {
+        ControllingPlayer = ControllingPlayer == 0 ? 1 : 0;
+    }
+    
+    private InteractMode UpdateInteractMode()
+    {
+        TotalBansRemaining = [0, 0, 0, 0];
+        int banRulesCount = ruleset.banAmounts.Length;
+        if (banRulesCount == 0) return InteractMode.PICK;
+
+        ControllingPlayer = controlStartPlayer;
+        int[] banAmounts = ruleset.banAmounts[matchCount < banRulesCount ? matchCount : banRulesCount - 1];
+        foreach (int banAmount in banAmounts)
+        {
+            TotalBansRemaining[ControllingPlayer] += banAmount;
+            SwapControllingPlayer();
+        }
+        
+        ControllingPlayer = controlStartPlayer;
+        int banSum = 0;
+        foreach (int banAmount in banAmounts)
+        {
+            Plugin.LogGlobal.LogInfo($"Ban amount {banAmount}");
+            CurrentBansRemaining = banAmount;
+            
+            for (int i = 0; i < banAmount; i++)
+            {
+                Plugin.LogGlobal.LogInfo($"Ban sum {banSum} index {banIndex} P{ControllingPlayer+1}");
+                if (banSum == banIndex)
+                {
+                    Plugin.LogGlobal.LogWarning("BAN MODE");
+                    return InteractMode.BAN;
+                }
+                banSum++;
+                TotalBansRemaining[ControllingPlayer]--;
+                CurrentBansRemaining--;
+            }
+
+            SwapControllingPlayer();
+        }
+
+        Plugin.LogGlobal.LogWarning("PICK MODE");
+        return InteractMode.PICK;
     }
 
     internal bool CheckPlayerInteraction(Stage stage, int playerNumber)
@@ -124,10 +182,29 @@ internal class SetTracker
 
     internal bool CheckPlayerInteraction(StageBan stageBan, int playerNumber)
     {
+        if (playerNumber != ControllingPlayer) return false;
         if (stageBan == null) return true;
         if (stageBan.reason != SetTracker.StageBan.BanReason.DSR) return false;
         if (stageBan.banPlayer == playerNumber || stageBan.banPlayer == -1) return false;
         return true;
+    }
+
+    internal int GetGameNumber()
+    {
+        return matchCount + 1;
+    }
+
+    internal int[] GetWinCounts()
+    {
+        int[] winCounts = [0, 0, 0, 0];
+        
+        foreach (Match match in completedMatches)
+        {
+            int winner = match.GetWinner();
+            winCounts[winner]++;
+        }
+
+        return winCounts;
     }
 
     private class Match

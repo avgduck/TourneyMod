@@ -3,6 +3,7 @@ using HarmonyLib;
 using LLBML.Players;
 using LLBML.Settings;
 using LLBML.States;
+using LLGUI;
 using LLHandlers;
 using LLScreen;
 
@@ -92,6 +93,18 @@ internal static class HarmonyPatches
             
             ScreenStageStrike.Close();
         }
+        
+        // GameStatesLobby.ProcessMsgStageSelect(Message message)
+        [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.LKBFKGGCFHE))]
+        [HarmonyPrefix]
+        private static void ProcessStageSelect_Prefix(HPNLMFHPHFD __instance, Message EIMJOIEPMNA)
+        {
+            IJDANPONMLL localLobby = __instance as IJDANPONMLL;
+            if (localLobby == null) return;
+
+            Message message = EIMJOIEPMNA;
+            if (message.msg == Msg.SEL_STAGE) __instance.EKFCNNPDJHH(); // GameStatesLobby.CloseStageSelect()
+        }
 
         [HarmonyPatch(typeof(ScreenPlayersStage), nameof(ScreenPlayersStage.OnOpen))]
         [HarmonyPrefix]
@@ -101,6 +114,29 @@ internal static class HarmonyPatches
             
             ScreenStageStrike.Instance.OnOpen(__instance);
             return false;
+        }
+
+        [HarmonyPatch(typeof(LLCursor), nameof(LLCursor.ResizeHWCursor))]
+        [HarmonyPostfix]
+        private static void HWCursor_Postfix(LLCursor __instance)
+        {
+            if (__instance.state != CursorState.POINTER_HW) return;
+            if (__instance.player == null) return;
+            ScreenStageStrike.GenerateCursorImages(__instance);
+        }
+
+        [HarmonyPatch(typeof(UIInput), nameof(UIInput.HandleCursors))]
+        [HarmonyPostfix]
+        private static void HandleCursors_Postfix()
+        {
+            if (UIInput.uiControl != UIControl.PLAYER_POINTERS) return;
+            if (!ScreenStageStrike.IsOpen)
+            {
+                ScreenStageStrike.ResetCursorColors();
+                return;
+            }
+            
+            ScreenStageStrike.UpdateCursorColors(SetTracker.Instance.ControllingPlayer);
         }
     }
 }
