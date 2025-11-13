@@ -155,15 +155,12 @@ internal class SetTracker
         int banSum = 0;
         foreach (int banAmount in banAmounts)
         {
-            Plugin.LogGlobal.LogInfo($"Ban amount {banAmount}");
             CurrentBansRemaining = banAmount;
             
             for (int i = 0; i < banAmount; i++)
             {
-                Plugin.LogGlobal.LogInfo($"Ban sum {banSum} index {banIndex} P{ControllingPlayer+1}");
                 if (banSum == banIndex)
                 {
-                    Plugin.LogGlobal.LogWarning("BAN MODE");
                     return InteractMode.BAN;
                 }
                 banSum++;
@@ -174,7 +171,6 @@ internal class SetTracker
             SwapControllingPlayer();
         }
 
-        Plugin.LogGlobal.LogWarning("PICK MODE");
         return InteractMode.PICK;
     }
 
