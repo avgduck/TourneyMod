@@ -24,7 +24,7 @@ internal class SetTracker
 
     internal static SetTracker Instance { get; private set; }
     internal static bool IsTrackingSet => Instance != null;
-    private List<Match> matches;
+    private List<Match> completedMatches;
     private int matchCount;
     private Match currentMatch;
     private List<StageBan> stageBans;
@@ -43,9 +43,35 @@ internal class SetTracker
     
     private SetTracker()
     {
-        matches = new List<Match>();
+        completedMatches = new List<Match>();
         matchCount = 0;
         
+        RecalculateStageBans();
+    }
+
+    internal void StartMatch(Stage stage)
+    {
+        Plugin.LogGlobal.LogInfo($"Starting new match on stage {stage}");
+        currentMatch = new Match(stage);
+    }
+
+    internal void EndMatch(int[] scores)
+    {
+        currentMatch.SetScores(scores);
+        Plugin.LogGlobal.LogInfo($"Ending match with stocks {string.Join(", ", [scores[0].ToString(), scores[1].ToString(), scores[2].ToString(), scores[3].ToString()])}");
+
+        if (currentMatch.GetWinner() == -1) return;
+        
+        Plugin.LogGlobal.LogInfo($"Match ended with winner P{currentMatch.GetWinner()+1}");
+        completedMatches.Add(currentMatch);
+        matchCount++;
+        currentMatch = null;
+        
+        RecalculateStageBans();
+    }
+
+    private void RecalculateStageBans()
+    {
         stageBans = new List<StageBan>();
         if (matchCount == 0)
         {
@@ -54,23 +80,24 @@ internal class SetTracker
                 stageBans.Add(new StageBan(stage, StageBan.BanReason.COUNTERPICK));
             }
         }
-        stageBans.Add(new StageBan(Stage.OUTSKIRTS, StageBan.BanReason.DSR, 0));
-        stageBans.Add(new StageBan(Stage.ROOM21, StageBan.BanReason.DSR, -1));
-        stageBans.Add(new StageBan(Stage.STADIUM, StageBan.BanReason.DSR, 1));
-    }
 
-    internal void StartMatch()
-    {
-        Plugin.LogGlobal.LogInfo("Starting new match");
-        currentMatch = new Match();
-    }
+        foreach (Match match in completedMatches)
+        {
+            int winner = match.GetWinner();
+            
+            StageBan stageBan = stageBans.Find(ban => ban.stage == match.stage);
+            if (stageBan != null)
+            {
+                if (stageBan.reason == StageBan.BanReason.DSR)
+                {
+                    stageBan.banPlayer = -1;
+                }
 
-    internal void EndMatch()
-    {
-        matches.Add(currentMatch);
-        matchCount++;
-        Plugin.LogGlobal.LogInfo("Ending match: total " + matchCount);
-        currentMatch = null;
+                continue;
+            }
+            
+            stageBans.Add(new StageBan(match.stage, StageBan.BanReason.DSR, winner));
+        }
     }
 
     internal List<StageBan> GetStageBans()
@@ -105,6 +132,33 @@ internal class SetTracker
 
     private class Match
     {
+        internal Stage stage;
+        internal int[] scores;
+
+        internal Match(Stage stage)
+        {
+            this.stage = stage;
+        }
+
+        internal void SetScores(int[] scores)
+        {
+            this.scores = scores;
+        }
+
+        internal int GetWinner()
+        {
+            if (scores == null) return -1;
+            int deadPlayer = -1;
+            int alivePlayer = -1;
+            for (int playerNumber = 0; playerNumber < 4; playerNumber++)
+            {
+                if (scores[playerNumber] == 0) deadPlayer = playerNumber;
+                else if (scores[playerNumber] > 0) alivePlayer = playerNumber;
+            }
+
+            if (deadPlayer == -1 || alivePlayer == -1) return -1;
+            return alivePlayer;
+        }
     }
 
     internal class StageBan

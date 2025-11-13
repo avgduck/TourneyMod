@@ -56,7 +56,6 @@ internal class ScreenStageStrike
         screenStage.UpdateText();
         this.screenStage.msgMenu = Msg.NONE;
 
-        Plugin.LogGlobal.LogInfo("ScreenStageStrike OnOpen successful");
         this.screenStage = screenStage;
 
         RectTransform bar_top = screenStage.transform.Find("bar_top").GetComponent<RectTransform>();
@@ -191,9 +190,9 @@ internal class ScreenStageStrike
     {
         if (!SetTracker.Instance.CheckPlayerInteraction(stage, playerNumber)) return;
         
-        //screenStage.SelectStage(playerNumber, (int)stage);
-        //UIScreen.blockGlobalInput = false;
-        SetTracker.Instance.BanStage(stage, playerNumber);
+        screenStage.SelectStage(playerNumber, (int)stage);
+        UIScreen.blockGlobalInput = false;
+        //SetTracker.Instance.BanStage(stage, playerNumber);
         UpdateStageBans();
     }
 
