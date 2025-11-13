@@ -8,8 +8,6 @@ public static class HarmonyPatches
     internal static void PatchAll()
     {
         Harmony harmony = new Harmony(Plugin.GUID);
-        //harmony.PatchAll(typeof(ScreenPlayersStage_Patch));
-        //Plugin.LogGlobal.LogInfo("Daio's stage select screen patch applied");
         harmony.PatchAll(typeof(CustomStageScreen));
         Plugin.LogGlobal.LogInfo("Custom stage screen patch applied");
     }
