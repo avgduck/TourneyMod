@@ -16,6 +16,7 @@ public class ScreenStageStrike
     private ScreenPlayersStage screenStage;
     private List<StageContainer> stageContainersNeutral;
     private List<StageContainer> stageContainersCounterpick;
+    private TMP_Text titleText;
 
     private static readonly Vector2 BG_SCALE = new Vector2(1f, 2f);
     private static readonly Vector2 BG_POSITION = new Vector2(0f, -20f);
@@ -61,7 +62,7 @@ public class ScreenStageStrike
 
         RectTransform lbTitle = bar_top.Find("lbTitle").GetComponent<RectTransform>();
         lbTitle.localScale = new Vector2(1f / TITLE_SCALE.x, 1f / TITLE_SCALE.y);
-        TMP_Text titleText = lbTitle.GetComponent<TMP_Text>();
+        titleText = lbTitle.GetComponent<TMP_Text>();
         titleText.fontSize = TITLE_FONT_SIZE;
 
         RectTransform bar_mid = screenStage.transform.Find("bar_mid").GetComponent<RectTransform>();
@@ -175,6 +176,18 @@ public class ScreenStageStrike
         screenStage.SelectStage(playerNumber, (int)stage);
     }
 
+    internal TMP_Text CreateNewText(string name, Transform parent)
+    {
+        TMP_Text text = Object.Instantiate(titleText, parent);
+        text.gameObject.name = name;
+        text.SetText("");
+        text.color = Color.white;
+        text.fontSize = 32;
+        text.transform.localScale = Vector3.one;
+        text.transform.localPosition = Vector3.zero;
+        return text;
+    }
+
     private class StageContainer
     {
         private Sprite stageSprite;
@@ -217,14 +230,20 @@ public class ScreenStageStrike
         {
             StoredStage = stage;
             
-            //Button = LLButton.CreateImageButton(ScreenStageStrike.Instance.screenStage.stageButtonsContainer, stageSprite, Color.white, Color.white);
             Button = StageButton.CreateStageButton(ScreenStageStrike.Instance.screenStage.stageButtonsContainer, stage);
             Button.SetActive(true);
             Button.onClick = (playerNumber) =>
                 Instance.OnClickStage(playerNumber, StoredStage);
 
-            //lbStageName = new GameObject("lbStageName").AddComponent<TMP_Text>();
-            //lbStageSize = new GameObject("lbStageName").AddComponent<TMP_Text>();
+            lbStageName = ScreenStageStrike.Instance.CreateNewText("lbStageName", Button.transform);
+            lbStageName.fontSize = 42;
+            lbStageName.rectTransform.localPosition = new Vector2(0f, -110f);
+            TextHandler.SetText(lbStageName, StageName);
+            
+            lbStageSize = ScreenStageStrike.Instance.CreateNewText("lbStageSize", Button.transform);
+            lbStageSize.fontSize = 22;
+            lbStageSize.rectTransform.localPosition = new Vector2(190f, 110f);
+            TextHandler.SetText(lbStageSize, $"{StageSize.x}x{StageSize.y}");
         }
     }
 
