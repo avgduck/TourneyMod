@@ -44,7 +44,7 @@ internal class SetTracker
     {
         completedMatches = new List<Match>();
         matchCount = 0;
-        ruleset = Ruleset.RULES_UK;
+        ruleset = Ruleset.RULES_STANDARD_ONLINE;
         controlStartPlayer = ruleset.firstBanPlayer;
         banIndex = 0;
         CurrentInteractMode = UpdateInteractMode();
@@ -90,22 +90,26 @@ internal class SetTracker
             }
         }
 
+        if (ruleset.dsrMode == Ruleset.DsrMode.OFF) return;
+        
+        Match[] lastWins = new Match[4];
         foreach (Match match in completedMatches)
         {
             int winner = match.GetWinner();
+            lastWins[winner] = match;
+        }
+        
+        foreach (Match match in completedMatches)
+        {
+            int winner = match.GetWinner();
+            Match lastWin = lastWins[winner];
             
             StageBan stageBan = stageBans.Find(ban => ban.stage == match.stage);
-            if (stageBan != null)
-            {
-                if (stageBan.reason == StageBan.BanReason.DSR)
-                {
-                    stageBan.banPlayer = -1;
-                }
+            if (stageBan != null && stageBan.reason != StageBan.BanReason.DSR) continue;
+            if (ruleset.dsrMode == Ruleset.DsrMode.LAST_WIN && match != lastWin) continue;
 
-                continue;
-            }
-            
-            stageBans.Add(new StageBan(match.stage, StageBan.BanReason.DSR, winner));
+            if (stageBan != null) stageBan.banPlayer = -1;
+            else stageBans.Add(new StageBan(match.stage, StageBan.BanReason.DSR, winner));
         }
     }
 

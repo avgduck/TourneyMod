@@ -17,7 +17,7 @@ internal class Ruleset
     ], [
     ], [
         [3],
-    ], 0, BanOrder.WINNER_BANS, DsrMode.OFF);
+    ], 0, BanOrder.WINNER_BANS, DsrMode.LAST_WIN);
     
     internal static readonly Ruleset RULES_UK = new Ruleset([
         Stage.JUNKTOWN,
@@ -63,6 +63,6 @@ internal class Ruleset
     {
         OFF,
         FULL_SET,
-        LAST_MATCH
+        LAST_WIN
     }
 }
