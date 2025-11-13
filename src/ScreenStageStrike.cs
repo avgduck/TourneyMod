@@ -5,6 +5,7 @@ using LLHandlers;
 using LLScreen;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TourneyMod;
 
@@ -125,11 +126,11 @@ public class ScreenStageStrike
 
             float posX = startPositionX + colIndex * (STAGE_SIZE.x + STAGES_SPACING.x);
             float posY = startPositionY - rowIndex * (STAGE_SIZE.y + STAGES_SPACING.y);
-            RectTransform buttonRect = container.StageButton.GetComponent<RectTransform>();
+            RectTransform buttonRect = container.Button.GetComponent<RectTransform>();
             buttonRect.anchoredPosition = new Vector2(posX, posY);
             buttonRect.localScale = Vector2.one * STAGE_SCALE_FACTOR;
 
-            screenStage.btStages[stageIndex] = container.StageButton;
+            screenStage.btStages[stageIndex] = container.Button;
 
             stageIndex++;
             colIndex++;
@@ -153,11 +154,11 @@ public class ScreenStageStrike
             float posX = startPositionX + colIndex * (STAGE_SIZE.x + STAGES_SPACING.x);
             float posY = startPositionY - (rowIndex + rowLengthsNeutral.Length) * (STAGE_SIZE.y + STAGES_SPACING.y);
             if (bothCategories) posY -= STAGE_CATEGORY_SPACING;
-            RectTransform buttonRect = container.StageButton.GetComponent<RectTransform>();
+            RectTransform buttonRect = container.Button.GetComponent<RectTransform>();
             buttonRect.anchoredPosition = new Vector2(posX, posY);
             buttonRect.localScale = Vector2.one * STAGE_SCALE_FACTOR;
             
-            screenStage.btStages[stageIndex] = container.StageButton;
+            screenStage.btStages[stageIndex] = container.Button;
 
             stageIndex++;
             colIndex++;
@@ -180,7 +181,7 @@ public class ScreenStageStrike
         private TMP_Text lbStageName;
         private TMP_Text lbStageSize;
 
-        internal LLButton StageButton { get; private set; }
+        internal LLButton Button { get; private set; }
         internal Stage StoredStage { get; private set; }
         internal string StageName => StoredStage switch
         {
@@ -211,22 +212,65 @@ public class ScreenStageStrike
             Stage.ROOM21 => new Vector2(1100, 550),
             _ => Vector2.zero
         };
-        
-        internal static Color COLOR_UNFOCUSED = Color.white * 0.6f;
-        internal static readonly Color COLOR_FOCUSED = Color.white;
 
         internal StageContainer(Stage stage)
         {
             StoredStage = stage;
-
-            stageSprite = JPLELOFJOOH.BNFIDCAPPDK($"_spritePreview{stage}"); // Assets.GetMenuSprite()
-            StageButton = LLButton.CreateImageButton(ScreenStageStrike.Instance.screenStage.stageButtonsContainer, stageSprite, COLOR_UNFOCUSED, COLOR_FOCUSED);
-            StageButton.SetActive(true);
-            StageButton.onClick = (playerNumber) =>
+            
+            //Button = LLButton.CreateImageButton(ScreenStageStrike.Instance.screenStage.stageButtonsContainer, stageSprite, Color.white, Color.white);
+            Button = StageButton.CreateStageButton(ScreenStageStrike.Instance.screenStage.stageButtonsContainer, stage);
+            Button.SetActive(true);
+            Button.onClick = (playerNumber) =>
                 Instance.OnClickStage(playerNumber, StoredStage);
 
             //lbStageName = new GameObject("lbStageName").AddComponent<TMP_Text>();
             //lbStageSize = new GameObject("lbStageName").AddComponent<TMP_Text>();
+        }
+    }
+
+    private class StageButton : LLButton
+    {
+        private static readonly Color COLOR_UNFOCUSED = Color.white * 0.6f;
+        private static readonly Color COLOR_FOCUSED = Color.white;
+
+        private bool[] playersHovering = [false, false, false, false];
+        private bool IsBeingHovered =>
+            !playersHovering[0] && !playersHovering[1] && !playersHovering[2] && !playersHovering[3];
+
+        private Image stageImage;
+
+        internal static StageButton CreateStageButton(Transform parent, Stage stage)
+        {
+            RectTransform rect = LLControl.CreatePanel(parent, $"Button_{stage}");
+            StageButton stageButton = rect.gameObject.AddComponent<StageButton>();
+            Sprite sprite = JPLELOFJOOH.BNFIDCAPPDK($"_spritePreview{stage}"); // Assets.GetMenuSprite()
+            stageButton.stageImage = LLControl.CreateImage(rect, sprite);
+            stageButton.Init();
+            return stageButton;
+        }
+
+        public override void InitNeeded()
+        {
+            OnHoverOut(-1);
+        }
+        
+        public override void OnHover(int playerNumber)
+        {
+            if (playerNumber == -1) return;
+            playersHovering[playerNumber] = true;
+            UpdateImage();
+        }
+
+        public override void OnHoverOut(int playerNumber)
+        {
+            if (playerNumber == -1) playersHovering = [false, false, false, false];
+            else playersHovering[playerNumber] = false;
+            UpdateImage();
+        }
+
+        private void UpdateImage()
+        {
+            stageImage.color = IsBeingHovered ? COLOR_UNFOCUSED : COLOR_FOCUSED;
         }
     }
 }
