@@ -9,13 +9,14 @@ using UnityEngine.UI;
 
 namespace TourneyMod;
 
-public class ScreenStageStrike
+internal class ScreenStageStrike
 {
     internal static ScreenStageStrike Instance { get; private set; }
     internal static bool IsOpen => Instance != null;
     private ScreenPlayersStage screenStage;
     private List<StageContainer> stageContainersNeutral;
     private List<StageContainer> stageContainersCounterpick;
+    private List<StageContainer> stageContainers;
     private TMP_Text titleText;
 
     private static readonly Vector2 BG_SCALE = new Vector2(1f, 2f);
@@ -39,12 +40,14 @@ public class ScreenStageStrike
     {
         Plugin.LogGlobal.LogInfo("Opening stage strike screen");
         Instance = new ScreenStageStrike();
+        UIScreen.blockGlobalInput = true;
     }
 
     internal static void Close()
     {
         Plugin.LogGlobal.LogInfo("Closing stage strike screen");
         Instance = null;
+        UIScreen.blockGlobalInput = false;
     }
 
     internal void OnOpen(ScreenPlayersStage screenStage)
@@ -82,6 +85,7 @@ public class ScreenStageStrike
         backText.fontSize = BACK_FONT_SIZE;
 
         CreateStageButtons();
+        UpdateStageBans();
     }
 
     private float GetRowWidth(int rowLength)
@@ -102,8 +106,8 @@ public class ScreenStageStrike
 
     private void CreateStageButtons()
     {
-        int[] rowLengthsNeutral = GetRowLengths(Plugin.StagesNeutral.Length);
-        int[] rowLengthsCounterpick = GetRowLengths(Plugin.StagesCounterpick.Length);
+        int[] rowLengthsNeutral = GetRowLengths(SetTracker.Instance.StagesNeutral.Length);
+        int[] rowLengthsCounterpick = GetRowLengths(SetTracker.Instance.StagesCounterpick.Length);
         int numRows = rowLengthsNeutral.Length + rowLengthsCounterpick.Length;
         bool bothCategories = rowLengthsNeutral.Length > 0 && rowLengthsCounterpick.Length > 0;
         
@@ -111,18 +115,20 @@ public class ScreenStageStrike
         if (bothCategories) totalHeight += STAGE_CATEGORY_SPACING;
         float startPositionY = STAGES_POSITION.y + totalHeight / 2f - STAGE_SIZE.y / 2f;
 
-        screenStage.nButtons = Plugin.StagesNeutral.Length + Plugin.StagesCounterpick.Length;
+        screenStage.nButtons = SetTracker.Instance.StagesNeutral.Length + SetTracker.Instance.StagesCounterpick.Length;
         screenStage.btStages = new LLButton[screenStage.nButtons];
 
         int stageIndex = 0;
         int rowIndex = 0;
         int colIndex = 0;
+        stageContainers = new List<StageContainer>();
         stageContainersNeutral = new List<StageContainer>();
-        foreach (Stage stage in Plugin.StagesNeutral)
+        foreach (Stage stage in SetTracker.Instance.StagesNeutral)
         {
             float startPositionX = STAGES_POSITION.x - GetRowWidth(rowLengthsNeutral[rowIndex]) / 2f + STAGE_SIZE.x / 2f;
             
             StageContainer container = new StageContainer(stage);
+            stageContainers.Add(container);
             stageContainersNeutral.Add(container);
 
             float posX = startPositionX + colIndex * (STAGE_SIZE.x + STAGES_SPACING.x);
@@ -145,11 +151,12 @@ public class ScreenStageStrike
         rowIndex = 0;
         colIndex = 0;
         stageContainersCounterpick = new List<StageContainer>();
-        foreach (Stage stage in Plugin.StagesCounterpick)
+        foreach (Stage stage in SetTracker.Instance.StagesCounterpick)
         {
             float startPositionX = STAGES_POSITION.x - GetRowWidth(rowLengthsCounterpick[rowIndex]) / 2f+ STAGE_SIZE.x / 2f;
             
             StageContainer container = new StageContainer(stage);
+            stageContainers.Add(container);
             stageContainersCounterpick.Add(container);
 
             float posX = startPositionX + colIndex * (STAGE_SIZE.x + STAGES_SPACING.x);
@@ -171,9 +178,19 @@ public class ScreenStageStrike
         }
     }
 
+    private void UpdateStageBans()
+    {
+        List<SetTracker.StageBan> stageBans = SetTracker.Instance.GetStageBans();
+        foreach (SetTracker.StageBan stageBan in stageBans)
+        {
+            stageContainers.Find((container) => container.StoredStage == stageBan.stage).Button.SetBan(stageBan);
+        }
+    }
+
     private void OnClickStage(int playerNumber, Stage stage)
     {
         screenStage.SelectStage(playerNumber, (int)stage);
+        UIScreen.blockGlobalInput = false;
     }
 
     internal TMP_Text CreateNewText(string name, Transform parent)
@@ -190,13 +207,12 @@ public class ScreenStageStrike
 
     private class StageContainer
     {
-        private Sprite stageSprite;
         private TMP_Text lbStageName;
         private TMP_Text lbStageSize;
 
-        internal LLButton Button { get; private set; }
+        internal StageButton Button { get; private set; }
         internal Stage StoredStage { get; private set; }
-        internal string StageName => StoredStage switch
+        private string StageName => StoredStage switch
         {
             Stage.OUTSKIRTS => "Outskirts",
             Stage.SEWERS => "Sewers", 
@@ -211,7 +227,7 @@ public class ScreenStageStrike
             _ => ""
         };
 
-        internal Vector2 StageSize => StoredStage switch
+        private Vector2 StageSize => StoredStage switch
         {
             Stage.OUTSKIRTS => new Vector2(1240, 510),
             Stage.SEWERS => new Vector2(1240, 510), 
@@ -249,21 +265,35 @@ public class ScreenStageStrike
 
     private class StageButton : LLButton
     {
+        private static readonly Color COLOR_BANNED = Color.white * 0.3f;
         private static readonly Color COLOR_UNFOCUSED = Color.white * 0.6f;
         private static readonly Color COLOR_FOCUSED = Color.white;
 
+        private static readonly Color COLOR_LOCK = Color.white;
+
+        private static readonly Color[] COLOR_LOCK_PLAYER =
+        [
+            new Color(1f, 0f, 0f, 1f),
+            new Color(0f, 0f, 1f, 1f),
+        ];
+
         private bool[] playersHovering = [false, false, false, false];
+        private SetTracker.StageBan stageBan;
+
         private bool IsBeingHovered =>
             !playersHovering[0] && !playersHovering[1] && !playersHovering[2] && !playersHovering[3];
 
         private Image stageImage;
+        private Image lockedImage;
 
         internal static StageButton CreateStageButton(Transform parent, Stage stage)
         {
             RectTransform rect = LLControl.CreatePanel(parent, $"Button_{stage}");
             StageButton stageButton = rect.gameObject.AddComponent<StageButton>();
-            Sprite sprite = JPLELOFJOOH.BNFIDCAPPDK($"_spritePreview{stage}"); // Assets.GetMenuSprite()
-            stageButton.stageImage = LLControl.CreateImage(rect, sprite);
+            Sprite stageSprite = JPLELOFJOOH.BNFIDCAPPDK($"_spritePreview{stage}"); // Assets.GetMenuSprite()
+            stageButton.stageImage = LLControl.CreateImage(rect, stageSprite);
+            Sprite lockedSprite = JPLELOFJOOH.BNFIDCAPPDK($"_spritePreviewLOCKED"); // Assets.GetMenuSprite()
+            stageButton.lockedImage = LLControl.CreateImage(rect, lockedSprite);
             stageButton.Init();
             return stageButton;
         }
@@ -272,9 +302,17 @@ public class ScreenStageStrike
         {
             OnHoverOut(-1);
         }
-        
+
+        public void SetBan(SetTracker.StageBan ban)
+        {
+            stageBan = ban;
+            catchHover = stageBan == null;
+            UpdateImage();
+        }
+
         public override void OnHover(int playerNumber)
         {
+            if (stageBan != null) return;
             if (playerNumber == -1) return;
             playersHovering[playerNumber] = true;
             UpdateImage();
@@ -282,6 +320,7 @@ public class ScreenStageStrike
 
         public override void OnHoverOut(int playerNumber)
         {
+            if (stageBan != null) return;
             if (playerNumber == -1) playersHovering = [false, false, false, false];
             else playersHovering[playerNumber] = false;
             UpdateImage();
@@ -289,7 +328,22 @@ public class ScreenStageStrike
 
         private void UpdateImage()
         {
-            stageImage.color = IsBeingHovered ? COLOR_UNFOCUSED : COLOR_FOCUSED;
+            stageImage.color = stageBan != null ? COLOR_BANNED : (IsBeingHovered ? COLOR_UNFOCUSED : COLOR_FOCUSED);
+            lockedImage.gameObject.SetActive(stageBan != null);
+            if (stageBan == null) return;
+
+            switch (stageBan.reason)
+            {
+                case SetTracker.StageBan.BanReason.COUNTERPICK:
+                    lockedImage.color = COLOR_LOCK;
+                    break;
+                case SetTracker.StageBan.BanReason.BAN:
+                    lockedImage.color = COLOR_LOCK_PLAYER[stageBan.banPlayer];
+                    break;
+                case SetTracker.StageBan.BanReason.DSR:
+                    lockedImage.color = COLOR_LOCK_PLAYER[stageBan.banPlayer];
+                    break;
+            }
         }
     }
 }

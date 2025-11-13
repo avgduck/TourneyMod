@@ -1,18 +1,51 @@
 using HarmonyLib;
+using LLBML.States;
 using LLScreen;
 
 namespace TourneyMod;
 
-public static class HarmonyPatches
+internal static class HarmonyPatches
 {
     internal static void PatchAll()
     {
         Harmony harmony = new Harmony(Plugin.GUID);
-        harmony.PatchAll(typeof(CustomStageScreen));
+        harmony.PatchAll(typeof(SetTrackingPatch));
+        Plugin.LogGlobal.LogInfo("Custom stage screen patch applied");
+        harmony.PatchAll(typeof(StageScreenPatch));
         Plugin.LogGlobal.LogInfo("Custom stage screen patch applied");
     }
 
-    internal static class CustomStageScreen
+    internal static class SetTrackingPatch
+    {
+        // GameStates.set(GameState newState, bool noLink = false)
+        [HarmonyPatch(typeof(DNPFJHMAIBP), nameof(DNPFJHMAIBP.HOGJDNCMNFP))]
+        [HarmonyPostfix]
+        private static void SetGameState_Postfix(JOFJHDJHJGI CFDCLPJMFDP)
+        {
+            GameState newState = CFDCLPJMFDP;
+            if (SetTracker.IsTrackingSet)
+            {
+                if (newState == GameState.MENU)
+                {
+                    SetTracker.EndSet();
+                }
+                else if (newState == GameState.GAME_INTRO)
+                {
+                    SetTracker.Instance.StartMatch();
+                }
+                else if (newState == GameState.LOBBY_LOCAL)
+                {
+                    SetTracker.Instance.EndMatch();
+                }
+            }
+            else if (newState == GameState.LOBBY_LOCAL)
+            {
+                SetTracker.StartSet();
+            }
+        }
+    }
+
+    internal static class StageScreenPatch
     {
         // GameStatesLobby.OpenStageSelect(bool canGoBack, bool localSpectator = false, ScreenType = ScreenType.PLAYERS_STAGE)
         [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.KOLLNKIKIKM))]
