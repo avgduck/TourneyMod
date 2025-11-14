@@ -37,17 +37,55 @@ public class Ruleset(
         LAST_WIN
     }
 
-    private string PrintList<T>(List<T> list)
+    private string PrintList<T>(List<T> list, bool includeBrackets = true)
     {
-        string s = "[";
-        
+        string s = "";
+        if (includeBrackets) s += "[";
+
         for (int i = 0; i < list.Count; i++)
         {
             if (i != 0) s += ", ";
             s += list[i];
         }
 
-        s += "]";
+        if (includeBrackets) s += "]";
+        return s;
+    }
+
+    private string PrintBanOrder()
+    {
+        string s = "";
+        if (banAmounts.Length == 0)
+        {
+            s += $"{(banOrder == BanOrder.WINNER_BANS ? "W" : "L")} picks";
+        }
+        else
+        {
+            int gameIndex = 0;
+            foreach (int[] banNums in banAmounts)
+            {
+                if (gameIndex != 0) s += " | ";
+                if (banAmounts.Length > 1) s += $"G{gameIndex + 1}{(gameIndex == banAmounts.Length - 1 ? "+" : "")} ";
+                bool bansIncluded = true;
+                for (int i = 0; i < banNums.Length; i++)
+                {
+                    if (banNums[i] == 0)
+                    {
+                        s += $"{(banOrder == BanOrder.WINNER_BANS ? "W" : "L")} picks";
+                        break;
+                    }
+
+                    if (i != 0) s += "-";
+                    for (int j = 0; j < banNums[i]; j++)
+                    {
+                        s += (i % 2 == 0) ? (banOrder == BanOrder.WINNER_BANS ? "W" : "L") : (banOrder == BanOrder.WINNER_BANS ? "L" : "W");
+                    }
+                }
+                
+                gameIndex++;
+            }
+        }
+        
         return s;
     }
 
@@ -58,7 +96,26 @@ public class Ruleset(
         {
             b.Add(PrintList<int>(banNums.ToList()));
         }
+
+        return
+            $"{{ id {id}, name '{name}', neutral {PrintList<Stage>(stagesNeutral.ToList())}, counterpick {PrintList<Stage>(stagesCounterpick.ToList())}, banAmounts {PrintList<string>(b)}, firstBanPlayer {firstBanPlayer}, banOrder {banOrder}, dsrMode {dsrMode} }}";
+    }
+
+    internal List<string> GetDescription()
+    {
+        List<string> text = new List<string>();
         
-        return $"{{ id {id}, name '{name}', neutral {PrintList<Stage>(stagesNeutral.ToList())}, counterpick {PrintList<Stage>(stagesCounterpick.ToList())}, banAmounts {PrintList<string>(b)}, firstBanPlayer {firstBanPlayer}, banOrder {banOrder}, dsrMode {dsrMode} }}";
+        text.Add("");
+        text.Add($"- <b>{name} [{id}]</b>:");
+        text.Add($"<i>Neutral Stages</i>: {PrintList<Stage>(stagesNeutral.ToList(), false)}");
+        text.Add($"<i>Counterpick Stages</i>: {PrintList<Stage>(stagesCounterpick.ToList(), false)}");
+        text.Add($"<i>Ban Order (P{firstBanPlayer+1} starts for G1)</i>: {PrintBanOrder()}");
+        text.Add($"<i>DSR</i>: {dsrMode switch {
+            DsrMode.OFF => "OFF",
+            DsrMode.FULL_SET => "ON, includes all wins",
+            DsrMode.LAST_WIN => "ON, only last win"
+        }}");
+        
+        return text;
     }
 }

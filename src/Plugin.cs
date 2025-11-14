@@ -32,7 +32,8 @@ internal class Plugin : BaseUnityPlugin
     {
         List<string> text = new List<string>();
         
-        text.Add("Choose a ruleset from those currently loaded, shown below. Default rulesets are included with the mod download, and custom rulesets can be specified in your Modding Folder.");
+        text.Add("Choose a ruleset from those currently loaded (shown below). Default rulesets are included with the mod download, and custom rulesets can be specified in your Modding Folder.");
+        text.Add("");
         text.Add("");
         
         text.Add("<b>Default Rulesets:</b>");
@@ -42,9 +43,10 @@ internal class Plugin : BaseUnityPlugin
         }
         else
         {
-            RulesetIO.RulesetsDefault.ForEach(ruleset => text.Add($"- <b>{ruleset.id}</b>: {ruleset}"));
+            RulesetIO.RulesetsDefault.ForEach(ruleset => text.AddRange(ruleset.GetDescription()));
         }
         
+        text.Add("");
         text.Add("");
         
         text.Add("<b>Custom Rulesets:</b>");
@@ -54,7 +56,7 @@ internal class Plugin : BaseUnityPlugin
         }
         else
         {
-            RulesetIO.RulesetsCustom.ForEach(ruleset => text.Add($"- <b>{ruleset.id}</b>: {ruleset}"));
+            RulesetIO.RulesetsCustom.ForEach(ruleset => text.AddRange(ruleset.GetDescription()));
         }
 
         return text;
