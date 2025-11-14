@@ -19,6 +19,7 @@ internal class SetTracker
     private List<StageBan> stageBans;
     internal int controlStartPlayer;
     internal int ControllingPlayer { get; private set; }
+    internal bool IsFreePickMode { get; private set; }
 
     internal enum InteractMode
     {
@@ -51,7 +52,8 @@ internal class SetTracker
         Plugin.LogGlobal.LogInfo($"Loaded ruleset {ruleset}");
         controlStartPlayer = ruleset.firstBanPlayer;
         banIndex = 0;
-        CurrentInteractMode = UpdateInteractMode();
+        IsFreePickMode = false;
+        UpdateInteractMode();
 
         RecalculateStageBans();
     }
@@ -93,7 +95,7 @@ internal class SetTracker
         int loser = winner == 0 ? 1 : 0;
         controlStartPlayer = ruleset.banOrder == Ruleset.BanOrder.WINNER_BANS ? winner : loser;
         banIndex = 0;
-        CurrentInteractMode = UpdateInteractMode();
+        UpdateInteractMode();
         
         RecalculateStageBans();
     }
@@ -142,7 +144,7 @@ internal class SetTracker
     {
         banIndex = 0;
         RecalculateStageBans();
-        CurrentInteractMode = UpdateInteractMode();
+        UpdateInteractMode();
     }
 
     internal List<StageBan> GetStageBans()
@@ -161,19 +163,29 @@ internal class SetTracker
         stageBans.Add(newBan);
 
         banIndex++;
-        CurrentInteractMode = UpdateInteractMode();
+        UpdateInteractMode();
     }
 
     private void SwapControllingPlayer()
     {
         ControllingPlayer = ControllingPlayer == 0 ? 1 : 0;
     }
+
+    internal void ToggleFreePickMode()
+    {
+        IsFreePickMode = !IsFreePickMode;
+        UpdateInteractMode();
+    }
     
-    private InteractMode UpdateInteractMode()
+    private void UpdateInteractMode()
     {
         TotalBansRemaining = [0, 0, 0, 0];
         int banRulesCount = ruleset.banAmounts.Length;
-        if (banRulesCount == 0) return InteractMode.PICK;
+        if (banRulesCount == 0 || IsFreePickMode)
+        {
+            CurrentInteractMode = InteractMode.PICK;
+            return;
+        }
 
         ControllingPlayer = controlStartPlayer;
         int[] banAmounts = ruleset.banAmounts[matchCount < banRulesCount ? matchCount : banRulesCount - 1];
@@ -194,7 +206,8 @@ internal class SetTracker
             {
                 if (banSum == banIndex)
                 {
-                    return InteractMode.BAN;
+                    CurrentInteractMode = InteractMode.BAN;
+                    return;
                 }
                 banSum++;
                 TotalBansRemaining[ControllingPlayer]--;
@@ -204,7 +217,7 @@ internal class SetTracker
             SwapControllingPlayer();
         }
 
-        return InteractMode.PICK;
+        CurrentInteractMode = InteractMode.PICK;
     }
 
     internal bool CheckPlayerInteraction(Stage stage, int playerNumber)
@@ -215,6 +228,7 @@ internal class SetTracker
 
     internal bool CheckPlayerInteraction(StageBan stageBan, int playerNumber)
     {
+        if (IsFreePickMode) return true;
         if (playerNumber != ControllingPlayer) return false;
         if (stageBan == null) return true;
         if (stageBan.reason != SetTracker.StageBan.BanReason.DSR) return false;

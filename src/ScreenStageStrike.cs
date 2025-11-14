@@ -36,6 +36,17 @@ internal class ScreenStageStrike
     private static readonly Vector2 STAGES_POSITION = new Vector2(0f, 0f);
     private static readonly Vector2 STAGES_SPACING = new Vector2(6f, 6f);
     private const float STAGE_CATEGORY_SPACING = 20f;
+
+    private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 270f);
+    private const int SETCOUNT_FONT_SIZE = 32;
+    private static readonly Vector2 BANSREMAINING_POSITION = new Vector2(0f, -276f);
+    private const int BANSREMAINING_FONT_SIZE = 18;
+    private static readonly Vector2 BANSTATUS_POSITION = new Vector2(0f, -310f);
+    private const int BANSTATUS_FONT_SIZE = 42;
+    
+    private static readonly Vector2 FREEPICK_POSITION = new Vector2(530f, -336f);
+    private static readonly Vector2 FREEPICK_SCALE = new Vector2(1f, 0.5f);
+    private const int FREEPICK_FONT_SIZE = 18;
     
     private static readonly Color[] COLOR_PLAYER =
     [
@@ -51,6 +62,8 @@ internal class ScreenStageStrike
     private TMP_Text lbSetCount;
     private TMP_Text lbBansRemaining;
     private TMP_Text lbBanStatus;
+
+    private LLButton btFreePick;
 
     internal static void Open()
     {
@@ -101,20 +114,28 @@ internal class ScreenStageStrike
         backText.fontSize = BACK_FONT_SIZE;
         
         lbSetCount = ScreenStageStrike.Instance.CreateNewText("lbSetCount", screenStage.transform);
-        lbSetCount.fontSize = 32;
+        lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
         lbSetCount.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1000f);
-        lbSetCount.rectTransform.localPosition = new Vector2(0f, 270f);
+        lbSetCount.rectTransform.localPosition = SETCOUNT_POSITION;
         TextHandler.SetText(lbSetCount, "");
         lbBansRemaining = ScreenStageStrike.Instance.CreateNewText("lbBansRemaining", screenStage.transform);
-        lbBansRemaining.fontSize = 18;
+        lbBansRemaining.fontSize = BANSREMAINING_FONT_SIZE;
         lbBansRemaining.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1000f);
-        lbBansRemaining.rectTransform.localPosition = new Vector2(0f, -276f);
+        lbBansRemaining.rectTransform.localPosition = BANSREMAINING_POSITION;
         TextHandler.SetText(lbBansRemaining, "");
         lbBanStatus = ScreenStageStrike.Instance.CreateNewText("lbBanStatus", screenStage.transform);
-        lbBanStatus.fontSize = 42;
+        lbBanStatus.fontSize = BANSTATUS_FONT_SIZE;
         lbBanStatus.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1000f);
-        lbBanStatus.rectTransform.localPosition = new Vector2(0f, -310f);
+        lbBanStatus.rectTransform.localPosition = BANSTATUS_POSITION;
         TextHandler.SetText(lbBanStatus, "");
+
+        btFreePick = ScreenStageStrike.Instance.CreateNewButton("btFreePick", screenStage.transform);
+        btFreePick.transform.localScale = FREEPICK_SCALE;
+        btFreePick.transform.localPosition = FREEPICK_POSITION;
+        btFreePick.SetText("Toggle free pick");
+        btFreePick.textMesh.transform.localScale = new Vector2(1f / FREEPICK_SCALE.x, 1f / FREEPICK_SCALE.y);
+        btFreePick.textMesh.fontSize = FREEPICK_FONT_SIZE;
+        btFreePick.onClick = (playerNumber) => { OnClickFreePick(); };
 
         CreateStageButtons();
         UpdateStageBans();
@@ -216,7 +237,7 @@ internal class ScreenStageStrike
         List<SetTracker.StageBan> stageBans = SetTracker.Instance.GetStageBans();
         foreach (SetTracker.StageBan stageBan in stageBans)
         {
-            stageContainers.Find((container) => container.StoredStage == stageBan.stage).Button.SetBan(stageBan);
+            stageContainers.Find((container) => container.StoredStage == stageBan.stage).Button.SetBan(SetTracker.Instance.IsFreePickMode ? null : stageBan);
         }
     }
 
@@ -225,14 +246,24 @@ internal class ScreenStageStrike
         int gameNumber = SetTracker.Instance.GetGameNumber();
         int[] winCounts = SetTracker.Instance.GetWinCounts();
         TextHandler.SetText(lbSetCount, $"Game {gameNumber} ({winCounts[0]}-{winCounts[1]})");
-        
-        TextHandler.SetText(lbBansRemaining, $"Bans remaining: P1 {SetTracker.Instance.TotalBansRemaining[0]}, P2 {SetTracker.Instance.TotalBansRemaining[1]}");
 
-        int controllingPlayer = SetTracker.Instance.ControllingPlayer;
-        lbBanStatus.color = COLOR_PLAYER[controllingPlayer];
-        TextHandler.SetText(lbBanStatus, SetTracker.Instance.CurrentInteractMode == SetTracker.InteractMode.BAN
-            ? $"P{controllingPlayer+1} banning {SetTracker.Instance.CurrentBansRemaining}..."
-            : $"P{controllingPlayer+1} picking...");
+        if (SetTracker.Instance.IsFreePickMode)
+        {
+            TextHandler.SetText(lbBansRemaining, $"Free pick mode");
+
+            lbBanStatus.color = Color.white;
+            TextHandler.SetText(lbBanStatus, SetTracker.Instance.CurrentInteractMode == SetTracker.InteractMode.PICK ? "Picking..." : "Banning...");
+        }
+        else
+        {
+            TextHandler.SetText(lbBansRemaining, $"Bans remaining: P1 {SetTracker.Instance.TotalBansRemaining[0]}, P2 {SetTracker.Instance.TotalBansRemaining[1]}");
+
+            int controllingPlayer = SetTracker.Instance.ControllingPlayer;
+            lbBanStatus.color = COLOR_PLAYER[controllingPlayer];
+            TextHandler.SetText(lbBanStatus, SetTracker.Instance.CurrentInteractMode == SetTracker.InteractMode.BAN
+                ? $"P{controllingPlayer+1} banning {SetTracker.Instance.CurrentBansRemaining}..."
+                : $"P{controllingPlayer+1} picking...");
+        }
     }
 
     // texture editing code from ColorSwap
@@ -279,7 +310,11 @@ internal class ScreenStageStrike
 
     internal static void UpdateCursorColors(int controllingPlayer)
     {
-        if (!IsOpen) ResetCursorColors();
+        if (!IsOpen || SetTracker.Instance.IsFreePickMode)
+        {
+            ResetCursorColors();
+            return;
+        }
         
         Player.ForAll((Player player) =>
         {
@@ -321,7 +356,14 @@ internal class ScreenStageStrike
         UpdateSetInfo();
     }
 
-    internal TMP_Text CreateNewText(string name, Transform parent)
+    private void OnClickFreePick()
+    {
+        SetTracker.Instance.ToggleFreePickMode();
+        UpdateStageBans();
+        UpdateSetInfo();
+    }
+
+    private TMP_Text CreateNewText(string name, Transform parent)
     {
         TMP_Text text = Object.Instantiate(titleText, parent);
         text.gameObject.name = name;
@@ -331,6 +373,17 @@ internal class ScreenStageStrike
         text.transform.localScale = Vector3.one;
         text.transform.localPosition = Vector3.zero;
         return text;
+    }
+
+    private LLButton CreateNewButton(string name, Transform parent)
+    {
+        LLButton button = Object.Instantiate(screenStage.btBack, parent);
+        button.gameObject.name = name;
+        button.SetText("");
+        button.textMesh.color = Color.white;
+        button.transform.localScale = Vector3.one;
+        button.transform.localPosition = Vector3.zero;
+        return button;
     }
 
     private class StageContainer
@@ -452,7 +505,7 @@ internal class ScreenStageStrike
         public void SetBan(SetTracker.StageBan ban)
         {
             stageBan = ban;
-            OnHoverOut(stageBan.banPlayer);
+            OnHoverOut(stageBan != null ? stageBan.banPlayer : -1);
             UpdateDisplay();
         }
 
