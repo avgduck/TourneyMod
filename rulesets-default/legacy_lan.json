@@ -1,0 +1,23 @@
+{
+  "id": "legacy_lan",
+  "name": "Legacy LAN",
+  "stagesNeutral": [
+    "JUNKTOWN",
+    "ROOM21",
+    "OUTSKIRTS",
+    "STADIUM",
+    "STREETS",
+    "POOL",
+    "SUBWAY",
+    "FACTORY",
+    "CONSTRUCTION"
+  ],
+  "stagesCounterpick": [],
+  "banAmounts": [
+    [1, 2, 2, 2, 1],
+    [2]
+  ],
+  "firstBanPlayer": 0,
+  "banOrder": "WINNER_BANS",
+  "dsrMode": "OFF"
+}

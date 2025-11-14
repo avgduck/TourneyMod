@@ -47,5 +47,10 @@
             <_BuildFiles Include="build\*.*" />
         </ItemGroup>
         <Copy SourceFiles="@(_BuildFiles)" DestinationFolder="C:\Users\Owner\AppData\Roaming\r2modmanPlus-local\LethalLeagueBlaze\profiles\Dev\BepInEx\plugins\TourneyMod" />
+        
+        <ItemGroup>
+            <_RuleFiles Include="rulesets-default\*.json" />
+        </ItemGroup>
+        <Copy SourceFiles="@(_RuleFiles)" DestinationFolder="C:\Users\Owner\AppData\Roaming\r2modmanPlus-local\LethalLeagueBlaze\profiles\Dev\BepInEx\plugins\TourneyMod\rulesets-default" />
     </Target>
 </Project>

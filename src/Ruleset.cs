@@ -1,68 +1,64 @@
+using System.Collections.Generic;
+using System.Linq;
 using LLHandlers;
 
 namespace TourneyMod;
 
-internal class Ruleset
+public class Ruleset(
+    string id,
+    string name,
+    Stage[] stagesNeutral,
+    Stage[] stagesCounterpick,
+    int[][] banAmounts,
+    int firstBanPlayer,
+    Ruleset.BanOrder banOrder,
+    Ruleset.DsrMode dsrMode)
 {
-    internal static readonly Ruleset RULES_STANDARD_ONLINE = new Ruleset([
-        Stage.JUNKTOWN,
-        Stage.ROOM21,
-        (Plugin.USE_SEWERS ? Stage.SEWERS : Stage.OUTSKIRTS),
-        Stage.STADIUM,
-        Stage.STREETS,
-        Stage.POOL,
-        Stage.SUBWAY,
-        Stage.FACTORY,
-        Stage.CONSTRUCTION,
-    ], [
-    ], [
-        [3],
-    ], 0, BanOrder.WINNER_BANS, DsrMode.LAST_WIN);
-    
-    internal static readonly Ruleset RULES_UK = new Ruleset([
-        Stage.JUNKTOWN,
-        Stage.ROOM21,
-        (Plugin.USE_SEWERS ? Stage.SEWERS : Stage.OUTSKIRTS),
-        Stage.STADIUM,
-        Stage.STREETS,
-    ], [
-        Stage.POOL,
-        Stage.SUBWAY,
-        Stage.FACTORY,
-        Stage.CONSTRUCTION,
-    ], [
-        [1, 2, 1],
-        [2]
-    ], 1, BanOrder.WINNER_BANS, DsrMode.FULL_SET);
-    
-    internal readonly Stage[] stagesNeutral;
-    internal readonly Stage[] stagesCounterpick;
+    public readonly string id = id;
+    public readonly string name = name;
+    public readonly Stage[] stagesNeutral = stagesNeutral;
+    public readonly Stage[] stagesCounterpick = stagesCounterpick;
 
-    internal readonly int[][] banAmounts;
-    internal readonly int firstBanPlayer;
-    internal readonly BanOrder banOrder;
-    internal readonly DsrMode dsrMode;
+    public readonly int[][] banAmounts = banAmounts;
+    public readonly int firstBanPlayer = firstBanPlayer;
+    public readonly BanOrder banOrder = banOrder;
+    public readonly DsrMode dsrMode = dsrMode;
 
-    internal Ruleset(Stage[] stagesNeutral, Stage[] stagesCounterpick, int[][] banAmounts, int firstBanPlayer, BanOrder banOrder, DsrMode dsrMode)
-    {
-        this.stagesNeutral = stagesNeutral;
-        this.stagesCounterpick = stagesCounterpick;
-        this.banAmounts = banAmounts;
-        this.firstBanPlayer = firstBanPlayer;
-        this.banOrder = banOrder;
-        this.dsrMode = dsrMode;
-    }
-
-    internal enum BanOrder
+    public enum BanOrder
     {
         WINNER_BANS,
         LOSER_BANS
     }
 
-    internal enum DsrMode
+    public enum DsrMode
     {
         OFF,
         FULL_SET,
         LAST_WIN
+    }
+
+    private string PrintList<T>(List<T> list)
+    {
+        string s = "[";
+        
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (i != 0) s += ", ";
+            s += list[i];
+        }
+
+        s += "]";
+        return s;
+    }
+
+    public override string ToString()
+    {
+        List<string> b = new List<string>();
+        foreach (int[] banNums in banAmounts)
+        {
+            b.Add(PrintList<int>(banNums.ToList()));
+        }
+        
+        return $"{id} {{ name '{name}', neutral {PrintList<Stage>(stagesNeutral.ToList())}, counterpick {PrintList<Stage>(stagesCounterpick.ToList())}, banAmounts {PrintList<string>(b)}, firstBanPlayer {firstBanPlayer}, banOrder {banOrder}, dsrMode {dsrMode} }}";
     }
 }

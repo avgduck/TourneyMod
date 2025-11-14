@@ -1,0 +1,22 @@
+{
+  "id": "standard_online",
+  "name": "Standard Online",
+  "stagesNeutral": [
+    "JUNKTOWN",
+    "ROOM21",
+    "OUTSKIRTS",
+    "STADIUM",
+    "STREETS",
+    "POOL",
+    "SUBWAY",
+    "FACTORY",
+    "CONSTRUCTION"
+  ],
+  "stagesCounterpick": [],
+  "banAmounts": [
+    [3]
+  ],
+  "firstBanPlayer": 0,
+  "banOrder": "WINNER_BANS",
+  "dsrMode": "OFF"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "mach_uk",
+  "name": "Mach (UK)",
+  "stagesNeutral": [
+    "JUNKTOWN",
+    "ROOM21",
+    "OUTSKIRTS",
+    "STADIUM",
+    "STREETS"
+  ],
+  "stagesCounterpick": [
+    "POOL",
+    "SUBWAY",
+    "FACTORY",
+    "CONSTRUCTION"
+  ],
+  "banAmounts": [
+    [1, 2, 1],
+    [2]
+  ],
+  "firstBanPlayer": 1,
+  "banOrder": "WINNER_BANS",
+  "dsrMode": "FULL_SET"
+}

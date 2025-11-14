@@ -47,7 +47,8 @@ internal class SetTracker
     {
         completedMatches = new List<Match>();
         matchCount = 0;
-        ruleset = Ruleset.RULES_STANDARD_ONLINE;
+        ruleset = RulesetIO.GetRulesetById("legacy_lan");
+        Plugin.LogGlobal.LogInfo($"Loaded ruleset {ruleset.id}");
         controlStartPlayer = ruleset.firstBanPlayer;
         banIndex = 0;
         CurrentInteractMode = UpdateInteractMode();
