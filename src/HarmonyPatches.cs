@@ -138,5 +138,41 @@ internal static class HarmonyPatches
             
             ScreenStageStrike.UpdateCursorColors(SetTracker.Instance.ControllingPlayer);
         }
+
+        // GameStatesGameResult.UpdateState(GameState state)
+        [HarmonyPatch(typeof(OEAINNHEMKA), nameof(OEAINNHEMKA.UpdateState))]
+        [HarmonyPostfix]
+        private static void ResultUpdateState_Postfix(OEAINNHEMKA __instance)
+        {
+            if (!SetTracker.Is1v1) return;
+            
+            Player.ForAll((Player player) =>
+            {
+                // KHMFCILNHHH.EOCBBKOIFNO -> RematchChoice.QUIT
+                __instance.DABHMHOCDEN(player.nr, KHMFCILNHHH.EOCBBKOIFNO);
+            });
+        }
+        
+        // GameStatesGameResult.SetRematchChoice(int playerNumber, RematchChoice choice)
+        [HarmonyPatch(typeof(OEAINNHEMKA), nameof(OEAINNHEMKA.DABHMHOCDEN))]
+        [HarmonyPostfix]
+        private static void SetRematchChoice_Postfix(OEAINNHEMKA __instance, int BKEOPDPFFPM, KHMFCILNHHH ONPJANKJDJH)
+        {
+            if (!SetTracker.Is1v1) return;
+            
+            int playerNumber = BKEOPDPFFPM;
+            KHMFCILNHHH rematchChoice = ONPJANKJDJH;
+            PostScreen screenResults = __instance.APFKDEMGLHJ;
+
+            screenResults.SetChoice(playerNumber, rematchChoice);
+            // NIPJFJKNGHO.DLPDHJFPKMJ -> ResultButtons.REMATCH_QUIT
+            // KHMFCILNHHH.EOCBBKOIFNO -> RematchChoice.QUIT
+            if (playerNumber == 0 && screenResults.resultButtons == NIPJFJKNGHO.DLPDHJFPKMJ &&
+                rematchChoice == KHMFCILNHHH.EOCBBKOIFNO)
+            {
+                // NIPJFJKNGHO.EOCBBKOIFNO -> ResultButtons.QUIT
+                screenResults.ShowButtons(NIPJFJKNGHO.EOCBBKOIFNO);
+            }
+        }
     }
 }
