@@ -1,6 +1,10 @@
-## [TourneyMod](https://thunderstore.io/c/lethal-league-blaze/p/avg_duck/TourneyMod/)
+# [TourneyMod](https://thunderstore.io/c/lethal-league-blaze/p/avg_duck/TourneyMod/)
 
 Adds many tournament-related features for Tournament Organizers and players! Currently designed for LAN tournaments only (local 1v1 mode), with support for online tournaments planned for a future version.
+
+_Note: This mod is NOT compatible with [Daioutzu's StageSelect](https://thunderstore.io/c/lethal-league-blaze/p/Daioutzu/StageSelect/)!_
+
+## Features
 
 ### Dynamic Set Count
 
@@ -33,5 +37,14 @@ The legal stage list as well as striking rules are specified in their own rulese
 ![Ruleset description preview](https://raw.githubusercontent.com/avgduck/TourneyMod/master/preview-images/ModMenu%20description.png)
 
 The mod comes packaged with a set of default rulesets, but by creating a new file you can create any number of your own rulesets! A [guide to ruleset files](https://github.com/avgduck/TourneyMod/wiki/Custom-Rulesets) can be found on the wiki.
+
+## Planned Features
+
+TourneyMod is planned to be expanded to enhance the entire tournament experience. This includes:
+
+* Offline crew battle mode
+* Online striking and set tracking
+
+and more! Be on the lookout for future updates, and feel free to submit any bug reports or feature requests to the [TourneyMod issues page](https://github.com/avgduck/TourneyMod/issues).
 
 [![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
