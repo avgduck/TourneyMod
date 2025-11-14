@@ -188,7 +188,8 @@ internal class SetTracker
         foreach (int banAmount in banAmounts)
         {
             CurrentBansRemaining = banAmount;
-            
+
+            if (banAmount == 0) break;
             for (int i = 0; i < banAmount; i++)
             {
                 if (banSum == banIndex)
