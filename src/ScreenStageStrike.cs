@@ -426,6 +426,13 @@ internal class ScreenStageStrike
             Stage.STREETS => "Streets",
             Stage.POOL => "Pool",
             Stage.ROOM21 => "Room 21",
+            Stage.OUTSKIRTS_2D => "Retro Outskirts",
+            Stage.POOL_2D => "Retro Pool",
+            Stage.SEWERS_2D => "Retro Sewers",
+            Stage.ROOM21_2D => "Retro Room 21",
+            Stage.STREETS_2D => "Retro Streets",
+            Stage.SUBWAY_2D => "Retro Subway",
+            Stage.FACTORY_2D => "Retro Factory",
             _ => ""
         };
 
@@ -458,6 +465,7 @@ internal class ScreenStageStrike
 
             lbStageName = ScreenStageStrike.Instance.CreateNewText("lbStageName", Button.transform);
             lbStageName.fontSize = 42;
+            lbStageName.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 500f);
             lbStageName.rectTransform.localPosition = new Vector2(0f, -110f);
             TextHandler.SetText(lbStageName, StageName);
             
