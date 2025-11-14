@@ -1,6 +1,7 @@
-﻿using BepInEx;
+﻿using System.Collections.Generic;
+using BepInEx;
 using BepInEx.Logging;
-using LLHandlers;
+using LLBML.Utils;
 
 namespace TourneyMod;
 
@@ -22,5 +23,40 @@ internal class Plugin : BaseUnityPlugin
         
         HarmonyPatches.PatchAll();
         RulesetIO.Init();
+
+        Configs.BindConfigs();
+        ModDependenciesUtils.RegisterToModMenu(this.Info, GetModMenuText());
+    }
+
+    private List<string> GetModMenuText()
+    {
+        List<string> text = new List<string>();
+        
+        text.Add("Choose a ruleset from those currently loaded, shown below. Default rulesets are included with the mod download, and custom rulesets can be specified in your Modding Folder.");
+        text.Add("");
+        
+        text.Add("<b>Default Rulesets:</b>");
+        if (RulesetIO.RulesetsDefault.Count == 0)
+        {
+            text.Add("none");
+        }
+        else
+        {
+            RulesetIO.RulesetsDefault.ForEach(ruleset => text.Add($"- <b>{ruleset.id}</b>: {ruleset}"));
+        }
+        
+        text.Add("");
+        
+        text.Add("<b>Custom Rulesets:</b>");
+        if (RulesetIO.RulesetsCustom.Count == 0)
+        {
+            text.Add("none");
+        }
+        else
+        {
+            RulesetIO.RulesetsCustom.ForEach(ruleset => text.Add($"- <b>{ruleset.id}</b>: {ruleset}"));
+        }
+
+        return text;
     }
 }

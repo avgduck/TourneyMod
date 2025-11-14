@@ -59,6 +59,6 @@ public class Ruleset(
             b.Add(PrintList<int>(banNums.ToList()));
         }
         
-        return $"{id} {{ name '{name}', neutral {PrintList<Stage>(stagesNeutral.ToList())}, counterpick {PrintList<Stage>(stagesCounterpick.ToList())}, banAmounts {PrintList<string>(b)}, firstBanPlayer {firstBanPlayer}, banOrder {banOrder}, dsrMode {dsrMode} }}";
+        return $"{{ id {id}, name '{name}', neutral {PrintList<Stage>(stagesNeutral.ToList())}, counterpick {PrintList<Stage>(stagesCounterpick.ToList())}, banAmounts {PrintList<string>(b)}, firstBanPlayer {firstBanPlayer}, banOrder {banOrder}, dsrMode {dsrMode} }}";
     }
 }
