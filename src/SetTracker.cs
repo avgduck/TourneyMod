@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using LLBML.Players;
+using LLBML.Settings;
 using LLHandlers;
 using UnityEngine;
 using UnityEngine.Experimental.PlayerLoop;
@@ -23,6 +25,7 @@ internal class SetTracker
         PICK,
         BAN
     }
+
     internal InteractMode CurrentInteractMode { get; private set; }
     internal int[] TotalBansRemaining { get; private set; }
     internal int CurrentBansRemaining { get; private set; }
@@ -39,7 +42,7 @@ internal class SetTracker
         Plugin.LogGlobal.LogInfo("Ending set tracker");
         Instance = null;
     }
-    
+
     private SetTracker()
     {
         completedMatches = new List<Match>();
@@ -48,8 +51,23 @@ internal class SetTracker
         controlStartPlayer = ruleset.firstBanPlayer;
         banIndex = 0;
         CurrentInteractMode = UpdateInteractMode();
-        
+
         RecalculateStageBans();
+    }
+
+    internal static bool Is1v1 {
+        get
+        {
+            if (GameSettings.current.gameMode != GameMode._1v1) return false;
+            
+            bool anyAIs = false;
+            Player.ForAllInMatch((Player player) =>
+            {
+                if (player.IsAI) anyAIs = true;
+            });
+
+            return !anyAIs;
+        }
     }
 
     internal void StartMatch(Stage stage)

@@ -68,7 +68,7 @@ internal static class HarmonyPatches
         private static void OpenStageSelect_Prefix(HPNLMFHPHFD __instance)
         {
             IJDANPONMLL localLobby = __instance as IJDANPONMLL;
-            if (localLobby == null) return;
+            if (localLobby == null || !SetTracker.Is1v1) return;
             
             ScreenStageStrike.Open(); // ScreenPlayersStage screenStage
         }
@@ -78,7 +78,7 @@ internal static class HarmonyPatches
         private static void OpenStageSelect_Postfix(HPNLMFHPHFD __instance)
         {
             IJDANPONMLL localLobby = __instance as IJDANPONMLL;
-            if (localLobby == null) return;
+            if (localLobby == null || !SetTracker.Is1v1) return;
 
             localLobby.GFHABHIBKHK(); // GameStatesLobbyLocal.ShowActiveCursors()
         }
@@ -89,7 +89,7 @@ internal static class HarmonyPatches
         private static void CloseStageSelect_Postfix(HPNLMFHPHFD __instance)
         {
             IJDANPONMLL localLobby = __instance as IJDANPONMLL;
-            if (localLobby == null) return;
+            if (localLobby == null || !SetTracker.Is1v1) return;
             
             ScreenStageStrike.Close();
         }
@@ -100,7 +100,7 @@ internal static class HarmonyPatches
         private static void ProcessStageSelect_Prefix(HPNLMFHPHFD __instance, Message EIMJOIEPMNA)
         {
             IJDANPONMLL localLobby = __instance as IJDANPONMLL;
-            if (localLobby == null) return;
+            if (localLobby == null || !SetTracker.Is1v1) return;
 
             Message message = EIMJOIEPMNA;
             if (message.msg == Msg.SEL_STAGE) __instance.EKFCNNPDJHH(); // GameStatesLobby.CloseStageSelect()
