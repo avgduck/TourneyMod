@@ -127,8 +127,14 @@ internal class SetTracker
             if (stageBan != null && stageBan.reason != StageBan.BanReason.DSR) continue;
             if (ruleset.dsrMode == Ruleset.DsrMode.LAST_WIN && match != lastWin) continue;
 
-            if (stageBan != null) stageBan.banPlayer = -1;
-            else stageBans.Add(new StageBan(match.stage, StageBan.BanReason.DSR, winner));
+            if (stageBan != null)
+            {
+                if (stageBan.banPlayer != winner) stageBan.banPlayer = -1;
+            }
+            else
+            {
+                stageBans.Add(new StageBan(match.stage, StageBan.BanReason.DSR, winner));
+            }
         }
     }
 
