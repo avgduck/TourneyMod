@@ -50,7 +50,7 @@ internal class SetTracker
         matchCount = 0;
         ruleset = RulesetIO.GetRulesetById(Configs.SelectedRulesetId.Value);
         Plugin.LogGlobal.LogInfo($"Loaded ruleset {ruleset}");
-        controlStartPlayer = ruleset.firstBanPlayer;
+        controlStartPlayer = ruleset.game1FirstPlayer;
         banIndex = 0;
         IsFreePickMode = false;
         UpdateInteractMode();
@@ -93,7 +93,7 @@ internal class SetTracker
         currentMatch = null;
 
         int loser = winner == 0 ? 1 : 0;
-        controlStartPlayer = ruleset.banOrder == Ruleset.BanOrder.WINNER_BANS ? winner : loser;
+        controlStartPlayer = ruleset.laterGamesFirstPlayer == Ruleset.FirstPlayer.WINNER ? winner : loser;
         banIndex = 0;
         UpdateInteractMode();
         

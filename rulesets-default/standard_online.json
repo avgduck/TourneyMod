@@ -16,7 +16,7 @@
   "banAmounts": [
     [3]
   ],
-  "firstBanPlayer": 0,
-  "banOrder": "WINNER_BANS",
+  "game1FirstPlayer": 0,
+  "laterGamesFirstPlayer": "WINNER",
   "dsrMode": "OFF"
 }

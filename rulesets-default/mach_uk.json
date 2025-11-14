@@ -18,7 +18,7 @@
     [1, 2, 1],
     [2]
   ],
-  "firstBanPlayer": 1,
-  "banOrder": "WINNER_BANS",
+  "game1FirstPlayer": 1,
+  "laterGamesFirstPlayer": "WINNER",
   "dsrMode": "FULL_SET"
 }
