@@ -64,6 +64,7 @@ internal class ScreenStageStrike
         Plugin.LogGlobal.LogInfo("Closing stage strike screen");
         Instance = null;
         UIScreen.blockGlobalInput = false;
+        SetTracker.Instance.ResetBans();
     }
 
     internal void OnOpen(ScreenPlayersStage screenStage)
@@ -309,7 +310,6 @@ internal class ScreenStageStrike
 
         if (SetTracker.Instance.CurrentInteractMode == SetTracker.InteractMode.PICK)
         {
-            UIScreen.blockGlobalInput = false;
             screenStage.SelectStage(playerNumber, (int)stage);
         }
         else

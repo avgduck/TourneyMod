@@ -113,6 +113,13 @@ internal class SetTracker
         }
     }
 
+    internal void ResetBans()
+    {
+        banIndex = 0;
+        RecalculateStageBans();
+        CurrentInteractMode = UpdateInteractMode();
+    }
+
     internal List<StageBan> GetStageBans()
     {
         return stageBans;
