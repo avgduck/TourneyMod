@@ -44,8 +44,8 @@ internal class ScreenStageStrike
     private static readonly Vector2 BANSTATUS_POSITION = new Vector2(0f, -310f);
     private const int BANSTATUS_FONT_SIZE = 42;
     
-    private static readonly Vector2 FREEPICK_POSITION = new Vector2(530f, -336f);
-    private static readonly Vector2 FREEPICK_SCALE = new Vector2(1f, 0.5f);
+    private static readonly Vector2 FREEPICK_POSITION = new Vector2(506f, -336f);
+    private static readonly Vector2 FREEPICK_SCALE = new Vector2(1.3f, 0.5f);
     private const int FREEPICK_FONT_SIZE = 18;
     
     private static readonly Color[] COLOR_PLAYER =
@@ -64,6 +64,7 @@ internal class ScreenStageStrike
     private TMP_Text lbBanStatus;
 
     private LLButton btFreePick;
+    private bool[] freePickVotes = [false, false];
 
     internal static void Open()
     {
@@ -132,10 +133,10 @@ internal class ScreenStageStrike
         btFreePick = ScreenStageStrike.Instance.CreateNewButton("btFreePick", screenStage.transform);
         btFreePick.transform.localScale = FREEPICK_SCALE;
         btFreePick.transform.localPosition = FREEPICK_POSITION;
-        btFreePick.SetText("Toggle free pick");
+        btFreePick.SetText("Toggle free pick 0/2");
         btFreePick.textMesh.transform.localScale = new Vector2(1f / FREEPICK_SCALE.x, 1f / FREEPICK_SCALE.y);
         btFreePick.textMesh.fontSize = FREEPICK_FONT_SIZE;
-        btFreePick.onClick = (playerNumber) => { OnClickFreePick(); };
+        btFreePick.onClick = (playerNumber) => { OnClickFreePick(playerNumber); };
 
         CreateStageButtons();
         UpdateStageBans();
@@ -264,6 +265,13 @@ internal class ScreenStageStrike
                 ? $"P{controllingPlayer+1} banning {SetTracker.Instance.CurrentBansRemaining}..."
                 : $"P{controllingPlayer+1} picking...");
         }
+        
+        int sum = 0;
+        foreach (bool vote in freePickVotes)
+        {
+            if (vote) sum++;
+        }
+        btFreePick.SetText($"Toggle free pick {sum}/2");
     }
 
     // texture editing code from ColorSwap
@@ -356,10 +364,23 @@ internal class ScreenStageStrike
         UpdateSetInfo();
     }
 
-    private void OnClickFreePick()
+    private void OnClickFreePick(int playerNumber)
     {
-        SetTracker.Instance.ToggleFreePickMode();
-        UpdateStageBans();
+        freePickVotes[playerNumber] = true;
+
+        int sum = 0;
+        foreach (bool vote in freePickVotes)
+        {
+            if (vote) sum++;
+        }
+
+        if (sum >= 2)
+        {
+            freePickVotes = [false, false];
+            SetTracker.Instance.ToggleFreePickMode();
+            UpdateStageBans();
+        }
+        
         UpdateSetInfo();
     }
 
