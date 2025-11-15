@@ -122,7 +122,6 @@ internal static class HarmonyPatches
         [HarmonyPostfix]
         private static void SetPlayerLayout_Postfix(ScreenPlayers __instance)
         {
-            Plugin.LogGlobal.LogWarning($"ScreenPlayers OnOpen, IsOpen {ScreenLobbyOverlay.IsOpen}, Is1v1 {SetTracker.Is1v1}");
             if (!ScreenLobbyOverlay.IsOpen || !SetTracker.Is1v1) return;
             
             ScreenLobbyOverlay.Instance.OnOpen(__instance);
