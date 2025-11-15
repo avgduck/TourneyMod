@@ -44,6 +44,13 @@
       <Folder Include="preview-images\" />
     </ItemGroup>
 
+    <ItemGroup>
+        <_ReleaseFiles Include="Thunderstore\icon.png" />
+        <_ReleaseFiles Include="Thunderstore\manifest.json" />
+        <_ReleaseFiles Include="README.md" />
+        <_ReleaseFiles Include="CHANGELOG.md" />
+    </ItemGroup>
+
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <Copy SourceFiles="bin\Debug\net35\TourneyMod.dll" DestinationFolder="build" />
 
@@ -56,5 +63,9 @@
             <_RuleFiles Include="rulesets-default\*.json" />
         </ItemGroup>
         <Copy SourceFiles="@(_RuleFiles)" DestinationFolder="C:\Users\Owner\AppData\Roaming\r2modmanPlus-local\LethalLeagueBlaze\profiles\Dev\BepInEx\plugins\TourneyMod\rulesets-default" />
+
+        <Copy SourceFiles="@(_BuildFiles)" DestinationFolder="release" />
+        <Copy SourceFiles="@(_ReleaseFiles)" DestinationFolder="release" />
+        <Copy SourceFiles="@(_RuleFiles)" DestinationFolder="release/rulesets-default" />
     </Target>
 </Project>
