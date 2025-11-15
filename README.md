@@ -10,9 +10,9 @@ _Note: This mod is NOT compatible with [Daioutzu's StageSelect](https://thunders
 
 Manually keep track of game wins no longer! TourneyMod keeps track of what game in the set the players are on, who won each set and on what stage, and displays the current set score!
 
-![Dynamic set count preview](https://raw.githubusercontent.com/avgduck/TourneyMod/master/preview-images/set%20count.png)
+![Dynamic set count preview](https://raw.githubusercontent.com/avgduck/TourneyMod/master/preview-images/set%20count.gif)
 
-A new set can be started simply by backing out and creating a new lobby.
+A new set can be started by creating a new lobby, or by voting via the reset button.
 
 ### Integrated Stage Striking
 
@@ -44,6 +44,7 @@ TourneyMod is planned to be expanded to enhance the entire tournament experience
 
 * Offline crew battle mode
 * Online striking and set tracking
+* Online resuming with saved stock counts after desync
 
 and more! Be on the lookout for future updates, and feel free to submit any bug reports or feature requests to the [TourneyMod issues page](https://github.com/avgduck/TourneyMod/issues).
 
