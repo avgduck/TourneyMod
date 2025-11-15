@@ -12,11 +12,16 @@ public class ScreenLobbyOverlay
     internal static bool IsOpen => Instance != null;
     
     private ScreenPlayers screenPlayers;
+    private TMP_Text lbGame;
     private TMP_Text lbSetCount;
     private LLButton btResetSetCount;
 
-    private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 280f);
-    private const int SETCOUNT_FONT_SIZE = 42;
+    //private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 280f);
+    //private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 220f);
+    private static readonly Vector2 GAME_POSITION = new Vector2(0f, 110f);
+    private const int GAME_FONT_SIZE = 28;
+    private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 64f);
+    private const int SETCOUNT_FONT_SIZE = 52;
     private static readonly Vector2 RESET_SCALE = new Vector2(1f, 1f);
     private static readonly Vector2 RESET_POSITION = new Vector2(0f, 344f);
     private const int RESET_FONT_SIZE = 18;
@@ -65,8 +70,12 @@ public class ScreenLobbyOverlay
     {
         this.screenPlayers = screenPlayers;
 
+        lbGame = CreateNewText("lbGame", screenPlayers.transform);
+        lbGame.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 500f);
+        lbGame.rectTransform.localPosition = GAME_POSITION;
+        lbGame.fontSize = GAME_FONT_SIZE;
+        
         lbSetCount = CreateNewText("lbSetCount", screenPlayers.transform);
-        Plugin.LogGlobal.LogWarning($"lbSetCount {lbSetCount}");
         lbSetCount.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 500f);
         lbSetCount.rectTransform.localPosition = SETCOUNT_POSITION;
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
@@ -90,7 +99,8 @@ public class ScreenLobbyOverlay
     {
         int gameNumber = SetTracker.Instance.GetGameNumber();
         int[] winCounts = SetTracker.Instance.GetWinCounts();
-        TextHandler.SetText(lbSetCount, $"Game {gameNumber} ({winCounts[0]}-{winCounts[1]})");
+        TextHandler.SetText(lbGame, $"Game {gameNumber}");
+        TextHandler.SetText(lbSetCount, $"({winCounts[0]}-{winCounts[1]})");
         
         int sum = 0;
         foreach (bool vote in resetVotes)
