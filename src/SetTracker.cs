@@ -240,7 +240,9 @@ internal class SetTracker
         if (playerNumber != ControllingPlayer) return false;
         if (stageBan == null) return true;
         if (stageBan.reason != SetTracker.StageBan.BanReason.DSR) return false;
-        if (stageBan.banPlayer == playerNumber || stageBan.banPlayer == -1) return false;
+        if (stageBan.banPlayer == -1) return false;
+        if (stageBan.banPlayer == playerNumber && CurrentInteractMode == InteractMode.PICK) return false;
+        if (stageBan.banPlayer != playerNumber && CurrentInteractMode == InteractMode.BAN) return false;
         return true;
     }
 
