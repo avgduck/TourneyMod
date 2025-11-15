@@ -66,6 +66,6 @@
 
         <Copy SourceFiles="@(_BuildFiles)" DestinationFolder="release" />
         <Copy SourceFiles="@(_ReleaseFiles)" DestinationFolder="release" />
-        <Copy SourceFiles="@(_RuleFiles)" DestinationFolder="release/rulesets-default" />
+        <Copy SourceFiles="@(_RuleFiles)" DestinationFolder="release/BepInEx/plugins/rulesets-default" />
     </Target>
 </Project>
