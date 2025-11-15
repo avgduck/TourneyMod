@@ -48,7 +48,6 @@ internal class SetTracker
     {
         ruleset = RulesetIO.GetRulesetById(Configs.SelectedRulesetId.Value);
         Plugin.LogGlobal.LogInfo($"Loaded ruleset {ruleset}");
-        controlStartPlayer = ruleset.game1FirstPlayer;
         IsFreePickMode = false;
         
         ResetSetCount();
@@ -76,6 +75,7 @@ internal class SetTracker
         completedMatches = new List<Match>();
         matchCount = 0;
         banIndex = 0;
+        controlStartPlayer = ruleset.game1FirstPlayer;
         
         UpdateInteractMode();
         RecalculateStageBans();
