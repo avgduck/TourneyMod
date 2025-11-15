@@ -46,16 +46,12 @@ internal class SetTracker
 
     private SetTracker()
     {
-        completedMatches = new List<Match>();
-        matchCount = 0;
         ruleset = RulesetIO.GetRulesetById(Configs.SelectedRulesetId.Value);
         Plugin.LogGlobal.LogInfo($"Loaded ruleset {ruleset}");
         controlStartPlayer = ruleset.game1FirstPlayer;
-        banIndex = 0;
         IsFreePickMode = false;
-        UpdateInteractMode();
-
-        RecalculateStageBans();
+        
+        ResetSetCount();
     }
 
     internal static bool Is1v1 {
@@ -71,6 +67,18 @@ internal class SetTracker
 
             return !anyAIs;
         }
+    }
+
+    internal void ResetSetCount()
+    {
+        Plugin.LogGlobal.LogInfo("Resetting set count");
+        
+        completedMatches = new List<Match>();
+        matchCount = 0;
+        banIndex = 0;
+        
+        UpdateInteractMode();
+        RecalculateStageBans();
     }
 
     internal void StartMatch(Stage stage)

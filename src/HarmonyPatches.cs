@@ -32,6 +32,7 @@ internal static class HarmonyPatches
             {
                 if (newState == GameState.MENU)
                 {
+                    ScreenLobbyOverlay.Close();
                     SetTracker.EndSet();
                 }
                 else if (newState == GameState.GAME_INTRO)
@@ -56,6 +57,7 @@ internal static class HarmonyPatches
             else if (newState == GameState.LOBBY_LOCAL)
             {
                 SetTracker.StartSet();
+                ScreenLobbyOverlay.Open();
             }
         }
     }
@@ -108,12 +110,22 @@ internal static class HarmonyPatches
 
         [HarmonyPatch(typeof(ScreenPlayersStage), nameof(ScreenPlayersStage.OnOpen))]
         [HarmonyPrefix]
-        private static bool OnOpen_Prefix(ScreenPlayersStage __instance)
+        private static bool ScreenPlayersStage_OnOpen_Prefix(ScreenPlayersStage __instance)
         {
             if (!ScreenStageStrike.IsOpen) return true;
             
             ScreenStageStrike.Instance.OnOpen(__instance);
             return false;
+        }
+
+        [HarmonyPatch(typeof(ScreenPlayers), nameof(ScreenPlayers.SetPlayerLayout))]
+        [HarmonyPostfix]
+        private static void SetPlayerLayout_Postfix(ScreenPlayers __instance)
+        {
+            Plugin.LogGlobal.LogWarning($"ScreenPlayers OnOpen, IsOpen {ScreenLobbyOverlay.IsOpen}, Is1v1 {SetTracker.Is1v1}");
+            if (!ScreenLobbyOverlay.IsOpen || !SetTracker.Is1v1) return;
+            
+            ScreenLobbyOverlay.Instance.OnOpen(__instance);
         }
 
         [HarmonyPatch(typeof(LLCursor), nameof(LLCursor.ResizeHWCursor))]
