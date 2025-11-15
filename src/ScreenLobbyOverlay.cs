@@ -16,11 +16,11 @@ public class ScreenLobbyOverlay
     private TMP_Text lbSetCount;
     private LLButton btResetSetCount;
 
-    //private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 280f);
-    //private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 220f);
-    private static readonly Vector2 GAME_POSITION = new Vector2(0f, 110f);
+    //private static readonly Vector2 GAME_POSITION = new Vector2(0f, 110f);
+    private static readonly Vector2 GAME_POSITION = new Vector2(0f, 250f);
     private const int GAME_FONT_SIZE = 28;
-    private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 64f);
+    //private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 64f);
+    private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 204f);
     private const int SETCOUNT_FONT_SIZE = 52;
     private static readonly Vector2 RESET_SCALE = new Vector2(1f, 1f);
     private static readonly Vector2 RESET_POSITION = new Vector2(0f, 344f);
