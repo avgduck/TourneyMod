@@ -8,7 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TourneyMod;
+namespace TourneyMod.UI;
 
 internal class ScreenStageStrike
 {

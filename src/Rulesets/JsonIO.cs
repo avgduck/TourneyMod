@@ -2,7 +2,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 
-namespace TourneyMod;
+namespace TourneyMod.Rulesets;
 
 internal static class JsonIO
 {

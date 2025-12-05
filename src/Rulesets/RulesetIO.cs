@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using TinyJson;
 
-namespace TourneyMod;
+namespace TourneyMod.Rulesets;
 
 internal static class RulesetIO
 {

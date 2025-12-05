@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LLHandlers;
 
-namespace TourneyMod;
+namespace TourneyMod.Rulesets;
 
 public class Ruleset(
     string id,

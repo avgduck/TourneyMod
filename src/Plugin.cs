@@ -2,6 +2,8 @@
 using BepInEx;
 using BepInEx.Logging;
 using LLBML.Utils;
+using TourneyMod.Patches;
+using TourneyMod.Rulesets;
 
 namespace TourneyMod;
 
@@ -12,9 +14,7 @@ internal class Plugin : BaseUnityPlugin
     public const string GUID = "avgduck.plugins.llb.tourneymod";
     
     internal static Plugin Instance { get; private set; }
-    internal static ManualLogSource LogGlobal;
-
-    internal const bool USE_SEWERS = false;
+    internal static ManualLogSource LogGlobal { get; private set; }
 
     private void Awake()
     {

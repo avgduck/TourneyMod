@@ -4,7 +4,7 @@ using LLScreen;
 using TMPro;
 using UnityEngine;
 
-namespace TourneyMod;
+namespace TourneyMod.UI;
 
 public class ScreenLobbyOverlay
 {
