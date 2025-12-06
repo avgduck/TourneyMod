@@ -271,8 +271,8 @@ internal class ScreenStageStrike
                 };
                 rowLengthsNeutral = numStagesNeutral switch
                 {
-                    >= 1 and <= 4 => [numStagesNeutral],
-                    >= 5 and <= 6 => [3, numStagesNeutral - 3],
+                    >= 1 and <= 5 => [numStagesNeutral],
+                    6 => [3, numStagesNeutral - 3],
                     >= 7 and <= 8 => [4, numStagesNeutral - 4],
                     9 => [5, 4],
                     10 => [5, 5],
@@ -283,14 +283,14 @@ internal class ScreenStageStrike
             case 9:
                 rowLengthsCounterpick = numStagesNeutral switch
                 {
-                    >= 0 and <= 4 => [3, 3, 3],
-                    >= 5 and <= 8 => [5, 4],
+                    >= 0 and <= 5 => [3, 3, 3],
+                    >= 6 and <= 8 => [5, 4],
                     _ => []
                 };
                 rowLengthsNeutral = numStagesNeutral switch
                 {
-                    >= 1 and <= 4 => [numStagesNeutral],
-                    >= 5 and <= 6 => [3, numStagesNeutral - 3],
+                    >= 1 and <= 5 => [numStagesNeutral],
+                    6 => [3, numStagesNeutral - 3],
                     >= 7 and <= 8 => [4, numStagesNeutral - 4],
                     _ => []
                 };
@@ -299,14 +299,14 @@ internal class ScreenStageStrike
             case 10:
                 rowLengthsCounterpick = numStagesNeutral switch
                 {
-                    0 => [3, 4, 3],
-                    >= 1 and <= 7 => [5, 5],
+                    >= 0 and <= 5 => [3, 4, 3],
+                    >= 6 and <= 7 => [5, 5],
                     _ => []
                 };
                 rowLengthsNeutral = numStagesNeutral switch
                 {
-                    >= 1 and <= 4 => [numStagesNeutral],
-                    >= 5 and <= 6 => [3, numStagesNeutral - 3],
+                    >= 1 and <= 5 => [numStagesNeutral],
+                    6 => [3, 3],
                     7 => [4, 3],
                     _ => []
                 };
