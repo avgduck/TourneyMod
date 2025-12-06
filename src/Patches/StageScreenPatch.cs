@@ -1,5 +1,6 @@
 using HarmonyLib;
 using LLBML.Players;
+using LLBML.Settings;
 using LLGUI;
 using LLScreen;
 using TourneyMod.UI;
@@ -13,20 +14,28 @@ internal static class StageScreenPatch
         [HarmonyPrefix]
         private static void OpenStageSelect_Prefix(HPNLMFHPHFD __instance)
         {
-            IJDANPONMLL localLobby = __instance as IJDANPONMLL;
-            if (localLobby == null || !SetTracker.Is1v1) return;
-            
-            ScreenStageStrike.Open(); // ScreenPlayersStage screenStage
+            //IJDANPONMLL localLobby = __instance as IJDANPONMLL;
+            //if (localLobby == null || !SetTracker.Is1v1) return;
+
+            if (!SetTracker.IsTrackingSet) return;
+            Plugin.LogGlobal.LogInfo($"OpenStageSelect: IsOnline {GameSettings.IsOnline}, OnlineMode {GameSettings.OnlineMode}");
+            if (GameSettings.IsOnline && GameSettings.OnlineMode != OnlineMode.HOSTED) return;
+            if (GameSettings.current.gameMode != GameMode._1v1) SetTracker.Instance.ForceAllStages();
+            ScreenStageStrike.Open();
         }
         // GameStatesLobby.OpenStageSelect(bool canGoBack, bool localSpectator = false, ScreenType = ScreenType.PLAYERS_STAGE)
         [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.KOLLNKIKIKM))]
         [HarmonyPostfix]
         private static void OpenStageSelect_Postfix(HPNLMFHPHFD __instance)
         {
-            IJDANPONMLL localLobby = __instance as IJDANPONMLL;
-            if (localLobby == null || !SetTracker.Is1v1) return;
+            //IJDANPONMLL localLobby = __instance as IJDANPONMLL;
+            //if (localLobby == null || !SetTracker.Is1v1) return;
 
-            localLobby.GFHABHIBKHK(); // GameStatesLobbyLocal.ShowActiveCursors()
+            //localLobby.LHCCKNCKCGD(); // GameStatesLobbyLocal.ShowActiveCursors()
+            if (!SetTracker.IsTrackingSet) return;
+            if (!ScreenStageStrike.IsOpen) return;
+            HPNLMFHPHFD lobby = __instance;
+            lobby.LHCCKNCKCGD(); // GameStatesLobby::ShowActiveCursors()
         }
         
         // GameStatesLobby.CloseStageSelect()
@@ -34,9 +43,11 @@ internal static class StageScreenPatch
         [HarmonyPostfix]
         private static void CloseStageSelect_Postfix(HPNLMFHPHFD __instance)
         {
-            IJDANPONMLL localLobby = __instance as IJDANPONMLL;
-            if (localLobby == null || !SetTracker.Is1v1) return;
+            //IJDANPONMLL localLobby = __instance as IJDANPONMLL;
+            //if (localLobby == null || !SetTracker.Is1v1) return;
             
+            if (!SetTracker.IsTrackingSet) return;
+            if (!ScreenStageStrike.IsOpen) return;
             ScreenStageStrike.Close();
         }
         
@@ -45,9 +56,11 @@ internal static class StageScreenPatch
         [HarmonyPrefix]
         private static void ProcessStageSelect_Prefix(HPNLMFHPHFD __instance, Message EIMJOIEPMNA)
         {
-            IJDANPONMLL localLobby = __instance as IJDANPONMLL;
-            if (localLobby == null || !SetTracker.Is1v1) return;
+            //IJDANPONMLL localLobby = __instance as IJDANPONMLL;
+            //if (localLobby == null || !SetTracker.Is1v1) return;
 
+            if (!SetTracker.IsTrackingSet) return;
+            if (!ScreenStageStrike.IsOpen) return;
             Message message = EIMJOIEPMNA;
             if (message.msg == Msg.SEL_STAGE) __instance.EKFCNNPDJHH(); // GameStatesLobby.CloseStageSelect()
         }
@@ -56,6 +69,7 @@ internal static class StageScreenPatch
         [HarmonyPrefix]
         private static bool ScreenPlayersStage_OnOpen_Prefix(ScreenPlayersStage __instance)
         {
+            if (!SetTracker.IsTrackingSet) return true;
             if (!ScreenStageStrike.IsOpen) return true;
             
             ScreenStageStrike.Instance.OnOpen(__instance);
@@ -66,10 +80,20 @@ internal static class StageScreenPatch
         [HarmonyPostfix]
         private static void SetPlayerLayout_Postfix(ScreenPlayers __instance)
         {
-            if (!ScreenLobbyOverlay.IsOpen || !SetTracker.Is1v1) return;
+            if (!ScreenLobbyOverlay.IsActive) return;
             
             ScreenLobbyOverlay.Instance.OnOpen(__instance);
         }
+
+        [HarmonyPatch(typeof(ScreenPlayers), nameof(ScreenPlayers.DoUpdate))]
+        [HarmonyPostfix]
+        private static void ScreenPlayers_DoUpdate_Postfix()
+        {
+            if (!ScreenLobbyOverlay.IsActive) return;
+            if (!ScreenLobbyOverlay.Instance.IsOpen) return; 
+            
+            ScreenLobbyOverlay.Instance.UpdateSetCount();
+        } 
 
         [HarmonyPatch(typeof(LLCursor), nameof(LLCursor.ResizeHWCursor))]
         [HarmonyPostfix]
@@ -99,7 +123,7 @@ internal static class StageScreenPatch
         [HarmonyPostfix]
         private static void ResultUpdateState_Postfix(OEAINNHEMKA __instance)
         {
-            if (!SetTracker.Is1v1) return;
+            if (GameSettings.IsOnline) return;
             
             Player.ForAll((Player player) =>
             {
@@ -113,7 +137,7 @@ internal static class StageScreenPatch
         [HarmonyPostfix]
         private static void SetRematchChoice_Postfix(OEAINNHEMKA __instance, int BKEOPDPFFPM, KHMFCILNHHH ONPJANKJDJH)
         {
-            if (!SetTracker.Is1v1) return;
+            if (GameSettings.IsOnline) return;
             
             int playerNumber = BKEOPDPFFPM;
             KHMFCILNHHH rematchChoice = ONPJANKJDJH;

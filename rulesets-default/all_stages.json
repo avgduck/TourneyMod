@@ -1,0 +1,30 @@
+{
+  "id": "all_stages",
+  "name": "All Stages",
+  "stagesNeutral": [
+    "OUTSKIRTS",
+    "SEWERS",
+    "JUNKTOWN",
+    "CONSTRUCTION",
+    "FACTORY",
+    "SUBWAY",
+    "STADIUM",
+    "STREETS",
+    "POOL",
+    "ROOM21"
+  ],
+  "stagesCounterpick": [
+    "OUTSKIRTS_2D",
+    "POOL_2D",
+    "SEWERS_2D",
+    "ROOM21_2D",
+    "STREETS_2D",
+    "SUBWAY_2D",
+    "FACTORY_2D"
+  ],
+  "banAmounts": [],
+  "game1FirstPlayer": 0,
+  "laterGamesFirstPlayer": "WINNER",
+  "dsrMode": "OFF",
+  "randomMode": "ANY_3D"
+}

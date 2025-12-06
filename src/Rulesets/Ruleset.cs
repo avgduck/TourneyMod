@@ -68,7 +68,7 @@ public class Ruleset(
         string s = "";
         if (banAmounts.Length == 0)
         {
-            s += $"{(laterGamesFirstPlayer == FirstPlayer.WINNER ? "W" : "L")} picks";
+            s += "Free pick";
         }
         else
         {

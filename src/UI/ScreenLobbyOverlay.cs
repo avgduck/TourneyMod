@@ -1,3 +1,4 @@
+using LLBML.Settings;
 using LLGUI;
 using LLHandlers;
 using LLScreen;
@@ -9,7 +10,8 @@ namespace TourneyMod.UI;
 public class ScreenLobbyOverlay
 {
     internal static ScreenLobbyOverlay Instance { get; private set; }
-    internal static bool IsOpen => Instance != null;
+    internal static bool IsActive => Instance != null;
+    internal bool IsOpen { get; private set; }
     
     private ScreenPlayers screenPlayers;
     private TMP_Text lbGame;
@@ -66,6 +68,12 @@ public class ScreenLobbyOverlay
 
     internal void OnOpen(ScreenPlayers screenPlayers)
     {
+        if (GameSettings.current.gameMode != GameMode._1v1 || (GameSettings.IsOnline && GameSettings.OnlineMode == OnlineMode.RANKED))
+        {
+            Plugin.LogGlobal.LogInfo("Game mode is not local 1v1! Hiding lobby overlay set count");
+            return;
+        }
+        
         this.screenPlayers = screenPlayers;
 
         lbGame = CreateNewText("lbGame", screenPlayers.transform);
@@ -78,22 +86,23 @@ public class ScreenLobbyOverlay
         lbSetCount.rectTransform.localPosition = SETCOUNT_POSITION;
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
 
-        resetVotes = [false, false];
+        resetVotes = [false, false, false, false];
         btResetSetCount = CreateNewButton("btResetSetCount", screenPlayers.transform);
         btResetSetCount.transform.localPosition = RESET_POSITION;
         btResetSetCount.transform.localScale = RESET_SCALE;
         btResetSetCount.textMesh.rectTransform.localScale = new Vector2(1f / RESET_SCALE.x, 1f / RESET_SCALE.y);
         btResetSetCount.textMesh.fontSize = RESET_FONT_SIZE;
-        btResetSetCount.SetText("Reset set count 0/2");
+        btResetSetCount.SetText("Reset set count 0/0");
         btResetSetCount.onClick = (playerNumber) =>
         {
             OnResetClicked(playerNumber);
         };
         
         UpdateSetCount();
+        IsOpen = true;
     }
 
-    private void UpdateSetCount()
+    internal void UpdateSetCount()
     {
         int gameNumber = SetTracker.Instance.GetGameNumber();
         int[] winCounts = SetTracker.Instance.GetWinCounts();
@@ -105,7 +114,7 @@ public class ScreenLobbyOverlay
         {
             if (vote) sum++;
         }
-        btResetSetCount.SetText($"Reset set count {sum}/2");
+        btResetSetCount.SetText($"Reset set count {sum}/{SetTracker.NumPlayersInMatch}");
     }
 
     private void OnResetClicked(int playerNumber)
@@ -118,9 +127,9 @@ public class ScreenLobbyOverlay
             if (vote) sum++;
         }
         
-        if (sum >= 2)
+        if (sum >= SetTracker.NumPlayersInMatch)
         {
-            resetVotes = [false, false];
+            resetVotes = [false, false, false, false];
             SetTracker.Instance.ResetSetCount();
         }
         

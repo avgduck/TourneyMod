@@ -19,6 +19,7 @@ internal class SetTracker
     internal int controlStartPlayer;
     internal int ControllingPlayer { get; private set; }
     internal bool IsFreePickMode { get; private set; }
+    internal bool IsFreePickForced { get; private set; }
 
     internal enum InteractMode
     {
@@ -48,10 +49,33 @@ internal class SetTracker
         ruleset = RulesetIO.GetRulesetById(Configs.SelectedRulesetId.Value);
         Plugin.LogGlobal.LogInfo($"Loaded ruleset {ruleset}");
         IsFreePickMode = false;
+        IsFreePickForced = ruleset.banAmounts.Length == 0;
         
         ResetSetCount();
     }
 
+    internal void ForceAllStages()
+    {
+        ruleset = RulesetIO.GetRulesetById("all_stages");
+        IsFreePickMode = false;
+        IsFreePickForced = ruleset.banAmounts.Length == 0;
+        
+        ResetSetCount();
+    }
+
+    internal static int NumPlayersInMatch
+    {
+        get
+        {
+            int sum = 0;
+            Player.ForAllInMatch((Player player) =>
+            {
+                if (!player.IsAI) sum++;
+            });
+            return sum;
+        }
+    }
+    
     internal static bool Is1v1 {
         get
         {
@@ -188,7 +212,7 @@ internal class SetTracker
     {
         TotalBansRemaining = [0, 0, 0, 0];
         int banRulesCount = ruleset.banAmounts.Length;
-        if (banRulesCount == 0 || IsFreePickMode)
+        if (banRulesCount == 0 || IsFreePickMode || IsFreePickForced)
         {
             CurrentInteractMode = InteractMode.PICK;
             return;
@@ -235,7 +259,7 @@ internal class SetTracker
 
     internal bool CheckPlayerInteraction(StageBan stageBan, int playerNumber)
     {
-        if (IsFreePickMode) return true;
+        if (IsFreePickMode || IsFreePickForced) return true;
         if (playerNumber != ControllingPlayer) return false;
         if (stageBan == null) return true;
         if (stageBan.reason != SetTracker.StageBan.BanReason.DSR) return false;

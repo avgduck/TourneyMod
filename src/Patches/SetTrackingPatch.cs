@@ -42,7 +42,7 @@ internal static class SetTrackingPatch
                 SetTracker.Instance.EndMatch(scores);
             }
         }
-        else if (newState == GameState.LOBBY_LOCAL)
+        else if (newState == GameState.LOBBY_LOCAL || newState == GameState.LOBBY_TRAINING || newState == GameState.LOBBY_ONLINE)
         {
             SetTracker.StartSet();
             ScreenLobbyOverlay.Open();
