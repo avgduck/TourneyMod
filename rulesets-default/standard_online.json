@@ -18,5 +18,6 @@
   ],
   "game1FirstPlayer": 0,
   "laterGamesFirstPlayer": "WINNER",
-  "dsrMode": "OFF"
+  "dsrMode": "OFF",
+  "randomMode": "OFF"
 }

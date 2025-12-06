@@ -12,7 +12,8 @@ public class Ruleset(
     int[][] banAmounts,
     int game1FirstPlayer,
     Ruleset.FirstPlayer laterGamesFirstPlayer,
-    Ruleset.DsrMode dsrMode)
+    Ruleset.DsrMode dsrMode,
+    Ruleset.RandomMode randomMode)
 {
     public readonly string id = id;
     public readonly string name = name;
@@ -23,6 +24,7 @@ public class Ruleset(
     public readonly int game1FirstPlayer = game1FirstPlayer;
     public readonly FirstPlayer laterGamesFirstPlayer = laterGamesFirstPlayer;
     public readonly DsrMode dsrMode = dsrMode;
+    public readonly RandomMode randomMode = randomMode;
 
     public enum FirstPlayer
     {
@@ -35,6 +37,15 @@ public class Ruleset(
         OFF,
         FULL_SET,
         LAST_WIN
+    }
+
+    public enum RandomMode
+    {
+        OFF,
+        ANY,
+        ANY_3D,
+        ANY_2D,
+        ANY_LEGAL
     }
 
     private string PrintList<T>(List<T> list, bool includeBrackets = true)
@@ -98,7 +109,7 @@ public class Ruleset(
         }
 
         return
-            $"{{ id {id}, name '{name}', neutral {PrintList<Stage>(stagesNeutral.ToList())}, counterpick {PrintList<Stage>(stagesCounterpick.ToList())}, banAmounts {PrintList<string>(b)}, game1FirstPlayer {game1FirstPlayer}, laterGamesFirstPlayer {laterGamesFirstPlayer}, dsrMode {dsrMode} }}";
+            $"{{ id {id}, name '{name}', neutral {PrintList<Stage>(stagesNeutral.ToList())}, counterpick {PrintList<Stage>(stagesCounterpick.ToList())}, banAmounts {PrintList<string>(b)}, game1FirstPlayer {game1FirstPlayer}, laterGamesFirstPlayer {laterGamesFirstPlayer}, dsrMode {dsrMode}, randomMode {randomMode} }}";
     }
 
     internal List<string> GetDescription()
@@ -115,7 +126,17 @@ public class Ruleset(
             DsrMode.FULL_SET => "ON, includes all wins",
             DsrMode.LAST_WIN => "ON, only last win"
         }}");
+        text.Add($"<i>Random Select</i>: {randomMode switch {
+            RandomMode.OFF => "OFF",
+            RandomMode.ANY => "ON, selects any stage (3D or 2D)",
+            RandomMode.ANY_3D => "ON, selects any 3D stage (same as vanilla random)",
+            RandomMode.ANY_2D => "ON, selects any 2D stage",
+            RandomMode.ANY_LEGAL => "ON, selects any legal stage (neutral or counterpick)"
+        }}");
         
         return text;
     }
+
+    public static readonly List<Stage> STAGES_3D = [Stage.OUTSKIRTS, Stage.SEWERS, Stage.JUNKTOWN, Stage.CONSTRUCTION, Stage.FACTORY, Stage.SUBWAY, Stage.STADIUM, Stage.STREETS, Stage.POOL, Stage.ROOM21];
+    public static readonly List<Stage> STAGES_2D = [Stage.OUTSKIRTS_2D, Stage.SEWERS_2D, Stage.ROOM21_2D, Stage.STREETS_2D, Stage.SUBWAY_2D, Stage.FACTORY_2D];
 }

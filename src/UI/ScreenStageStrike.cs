@@ -5,6 +5,7 @@ using LLGUI;
 using LLHandlers;
 using LLScreen;
 using TMPro;
+using TourneyMod.Rulesets;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,10 +33,15 @@ internal class ScreenStageStrike
     private const int BACK_FONT_SIZE = 22;
 
     private static readonly float STAGE_SCALE_FACTOR = 0.62f;
+    private static readonly float STAGE_SCALE_FACTOR_MINI = 0.48f;
+    private static readonly float STAGE_SCALE_FACTOR_TINY = 0.41f;
     private static readonly Vector2 STAGE_SIZE = new Vector2(500f, 250f) * STAGE_SCALE_FACTOR;
+    private static readonly Vector2 STAGE_SIZE_MINI = new Vector2(500f, 250f) * STAGE_SCALE_FACTOR_MINI;
+    private static readonly Vector2 STAGE_SIZE_TINY = new Vector2(500f, 250f) * STAGE_SCALE_FACTOR_TINY;
     private static readonly Vector2 STAGES_POSITION = new Vector2(0f, 0f);
     private static readonly Vector2 STAGES_SPACING = new Vector2(6f, 6f);
     private const float STAGE_CATEGORY_SPACING = 20f;
+    private const float STAGE_CATEGORY_SPACING_MINI = 10f;
 
     private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 270f);
     private const int SETCOUNT_FONT_SIZE = 32;
@@ -47,6 +53,10 @@ internal class ScreenStageStrike
     private static readonly Vector2 FREEPICK_POSITION = new Vector2(506f, -336f);
     private static readonly Vector2 FREEPICK_SCALE = new Vector2(1.3f, 0.5f);
     private const int FREEPICK_FONT_SIZE = 18;
+    
+    private static readonly Vector2 RANDOM_POSITION = new Vector2(-378f, -336f);
+    private static readonly Vector2 RANDOM_SCALE = new Vector2(1.42f, 0.5f);
+    private const int RANDOM_FONT_SIZE = 18;
     
     private static readonly Color[] COLOR_PLAYER =
     [
@@ -65,6 +75,9 @@ internal class ScreenStageStrike
 
     private LLButton btFreePick;
     private bool[] freePickVotes = [false, false];
+    
+    private LLButton btRandom;
+    private bool[] randomVotes = [false, false];
 
     internal static void Open()
     {
@@ -136,39 +149,297 @@ internal class ScreenStageStrike
         btFreePick.SetText("Toggle free pick 0/2");
         btFreePick.textMesh.transform.localScale = new Vector2(1f / FREEPICK_SCALE.x, 1f / FREEPICK_SCALE.y);
         btFreePick.textMesh.fontSize = FREEPICK_FONT_SIZE;
-        btFreePick.onClick = (playerNumber) => { OnClickFreePick(playerNumber); };
+        btFreePick.onClick = OnClickFreePick;
+        
+        btRandom = ScreenStageStrike.Instance.CreateNewButton("btRandom", screenStage.transform);
+        btRandom.transform.localScale = RANDOM_SCALE;
+        btRandom.transform.localPosition = RANDOM_POSITION;
+        btRandom.SetText("Random (off) 0/2");
+        btRandom.textMesh.transform.localScale = new Vector2(1f / RANDOM_SCALE.x, 1f / RANDOM_SCALE.y);
+        btRandom.textMesh.fontSize = RANDOM_FONT_SIZE;
+        btRandom.onClick = OnClickRandom;
+        if (SetTracker.Instance.ruleset.randomMode == Ruleset.RandomMode.OFF) btRandom.gameObject.SetActive(false);
 
-        CreateStageButtons();
+        CreateStageContainers();
         UpdateStageBans();
         UpdateSetInfo();
     }
 
-    private float GetRowWidth(int rowLength)
+    private float GetRowWidth(int rowLength, Vector2 stageSize)
     {
-        return rowLength * STAGE_SIZE.x + (rowLength - 1) * STAGES_SPACING.x;
+        return rowLength * stageSize.x + (rowLength - 1) * STAGES_SPACING.x;
     }
 
-    private static int[] GetRowLengths(int numStages)
+    private struct RowLengths(int[] rowLengthsNeutral, int[]  rowLengthsCounterpick, int maxRowLength, int numRowsTotal)
     {
-        return numStages switch {
-            >= 1 and <= 4 => [numStages],
-            >= 5 and <= 6 => [3, numStages - 3],
-            >= 7 and <= 8 => [4, numStages - 4],
-            9 => [3, 3, 3],
-            _ => []
-        };
+        internal int[] rowLengthsNeutral = rowLengthsNeutral;
+        internal int[] rowLengthsCounterpick = rowLengthsCounterpick;
+        internal int maxRowLength = maxRowLength;
+        internal int numRowsTotal = numRowsTotal;
     }
-
-    private void CreateStageButtons()
+    private static RowLengths GetRowLengths(int numStagesNeutral, int numStagesCounterpick)
     {
-        int[] rowLengthsNeutral = GetRowLengths(SetTracker.Instance.ruleset.stagesNeutral.Length);
-        int[] rowLengthsCounterpick = GetRowLengths(SetTracker.Instance.ruleset.stagesCounterpick.Length);
-        int numRows = rowLengthsNeutral.Length + rowLengthsCounterpick.Length;
-        bool bothCategories = rowLengthsNeutral.Length > 0 && rowLengthsCounterpick.Length > 0;
+        int[] rowLengthsNeutral;
+        int[] rowLengthsCounterpick;
+
+        switch (numStagesCounterpick)
+        {
+            case 0:
+                rowLengthsCounterpick = [];
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 4 => [numStagesNeutral],
+                    >= 5 and <= 6 => [3, numStagesNeutral - 3],
+                    >= 7 and <= 8 => [4, numStagesNeutral - 4],
+                    9 => [3, 3, 3],
+                    10 => [3, 4, 3],
+                    11 => [4, 4, 3],
+                    12 => [4, 4, 4],
+                    13 => [4, 5, 4],
+                    14 => [5, 5, 4],
+                    15 => [5, 5, 5],
+                    16 => [4, 4, 4, 4],
+                    17 => [5, 4, 4, 4],
+                    _ => []
+                };
+                break;
+            
+            case >= 1 and <= 4:
+                rowLengthsCounterpick = [numStagesCounterpick];
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 4 => [numStagesNeutral],
+                    >= 5 and <= 6 => [3, numStagesNeutral - 3],
+                    >= 7 and <= 8 => [4, numStagesNeutral - 4],
+                    9 => [5, 4],
+                    10 => [5, 5],
+                    11 => [4, 4, 3],
+                    12 => [4, 4, 4],
+                    13 => [4, 5, 4],
+                    14 => [5, 5, 4],
+                    15 => [5, 5, 5],
+                    16 => [5, 6, 5],
+                    _ => []
+                };
+                break;
+            
+            case 5:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    >= 0 and <= 8 => [3, 2],
+                    >= 9 => [5],
+                    _ => []
+                };
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 4 => [numStagesNeutral],
+                    >= 5 and <= 6 => [3, numStagesNeutral - 3],
+                    >= 7 and <= 8 => [4, numStagesNeutral - 4],
+                    9 => [5, 4],
+                    10 => [5, 5],
+                    11 => [4, 4, 3],
+                    12 => [4, 4, 4],
+                    _ => []
+                };
+                break;
+            
+            case 6:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    >= 0 and <= 10 => [3, 3],
+                    11 => [6],
+                    _ => []
+                };
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 4 => [numStagesNeutral],
+                    >= 5 and <= 6 => [3, numStagesNeutral - 3],
+                    >= 7 and <= 8 => [4, numStagesNeutral - 4],
+                    9 => [5, 4],
+                    10 => [5, 5],
+                    11 => [4, 4, 3],
+                    _ => []
+                };
+                break;
+            
+            case >= 7 and <= 8:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    >= 0 and <= 10 => [4, numStagesCounterpick - 4],
+                    _ => []
+                };
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 4 => [numStagesNeutral],
+                    >= 5 and <= 6 => [3, numStagesNeutral - 3],
+                    >= 7 and <= 8 => [4, numStagesNeutral - 4],
+                    9 => [5, 4],
+                    10 => [5, 5],
+                    _ => []
+                };
+                break;
+            
+            case 9:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    0 => [3, 3, 3],
+                    >= 1 and <= 8 => [5, 4],
+                    _ => []
+                };
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 4 => [numStagesNeutral],
+                    >= 5 and <= 6 => [3, numStagesNeutral - 3],
+                    >= 7 and <= 8 => [4, numStagesNeutral - 4],
+                    _ => []
+                };
+                break;
+            
+            case 10:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    0 => [3, 4, 3],
+                    >= 1 and <= 7 => [5, 5],
+                    _ => []
+                };
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 4 => [numStagesNeutral],
+                    >= 5 and <= 6 => [3, numStagesNeutral - 3],
+                    7 => [4, 3],
+                    _ => []
+                };
+                break;
+            
+            case 11:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    >= 0 and <= 6 => [4, 4, 3],
+                    _ => []
+                };
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 6 => [numStagesNeutral],
+                    _ => []
+                };
+                break;
+            
+            case 12:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    >= 0 and <= 5 => [4, 4, 4],
+                    _ => []
+                };
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 5 => [numStagesNeutral],
+                    _ => []
+                };
+                break;
+            
+            case 13:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    >= 0 and <= 5 => [4, 5, 4],
+                    _ => []
+                };
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 4 => [numStagesNeutral],
+                    _ => []
+                };
+                break;
+            
+            case 14:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    >= 0 and <= 5 => [5, 5, 4],
+                    _ => []
+                };
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 3 => [numStagesNeutral],
+                    _ => []
+                };
+                break;
+            
+            case 15:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    >= 0 and <= 5 => [5, 5, 5],
+                    _ => []
+                };
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    >= 1 and <= 2 => [numStagesNeutral],
+                    _ => []
+                };
+                break;
+            
+            case 16:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    0 => [4, 4, 4, 4],
+                    1 => [5, 6, 5],
+                    _ => []
+                };
+                rowLengthsNeutral = numStagesNeutral switch
+                {
+                    1 => [1],
+                    _ => []
+                };
+                break;
+            
+            case 17:
+                rowLengthsCounterpick = numStagesNeutral switch
+                {
+                    0 => [5, 4, 4, 4],
+                    _ => []
+                };
+                rowLengthsNeutral = [];
+                break;
+            
+            default:
+                rowLengthsCounterpick = [];
+                rowLengthsNeutral = [];
+                break;
+        }
+
+        int maxRowLength = 0;
+        foreach (int l in rowLengthsNeutral)
+        {
+            if (l > maxRowLength) maxRowLength = l;
+        }
+        foreach (int l in rowLengthsCounterpick)
+        {
+            if (l > maxRowLength) maxRowLength = l;
+        }
         
-        float totalHeight = numRows * STAGE_SIZE.y + (numRows - 1) * STAGES_SPACING.y;
-        if (bothCategories) totalHeight += STAGE_CATEGORY_SPACING;
-        float startPositionY = STAGES_POSITION.y + totalHeight / 2f - STAGE_SIZE.y / 2f;
+        int numRowsTotal = rowLengthsNeutral.Length + rowLengthsCounterpick.Length;
+
+        return new RowLengths(rowLengthsNeutral, rowLengthsCounterpick, maxRowLength, numRowsTotal);
+    }
+
+    private void CreateStageContainers()
+    {
+        RowLengths rowLengths = GetRowLengths(SetTracker.Instance.ruleset.stagesNeutral.Length, SetTracker.Instance.ruleset.stagesCounterpick.Length);
+        
+        bool useBothCategories = rowLengths.rowLengthsNeutral.Length > 0 && rowLengths.rowLengthsCounterpick.Length > 0;
+        
+        Vector2 stageSize = STAGE_SIZE;
+        if (rowLengths.maxRowLength > 4 || rowLengths.numRowsTotal > 3) stageSize = STAGE_SIZE_MINI;
+        if (rowLengths.maxRowLength > 5) stageSize = STAGE_SIZE_TINY;
+        
+        float stageScaleFactor = STAGE_SCALE_FACTOR;
+        if (rowLengths.maxRowLength > 4 || rowLengths.numRowsTotal > 3) stageScaleFactor = STAGE_SCALE_FACTOR_MINI;
+        if (rowLengths.maxRowLength > 5) stageScaleFactor = STAGE_SCALE_FACTOR_TINY;
+
+        float stageCategorySpacing = STAGE_CATEGORY_SPACING;
+        if (rowLengths.maxRowLength > 4 || rowLengths.numRowsTotal > 3) stageCategorySpacing = STAGE_CATEGORY_SPACING_MINI;
+        
+        float totalHeight = rowLengths.numRowsTotal * stageSize.y + (rowLengths.numRowsTotal - 1) * STAGES_SPACING.y;
+        if (useBothCategories) totalHeight += stageCategorySpacing;
+        float startPositionY = STAGES_POSITION.y + totalHeight / 2f - stageSize.y / 2f;
 
         screenStage.nButtons = SetTracker.Instance.ruleset.stagesNeutral.Length + SetTracker.Instance.ruleset.stagesCounterpick.Length;
         screenStage.btStages = new LLButton[screenStage.nButtons];
@@ -180,23 +451,23 @@ internal class ScreenStageStrike
         stageContainersNeutral = new List<StageContainer>();
         foreach (Stage stage in SetTracker.Instance.ruleset.stagesNeutral)
         {
-            float startPositionX = STAGES_POSITION.x - GetRowWidth(rowLengthsNeutral[rowIndex]) / 2f + STAGE_SIZE.x / 2f;
+            float startPositionX = STAGES_POSITION.x - GetRowWidth(rowLengths.rowLengthsNeutral[rowIndex], stageSize) / 2f + stageSize.x / 2f;
             
             StageContainer container = new StageContainer(stage);
             stageContainers.Add(container);
             stageContainersNeutral.Add(container);
 
-            float posX = startPositionX + colIndex * (STAGE_SIZE.x + STAGES_SPACING.x);
-            float posY = startPositionY - rowIndex * (STAGE_SIZE.y + STAGES_SPACING.y);
+            float posX = startPositionX + colIndex * (stageSize.x + STAGES_SPACING.x);
+            float posY = startPositionY - rowIndex * (stageSize.y + STAGES_SPACING.y);
             RectTransform buttonRect = container.Button.GetComponent<RectTransform>();
             buttonRect.anchoredPosition = new Vector2(posX, posY);
-            buttonRect.localScale = Vector2.one * STAGE_SCALE_FACTOR;
+            buttonRect.localScale = Vector2.one * stageScaleFactor;
 
             screenStage.btStages[stageIndex] = container.Button;
 
             stageIndex++;
             colIndex++;
-            if (colIndex >= rowLengthsNeutral[rowIndex])
+            if (colIndex >= rowLengths.rowLengthsNeutral[rowIndex])
             {
                 rowIndex++;
                 colIndex = 0;
@@ -208,24 +479,24 @@ internal class ScreenStageStrike
         stageContainersCounterpick = new List<StageContainer>();
         foreach (Stage stage in SetTracker.Instance.ruleset.stagesCounterpick)
         {
-            float startPositionX = STAGES_POSITION.x - GetRowWidth(rowLengthsCounterpick[rowIndex]) / 2f+ STAGE_SIZE.x / 2f;
+            float startPositionX = STAGES_POSITION.x - GetRowWidth(rowLengths.rowLengthsCounterpick[rowIndex], stageSize) / 2f+ stageSize.x / 2f;
             
             StageContainer container = new StageContainer(stage);
             stageContainers.Add(container);
             stageContainersCounterpick.Add(container);
 
-            float posX = startPositionX + colIndex * (STAGE_SIZE.x + STAGES_SPACING.x);
-            float posY = startPositionY - (rowIndex + rowLengthsNeutral.Length) * (STAGE_SIZE.y + STAGES_SPACING.y);
-            if (bothCategories) posY -= STAGE_CATEGORY_SPACING;
+            float posX = startPositionX + colIndex * (stageSize.x + STAGES_SPACING.x);
+            float posY = startPositionY - (rowIndex + rowLengths.rowLengthsNeutral.Length) * (stageSize.y + STAGES_SPACING.y);
+            if (useBothCategories) posY -= stageCategorySpacing;
             RectTransform buttonRect = container.Button.GetComponent<RectTransform>();
             buttonRect.anchoredPosition = new Vector2(posX, posY);
-            buttonRect.localScale = Vector2.one * STAGE_SCALE_FACTOR;
+            buttonRect.localScale = Vector2.one * stageScaleFactor;
             
             screenStage.btStages[stageIndex] = container.Button;
 
             stageIndex++;
             colIndex++;
-            if (colIndex >= rowLengthsCounterpick[rowIndex])
+            if (colIndex >= rowLengths.rowLengthsCounterpick[rowIndex])
             {
                 rowIndex++;
                 colIndex = 0;
@@ -266,12 +537,25 @@ internal class ScreenStageStrike
                 : $"P{controllingPlayer+1} picking...");
         }
         
-        int sum = 0;
+        int freePickSum = 0;
         foreach (bool vote in freePickVotes)
         {
-            if (vote) sum++;
+            if (vote) freePickSum++;
         }
-        btFreePick.SetText($"Toggle free pick {sum}/2");
+        btFreePick.SetText($"Toggle free pick {freePickSum}/2");
+        
+        int randomSum = 0;
+        foreach (bool vote in randomVotes)
+        {
+            if (vote) randomSum++;
+        }
+        btRandom.SetText($"Random {SetTracker.Instance.ruleset.randomMode switch {
+            Ruleset.RandomMode.OFF => "(off)",
+            Ruleset.RandomMode.ANY => "(any 3D/2D)",
+            Ruleset.RandomMode.ANY_3D => "(any 3D)",
+            Ruleset.RandomMode.ANY_2D => "(any 2D)",
+            Ruleset.RandomMode.ANY_LEGAL => "(any legal)",
+        }} {randomSum}/2");
     }
 
     // texture editing code from ColorSwap
@@ -379,6 +663,50 @@ internal class ScreenStageStrike
             freePickVotes = [false, false];
             SetTracker.Instance.ToggleFreePickMode();
             UpdateStageBans();
+        }
+        
+        UpdateSetInfo();
+    }
+
+    private void OnClickRandom(int playerNumber)
+    {
+        randomVotes[playerNumber] = true;
+
+        int sum = 0;
+        foreach (bool vote in randomVotes)
+        {
+            if (vote) sum++;
+        }
+
+        if (sum >= 2)
+        {
+            randomVotes = [false, false];
+            List<Stage> randomStagePool = new List<Stage>();
+            switch (SetTracker.Instance.ruleset.randomMode)
+            {
+                case Ruleset.RandomMode.ANY:
+                    randomStagePool.AddRange(Ruleset.STAGES_3D);
+                    randomStagePool.AddRange(Ruleset.STAGES_2D);
+                    break;
+                
+                case Ruleset.RandomMode.ANY_3D:
+                    randomStagePool.AddRange(Ruleset.STAGES_3D);
+                    break;
+                
+                case Ruleset.RandomMode.ANY_2D:
+                    randomStagePool.AddRange(Ruleset.STAGES_2D);
+                    break;
+                
+                case Ruleset.RandomMode.ANY_LEGAL:
+                    randomStagePool.AddRange(SetTracker.Instance.ruleset.stagesNeutral);
+                    randomStagePool.AddRange(SetTracker.Instance.ruleset.stagesCounterpick);
+                    break;
+                
+                case Ruleset.RandomMode.OFF:
+                default:
+                    break;
+            }
+            if (SetTracker.Instance.ruleset.randomMode != Ruleset.RandomMode.OFF) screenStage.SelectStage(playerNumber, (int)randomStagePool[Random.RandomRangeInt(0, randomStagePool.Count)]);
         }
         
         UpdateSetInfo();

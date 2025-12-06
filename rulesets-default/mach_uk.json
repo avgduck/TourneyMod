@@ -20,5 +20,6 @@
   ],
   "game1FirstPlayer": 1,
   "laterGamesFirstPlayer": "WINNER",
-  "dsrMode": "FULL_SET"
+  "dsrMode": "FULL_SET",
+  "randomMode": "OFF"
 }
