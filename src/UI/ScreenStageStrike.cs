@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using LLBML.Players;
 using LLBML.States;
+using LLBML.Utils;
 using LLGUI;
 using LLHandlers;
 using LLScreen;
@@ -226,7 +227,7 @@ internal class ScreenStageStrike
             case 5:
                 rowLengthsCounterpick = numStagesNeutral switch
                 {
-                    >= 0 and <= 8 => [3, 2],
+                    >= 0 and <= 10 => [3, 2],
                     >= 9 => [5],
                     _ => []
                 };
@@ -282,8 +283,8 @@ internal class ScreenStageStrike
             case 9:
                 rowLengthsCounterpick = numStagesNeutral switch
                 {
-                    0 => [3, 3, 3],
-                    >= 1 and <= 8 => [5, 4],
+                    >= 0 and <= 4 => [3, 3, 3],
+                    >= 5 and <= 8 => [5, 4],
                     _ => []
                 };
                 rowLengthsNeutral = numStagesNeutral switch
@@ -340,7 +341,7 @@ internal class ScreenStageStrike
             case 13:
                 rowLengthsCounterpick = numStagesNeutral switch
                 {
-                    >= 0 and <= 5 => [4, 5, 4],
+                    >= 0 and <= 4 => [4, 5, 4],
                     _ => []
                 };
                 rowLengthsNeutral = numStagesNeutral switch
@@ -353,7 +354,7 @@ internal class ScreenStageStrike
             case 14:
                 rowLengthsCounterpick = numStagesNeutral switch
                 {
-                    >= 0 and <= 5 => [5, 5, 4],
+                    >= 0 and <= 3 => [5, 5, 4],
                     _ => []
                 };
                 rowLengthsNeutral = numStagesNeutral switch
@@ -366,7 +367,7 @@ internal class ScreenStageStrike
             case 15:
                 rowLengthsCounterpick = numStagesNeutral switch
                 {
-                    >= 0 and <= 5 => [5, 5, 5],
+                    >= 0 and <= 2 => [5, 5, 5],
                     _ => []
                 };
                 rowLengthsNeutral = numStagesNeutral switch
@@ -742,27 +743,7 @@ internal class ScreenStageStrike
 
         internal StageButton Button { get; private set; }
         internal Stage StoredStage { get; private set; }
-        private string StageName => StoredStage switch
-        {
-            Stage.OUTSKIRTS => "Outskirts",
-            Stage.SEWERS => "Sewers", 
-            Stage.JUNKTOWN => "Desert",
-            Stage.CONSTRUCTION => "Elevator",
-            Stage.FACTORY => "Factory",
-            Stage.SUBWAY => "Subway",
-            Stage.STADIUM => "Stadium",
-            Stage.STREETS => "Streets",
-            Stage.POOL => "Pool",
-            Stage.ROOM21 => "Room 21",
-            Stage.OUTSKIRTS_2D => "Retro Outskirts",
-            Stage.POOL_2D => "Retro Pool",
-            Stage.SEWERS_2D => "Retro Sewers",
-            Stage.ROOM21_2D => "Retro Room 21",
-            Stage.STREETS_2D => "Retro Streets",
-            Stage.SUBWAY_2D => "Retro Subway",
-            Stage.FACTORY_2D => "Retro Factory",
-            _ => ""
-        };
+        private string StageName => StringUtils.GetStageReadableName(StoredStage);
 
         private Vector2 StageSize => StoredStage switch
         {
@@ -800,7 +781,7 @@ internal class ScreenStageStrike
             lbStageSize = ScreenStageStrike.Instance.CreateNewText("lbStageSize", Button.transform);
             lbStageSize.fontSize = 22;
             lbStageSize.rectTransform.localPosition = new Vector2(190f, 110f);
-            TextHandler.SetText(lbStageSize, $"{StageSize.x}x{StageSize.y}");
+            TextHandler.SetText(lbStageSize, (StageSize != Vector2.zero ? $"{StageSize.x}x{StageSize.y}" : ""));
         }
     }
 
