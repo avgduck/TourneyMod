@@ -13,5 +13,8 @@ internal static class HarmonyPatches
         
         harmony.PatchAll(typeof(StageScreenPatch));
         Plugin.LogGlobal.LogInfo("Stage select screen patch applied");
+        
+        harmony.PatchAll(typeof(StageSizePatch));
+        Plugin.LogGlobal.LogInfo("Stage size check patch applied");
     }
 }

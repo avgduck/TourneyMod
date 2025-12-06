@@ -763,6 +763,15 @@ internal class ScreenStageStrike
             Stage.STREETS => new Vector2(1320, 515),
             Stage.POOL => new Vector2(1210, 575),
             Stage.ROOM21 => new Vector2(1100, 550),
+            
+            Stage.OUTSKIRTS_2D => new Vector2(1230, 493),
+            Stage.POOL_2D => new Vector2(1160, 518),
+            Stage.SEWERS_2D => new Vector2(1162, 512),
+            Stage.ROOM21_2D => new Vector2(975, 484),
+            Stage.STREETS_2D => new Vector2(1105, 480),
+            Stage.SUBWAY_2D => new Vector2(1100, 483),
+            Stage.FACTORY_2D => new Vector2(1256, 407),
+            
             _ => Vector2.zero
         };
 
