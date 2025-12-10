@@ -12,11 +12,12 @@ internal class RulesetPreviewWindow : MonoBehaviour
 {
     private static readonly Vector2 POSITION = new Vector2(530f, 200f);
     private const float FONT_SIZE = 12f;
-    private const float FONT_SIZE_2 = 8f;
+    private const float FONT_SIZE_2 = 10f;
     private const float SPACING = 20f;
 
     private const float LEFTCOL = -143f;
     private const float RIGHTCOL = 63f;
+    private const float LEFT = 6f;
 
     internal static void Create(Transform tfParent)
     {
@@ -58,7 +59,7 @@ internal class RulesetPreviewWindow : MonoBehaviour
         tfContainer = LLControl.CreatePanel(rectTransform, "container", 0f, 0f);
         imgBg = LLControl.CreateImage(tfContainer, Sprite.Create(Texture2D.whiteTexture, new Rect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f)));
         imgBg.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 200f);
-        imgBg.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 500f);
+        imgBg.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 440f);
         imgBg.rectTransform.ForceUpdateRectTransforms();
         imgBg.rectTransform.pivot = new Vector2(0.5f, 1f);
         imgBg.rectTransform.localPosition = new Vector2(0f, 30f);
@@ -81,100 +82,100 @@ internal class RulesetPreviewWindow : MonoBehaviour
 
         rulesetInfo = new List<TextMeshProUGUI>();
         
-        lbName1 = LLControl.CreatePanel(tfContainer, "lbName1", LEFTCOL, -SPACING * (1)).gameObject.AddComponent<TextMeshProUGUI>();
+        lbName1 = LLControl.CreatePanel(tfContainer, "lbName1", LEFT, -SPACING * (1)).gameObject.AddComponent<TextMeshProUGUI>();
         lbName1.fontSize = FONT_SIZE;
         lbName1.enableWordWrapping = false;
-        lbName1.alignment = TextAlignmentOptions.TopRight;
+        lbName1.alignment = TextAlignmentOptions.TopLeft;
         lbName1.color = Color.white;
         lbName1.SetText("Name:");
         rulesetInfo.Add(lbName1);
         
-        lbName2 = LLControl.CreatePanel(tfContainer, "lbName2", RIGHTCOL, -SPACING * (1) - (FONT_SIZE - FONT_SIZE_2)/2f).gameObject.AddComponent<TextMeshProUGUI>();
+        lbName2 = LLControl.CreatePanel(tfContainer, "lbName2", LEFT, -SPACING * (1) - FONT_SIZE).gameObject.AddComponent<TextMeshProUGUI>();
         lbName2.fontSize = FONT_SIZE_2;
         lbName2.enableWordWrapping = false;
         lbName2.alignment = TextAlignmentOptions.TopLeft;
-        lbName2.color = Color.white;
+        lbName2.color = Color.yellow;
         lbName2.SetText("");
         rulesetInfo.Add(lbName2);
         
-        lbNeutralStages1 = LLControl.CreatePanel(tfContainer, "lbNeutralStages", LEFTCOL, -SPACING * (2)).gameObject.AddComponent<TextMeshProUGUI>();
+        lbNeutralStages1 = LLControl.CreatePanel(tfContainer, "lbNeutralStages", LEFT, -SPACING * (2) - FONT_SIZE_2 * (1)).gameObject.AddComponent<TextMeshProUGUI>();
         lbNeutralStages1.fontSize = FONT_SIZE;
         lbNeutralStages1.enableWordWrapping = false;
-        lbNeutralStages1.alignment = TextAlignmentOptions.TopRight;
+        lbNeutralStages1.alignment = TextAlignmentOptions.TopLeft;
         lbNeutralStages1.color = Color.white;
-        lbNeutralStages1.SetText("Neutral\nStages:");
+        lbNeutralStages1.SetText("Neutral stages:");
         rulesetInfo.Add(lbNeutralStages1);
         
-        lbNeutralStages2 = LLControl.CreatePanel(tfContainer, "lbNeutralStageCount", RIGHTCOL, -SPACING * (2) - (FONT_SIZE - FONT_SIZE_2)/2f).gameObject.AddComponent<TextMeshProUGUI>();
+        lbNeutralStages2 = LLControl.CreatePanel(tfContainer, "lbNeutralStageCount", LEFT, -SPACING * (2) - FONT_SIZE_2 * (1) - FONT_SIZE).gameObject.AddComponent<TextMeshProUGUI>();
         lbNeutralStages2.fontSize = FONT_SIZE_2;
         lbNeutralStages2.enableWordWrapping = false;
         lbNeutralStages2.alignment = TextAlignmentOptions.TopLeft;
-        lbNeutralStages2.color = Color.white;
+        lbNeutralStages2.color = Color.yellow;
         lbNeutralStages2.SetText("");
         rulesetInfo.Add(lbNeutralStages2);
         
-        lbCounterpickStages1 = LLControl.CreatePanel(tfContainer, "lbCounterpickStages", LEFTCOL, -SPACING * (2+8)).gameObject.AddComponent<TextMeshProUGUI>();
+        lbCounterpickStages1 = LLControl.CreatePanel(tfContainer, "lbCounterpickStages", LEFT, -SPACING * (3) - FONT_SIZE_2 * (1+10)).gameObject.AddComponent<TextMeshProUGUI>();
         lbCounterpickStages1.fontSize = FONT_SIZE;
         lbCounterpickStages1.enableWordWrapping = false;
-        lbCounterpickStages1.alignment = TextAlignmentOptions.TopRight;
+        lbCounterpickStages1.alignment = TextAlignmentOptions.TopLeft;
         lbCounterpickStages1.color = Color.white;
-        lbCounterpickStages1.SetText("Counter\n-pick\nStages:");
+        lbCounterpickStages1.SetText("Counterpick stages:");
         rulesetInfo.Add(lbCounterpickStages1);
 
-        lbCounterpickStages2 = LLControl.CreatePanel(tfContainer, "lbCounterpickStageCount", RIGHTCOL, -SPACING * (2+8) - (FONT_SIZE - FONT_SIZE_2)/2f).gameObject.AddComponent<TextMeshProUGUI>();
+        lbCounterpickStages2 = LLControl.CreatePanel(tfContainer, "lbCounterpickStageCount", LEFT, -SPACING * (3) - FONT_SIZE_2 * (1+10) - FONT_SIZE).gameObject.AddComponent<TextMeshProUGUI>();
         lbCounterpickStages2.fontSize = FONT_SIZE_2;
         lbCounterpickStages2.enableWordWrapping = false;
         lbCounterpickStages2.alignment = TextAlignmentOptions.TopLeft;
-        lbCounterpickStages2.color = Color.white;
+        lbCounterpickStages2.color = Color.yellow;
         lbCounterpickStages2.SetText("");
         rulesetInfo.Add(lbCounterpickStages2);
         
-        lbDsrMode1 = LLControl.CreatePanel(tfContainer, "lbDsrMode1", LEFTCOL, -SPACING * (2+16)).gameObject.AddComponent<TextMeshProUGUI>();
+        lbDsrMode1 = LLControl.CreatePanel(tfContainer, "lbDsrMode1", LEFT, -SPACING * (4) - FONT_SIZE_2 * (1+20)).gameObject.AddComponent<TextMeshProUGUI>();
         lbDsrMode1.fontSize = FONT_SIZE;
         lbDsrMode1.enableWordWrapping = false;
-        lbDsrMode1.alignment = TextAlignmentOptions.TopRight;
+        lbDsrMode1.alignment = TextAlignmentOptions.TopLeft;
         lbDsrMode1.color = Color.white;
         lbDsrMode1.SetText("DSR:");
         rulesetInfo.Add(lbDsrMode1);
 
-        lbDsrMode2 = LLControl.CreatePanel(tfContainer, "lbDsrMode2", RIGHTCOL, -SPACING * (2+16) - (FONT_SIZE - FONT_SIZE_2)/2f).gameObject.AddComponent<TextMeshProUGUI>();
+        lbDsrMode2 = LLControl.CreatePanel(tfContainer, "lbDsrMode2", LEFT, -SPACING * (4) - FONT_SIZE_2 * (1+20) - FONT_SIZE).gameObject.AddComponent<TextMeshProUGUI>();
         lbDsrMode2.fontSize = FONT_SIZE_2;
         lbDsrMode2.enableWordWrapping = false;
         lbDsrMode2.alignment = TextAlignmentOptions.TopLeft;
-        lbDsrMode2.color = Color.white;
+        lbDsrMode2.color = Color.yellow;
         lbDsrMode2.SetText("");
         rulesetInfo.Add(lbDsrMode2);
         
-        lbRandomMode1 = LLControl.CreatePanel(tfContainer, "lbRandomMode1", LEFTCOL, -SPACING * (2+16+1)).gameObject.AddComponent<TextMeshProUGUI>();
+        lbRandomMode1 = LLControl.CreatePanel(tfContainer, "lbRandomMode1", LEFT, -SPACING * (5) - FONT_SIZE_2 * (2+20)).gameObject.AddComponent<TextMeshProUGUI>();
         lbRandomMode1.fontSize = FONT_SIZE;
         lbRandomMode1.enableWordWrapping = false;
-        lbRandomMode1.alignment = TextAlignmentOptions.TopRight;
+        lbRandomMode1.alignment = TextAlignmentOptions.TopLeft;
         lbRandomMode1.color = Color.white;
         lbRandomMode1.SetText("Random:");
         rulesetInfo.Add(lbRandomMode1);
 
-        lbRandomMode2 = LLControl.CreatePanel(tfContainer, "lbRandomMode2", RIGHTCOL, -SPACING * (2+16+1) - (FONT_SIZE - FONT_SIZE_2)/2f).gameObject.AddComponent<TextMeshProUGUI>();
+        lbRandomMode2 = LLControl.CreatePanel(tfContainer, "lbRandomMode2", LEFT, -SPACING * (5) - FONT_SIZE_2 * (2+20) - FONT_SIZE).gameObject.AddComponent<TextMeshProUGUI>();
         lbRandomMode2.fontSize = FONT_SIZE_2;
         lbRandomMode2.enableWordWrapping = false;
         lbRandomMode2.alignment = TextAlignmentOptions.TopLeft;
-        lbRandomMode2.color = Color.white;
+        lbRandomMode2.color = Color.yellow;
         lbRandomMode2.SetText("");
         rulesetInfo.Add(lbRandomMode2);
         
         
-        lbBanOrder1 = LLControl.CreatePanel(tfContainer, "lbBanOrder1", LEFTCOL, -SPACING * (2+16+2)).gameObject.AddComponent<TextMeshProUGUI>();
+        lbBanOrder1 = LLControl.CreatePanel(tfContainer, "lbBanOrder1", LEFT, -SPACING * (6) - FONT_SIZE_2 * (3+20)).gameObject.AddComponent<TextMeshProUGUI>();
         lbBanOrder1.fontSize = FONT_SIZE;
         lbBanOrder1.enableWordWrapping = false;
-        lbBanOrder1.alignment = TextAlignmentOptions.TopRight;
+        lbBanOrder1.alignment = TextAlignmentOptions.TopLeft;
         lbBanOrder1.color = Color.white;
-        lbBanOrder1.SetText("Ban\nOrder:");
+        lbBanOrder1.SetText("Ban order:");
         rulesetInfo.Add(lbBanOrder1);
         
-        lbBanOrder2 = LLControl.CreatePanel(tfContainer, "lbBanOrder2", RIGHTCOL, -SPACING * (2+16+2) - (FONT_SIZE - FONT_SIZE_2)/2f).gameObject.AddComponent<TextMeshProUGUI>();
+        lbBanOrder2 = LLControl.CreatePanel(tfContainer, "lbBanOrder2", LEFT, -SPACING * (6) - FONT_SIZE_2 * (3+20) - FONT_SIZE).gameObject.AddComponent<TextMeshProUGUI>();
         lbBanOrder2.fontSize = FONT_SIZE_2;
         lbBanOrder2.enableWordWrapping = false;
         lbBanOrder2.alignment = TextAlignmentOptions.TopLeft;
-        lbBanOrder2.color = Color.white;
+        lbBanOrder2.color = Color.yellow;
         lbBanOrder2.SetText("");
         rulesetInfo.Add(lbBanOrder2);
         
@@ -187,7 +188,7 @@ internal class RulesetPreviewWindow : MonoBehaviour
 
         for (int stageIndex = 0; stageIndex < stages.Length; stageIndex++)
         {
-            if (stageIndex != 0) s += $",\n";
+            if (stageIndex != 0) s += $",{(stageIndex % 2 == 0 ? "\n" : " ")}";
             s += LLBML.Utils.StringUtils.GetStageReadableName(stages[stageIndex]);
         }
         
@@ -243,7 +244,7 @@ internal class RulesetPreviewWindow : MonoBehaviour
 
         Ruleset ruleset = Plugin.Instance.selectedRuleset;
         tfContainer.gameObject.SetActive(true);
-        lbRuleset.color = ruleset == null ? Color.red : Color.white;
+        lbRuleset.color = ruleset == null ? Color.red : Color.green;
         lbRuleset.SetText(ruleset == null ? "NULL" : ruleset.id);
 
         if (ruleset == null)
