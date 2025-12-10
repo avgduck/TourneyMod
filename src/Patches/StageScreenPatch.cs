@@ -20,7 +20,7 @@ internal static class StageScreenPatch
             if (!SetTracker.IsTrackingSet) return;
             Plugin.LogGlobal.LogInfo($"OpenStageSelect: IsOnline {GameSettings.IsOnline}, OnlineMode {GameSettings.OnlineMode}");
             if (GameSettings.IsOnline && GameSettings.OnlineMode != OnlineMode.HOSTED) return;
-            if (GameSettings.current.gameMode != GameMode._1v1 || SetTracker.Instance.ruleset == null) SetTracker.Instance.ForceAllStages();
+            if (GameSettings.current.gameMode != GameMode._1v1) SetTracker.Instance.ForceAllStages();
             ScreenStageStrike.Open();
         }
         // GameStatesLobby.OpenStageSelect(bool canGoBack, bool localSpectator = false, ScreenType = ScreenType.PLAYERS_STAGE)

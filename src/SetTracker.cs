@@ -47,6 +47,13 @@ internal class SetTracker
     private SetTracker()
     {
         ruleset = Plugin.Instance.selectedRuleset;
+
+        if (ruleset == null)
+        {
+            ForceAllStages();
+            return;
+        }
+        
         IsFreePickMode = false;
         IsFreePickForced = ruleset.banAmounts.Length == 0;
         
