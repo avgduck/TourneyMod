@@ -32,6 +32,9 @@
       <Reference Include="LLBModdingLib">
         <HintPath>libs\LLBModdingLib.dll</HintPath>
       </Reference>
+      <Reference Include="ModMenu">
+        <HintPath>libs\ModMenu.dll</HintPath>
+      </Reference>
       <Reference Include="TextMeshPro">
         <HintPath>libs\TextMeshPro.dll</HintPath>
       </Reference>

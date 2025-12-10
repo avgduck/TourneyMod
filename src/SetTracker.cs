@@ -46,8 +46,7 @@ internal class SetTracker
 
     private SetTracker()
     {
-        ruleset = RulesetIO.GetRulesetById(Configs.SelectedRulesetId.Value);
-        Plugin.LogGlobal.LogInfo($"Loaded ruleset {ruleset}");
+        ruleset = Plugin.Instance.selectedRuleset;
         IsFreePickMode = false;
         IsFreePickForced = ruleset.banAmounts.Length == 0;
         
