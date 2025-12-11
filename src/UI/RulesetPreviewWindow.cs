@@ -245,7 +245,7 @@ internal class RulesetPreviewWindow : MonoBehaviour
         Ruleset ruleset = Plugin.Instance.selectedRuleset;
         tfContainer.gameObject.SetActive(true);
         lbRuleset.color = ruleset == null ? Color.red : Color.green;
-        lbRuleset.SetText(ruleset == null ? "NULL" : ruleset.id);
+        lbRuleset.SetText(ruleset == null ? "NULL" : ruleset.Id);
 
         if (ruleset == null)
         {

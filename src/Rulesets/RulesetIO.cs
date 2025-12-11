@@ -13,8 +13,8 @@ internal static class RulesetIO
     internal static DirectoryInfo RulesetsDirectoryDefault;
     internal static DirectoryInfo RulesetsDirectoryCustom;
 
-    internal static List<Ruleset> RulesetsDefault;
-    internal static List<Ruleset> RulesetsCustom;
+    internal static Dictionary<string, Ruleset> RulesetsDefault;
+    internal static Dictionary<string, Ruleset> RulesetsCustom;
 
     internal static void Init()
     {
@@ -27,37 +27,54 @@ internal static class RulesetIO
         if (!Directory.Exists(customPath)) Directory.CreateDirectory(customPath);
         RulesetsDirectoryCustom = new DirectoryInfo(customPath);
 
-        RulesetsDefault = new List<Ruleset>();
+        RulesetsDefault = new Dictionary<string, Ruleset>();
         foreach (FileInfo file in RulesetsDirectoryDefault.GetFiles().OrderBy(f => f.Name))
         {
             Ruleset ruleset = LoadRulesetFile(file);
-            Plugin.LogGlobal.LogInfo($"Loaded default ruleset: {ruleset}");
-            RulesetsDefault.Add(ruleset);
+
+            if (ruleset == null) continue;
+            if (RulesetsDefault.ContainsKey(ruleset.Id))
+            {
+                Plugin.LogGlobal.LogWarning($"Failed to load default ruleset '{ruleset.Id}': ruleset with id '{ruleset.Id}' already exists");
+                continue;
+            }
+            
+            Plugin.LogGlobal.LogInfo($"Loaded default ruleset: {ruleset.Id}");
+            RulesetsDefault.Add(ruleset.Id, ruleset);
         }
         
-        RulesetsCustom = new List<Ruleset>();
+        RulesetsCustom = new Dictionary<string, Ruleset>();
         foreach (FileInfo file in RulesetsDirectoryCustom.GetFiles().OrderBy(f => f.Name))
         {
             Ruleset ruleset = LoadRulesetFile(file);
-            Plugin.LogGlobal.LogInfo($"Loaded custom ruleset: {ruleset}");
-            RulesetsCustom.Add(ruleset);
+            
+            if (ruleset == null) continue;
+            if (RulesetsDefault.ContainsKey(ruleset.Id) || RulesetsCustom.ContainsKey(ruleset.Id))
+            {
+                Plugin.LogGlobal.LogWarning($"Failed to load custom ruleset '{ruleset.Id}': ruleset with id '{ruleset.Id}' already exists");
+                continue;
+            }
+            
+            Plugin.LogGlobal.LogInfo($"Loaded custom ruleset: {ruleset.Id}");
+            RulesetsCustom.Add(ruleset.Id, ruleset);
         }
     }
 
     private static Ruleset LoadRulesetFile(FileInfo file)
     {
+        if (!file.Name.Contains(".json")) return null;
+        string id = file.Name.Replace(".json", "");
+        
         string json = JsonIO.ReadFile(file);
         Ruleset ruleset = json.FromJson<Ruleset>();
+        ruleset.InitId(id);
         return ruleset;
     }
 
     internal static Ruleset GetRulesetById(string id)
     {
-        Ruleset ruleset = RulesetsDefault.Find(rs => rs.id == id);
-        if (ruleset != null) return ruleset;
-        
-        ruleset = RulesetsCustom.Find(rs => rs.id == id);
-        if (ruleset != null) return ruleset;
+        if (RulesetsDefault.ContainsKey(id)) return RulesetsDefault[id];
+        if (RulesetsCustom.ContainsKey(id)) return RulesetsCustom[id];
         
         return null;
     }

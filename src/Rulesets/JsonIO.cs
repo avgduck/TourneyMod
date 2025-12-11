@@ -1,5 +1,4 @@
 using System.IO;
-using System.IO.Compression;
 using System.Text;
 
 namespace TourneyMod.Rulesets;
@@ -10,19 +9,17 @@ internal static class JsonIO
     {
         using MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(data));
         using FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write);
-        {
-            CopyStream(memoryStream, fileStream);
-        }
+        
+        CopyStream(memoryStream, fileStream);
     }
 
     internal static string ReadFile(FileInfo file)
     {
         using FileStream fileStream = file.OpenRead();
         using MemoryStream memoryStream = new MemoryStream();
-        {
-            CopyStream(fileStream, memoryStream);
-            return Encoding.UTF8.GetString(memoryStream.ToArray());
-        }
+        
+        CopyStream(fileStream, memoryStream);
+        return Encoding.UTF8.GetString(memoryStream.ToArray());
     }
 
     private static void CopyStream(Stream input, Stream output)

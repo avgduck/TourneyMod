@@ -5,7 +5,6 @@ using LLHandlers;
 namespace TourneyMod.Rulesets;
 
 public class Ruleset(
-    string id,
     string name,
     Stage[] stagesNeutral,
     Stage[] stagesCounterpick,
@@ -15,7 +14,7 @@ public class Ruleset(
     Ruleset.DsrMode dsrMode,
     Ruleset.RandomMode randomMode)
 {
-    public readonly string id = id;
+    public string Id { get; private set; }
     public readonly string name = name;
     public readonly Stage[] stagesNeutral = stagesNeutral;
     public readonly Stage[] stagesCounterpick = stagesCounterpick;
@@ -48,31 +47,10 @@ public class Ruleset(
         ANY_LEGAL
     }
 
-    private string PrintList<T>(List<T> list, bool includeBrackets = true)
+    internal void InitId(string id)
     {
-        string s = "";
-        if (includeBrackets) s += "[";
-
-        for (int i = 0; i < list.Count; i++)
-        {
-            if (i != 0) s += ", ";
-            s += list[i];
-        }
-
-        if (includeBrackets) s += "]";
-        return s;
-    }
-
-    public override string ToString()
-    {
-        List<string> b = new List<string>();
-        foreach (int[] banNums in banAmounts)
-        {
-            b.Add(PrintList<int>(banNums.ToList()));
-        }
-
-        return
-            $"{{ id {id}, name '{name}', neutral {PrintList<Stage>(stagesNeutral.ToList())}, counterpick {PrintList<Stage>(stagesCounterpick.ToList())}, banAmounts {PrintList<string>(b)}, game1FirstPlayer {game1FirstPlayer}, laterGamesFirstPlayer {laterGamesFirstPlayer}, dsrMode {dsrMode}, randomMode {randomMode} }}";
+        if (Id != null) Plugin.LogGlobal.LogWarning($"Failed to set id '{id}' to ruleset with existing id '{Id}'");
+        else Id = id;
     }
 
     public static readonly List<Stage> STAGES_3D = [Stage.OUTSKIRTS, Stage.SEWERS, Stage.JUNKTOWN, Stage.CONSTRUCTION, Stage.FACTORY, Stage.SUBWAY, Stage.STADIUM, Stage.STREETS, Stage.POOL, Stage.ROOM21];

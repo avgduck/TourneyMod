@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using BepInEx;
 using BepInEx.Logging;
 using LLBML.Utils;
@@ -65,7 +66,7 @@ internal class Plugin : BaseUnityPlugin
         }
         else
         {
-            RulesetIO.RulesetsDefault.ForEach(ruleset => text.Add($"- {ruleset.name} [<b>{ruleset.id}</b>]"));
+            RulesetIO.RulesetsDefault.ToList().ForEach(entry => text.Add($"- {entry.Value.name} [<b>{entry.Key}</b>]"));
         }
         
         text.Add("");
@@ -77,7 +78,7 @@ internal class Plugin : BaseUnityPlugin
         }
         else
         {
-            RulesetIO.RulesetsCustom.ForEach(ruleset => text.Add($"- {ruleset.name} [<b>{ruleset.id}</b>]"));
+            RulesetIO.RulesetsCustom.ToList().ForEach(entry => text.Add($"- {entry.Value.name} [<b>{entry.Key}</b>]"));
         }
 
         return text;
