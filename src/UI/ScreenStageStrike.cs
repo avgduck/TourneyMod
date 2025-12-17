@@ -515,10 +515,12 @@ internal class ScreenStageStrike
     private void UpdateStageBans()
     {
         List<StageBan> stageBans = StageStrikeTracker.Instance.CurrentStrikeInfo.StageBans;
-        foreach (StageBan stageBan in stageBans)
+        stageBans.ForEach(ban =>
         {
-            stageContainers.Find((container) => container.StoredStage == stageBan.stage).Button.SetBan(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced ? null : stageBan);
-        }
+            StageContainer stageContainer = stageContainers.Find(container => container.StoredStage == ban.stage);
+            if (stageContainer == null) return;
+            stageContainer.Button.SetBan(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced ? null : ban);
+        });
     }
 
     private void UpdateSetInfo()
