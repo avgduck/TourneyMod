@@ -30,16 +30,15 @@ internal class StrikeInfo
         ActiveRuleset = ruleset;
         ControlStartPlayer = ActiveRuleset.game1FirstPlayer;
         IsFreePickForced = ActiveRuleset.banAmounts.Length == 0;
-
-        StageBans = new List<StageBan>();
-        RecalculateInitialBans();
+        
+        InitBans();
         UpdateInteractMode();
     }
 
-    private void RecalculateInitialBans()
+    private void InitBans()
     {
         banIndex = 0;
-        StageBans.Clear();
+        StageBans = new List<StageBan>();
 
         if (!SetTracker.Instance.IsTrackingSet) return;
         Set set = SetTracker.Instance.CurrentSet;

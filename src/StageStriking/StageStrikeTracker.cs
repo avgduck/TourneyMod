@@ -1,5 +1,4 @@
 using BepInEx.Logging;
-using LLBML.Settings;
 using TourneyMod.Rulesets;
 using TourneyMod.SetTracking;
 
