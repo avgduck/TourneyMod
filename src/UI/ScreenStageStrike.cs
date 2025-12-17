@@ -644,6 +644,7 @@ internal class ScreenStageStrike
 
         if (SetTracker.Instance.CurrentInteractMode == SetTracker.InteractMode.PICK)
         {
+            UIScreen.blockGlobalInput = false;
             screenStage.SelectStage(playerNumber, (int)stage);
         }
         else
@@ -713,7 +714,12 @@ internal class ScreenStageStrike
                 default:
                     break;
             }
-            if (SetTracker.Instance.ruleset.randomMode != Ruleset.RandomMode.OFF) screenStage.SelectStage(playerNumber, (int)randomStagePool[Random.RandomRangeInt(0, randomStagePool.Count)]);
+
+            if (SetTracker.Instance.ruleset.randomMode != Ruleset.RandomMode.OFF)
+            {
+                UIScreen.blockGlobalInput = false;
+                screenStage.SelectStage(playerNumber, (int)randomStagePool[Random.RandomRangeInt(0, randomStagePool.Count)]);
+            }
         }
         
         UpdateSetInfo();
