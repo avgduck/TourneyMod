@@ -8,6 +8,8 @@ using LLHandlers;
 using LLScreen;
 using TMPro;
 using TourneyMod.Rulesets;
+using TourneyMod.SetTracking;
+using TourneyMod.StageStriking;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -93,7 +95,6 @@ internal class ScreenStageStrike
         Plugin.LogGlobal.LogInfo("Closing stage strike screen");
         Instance = null;
         UIScreen.blockGlobalInput = false;
-        SetTracker.Instance.ResetBans();
     }
 
     internal void OnOpen(ScreenPlayersStage screenStage)
@@ -156,7 +157,7 @@ internal class ScreenStageStrike
         btFreePick.textMesh.transform.localScale = new Vector2(1f / FREEPICK_SCALE.x, 1f / FREEPICK_SCALE.y);
         btFreePick.textMesh.fontSize = FREEPICK_FONT_SIZE;
         btFreePick.onClick = OnClickFreePick;
-        if (SetTracker.Instance.IsFreePickForced) btFreePick.gameObject.SetActive(false);
+        if (StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced) btFreePick.gameObject.SetActive(false);
         
         btRandom = ScreenStageStrike.Instance.CreateNewButton("btRandom", screenStage.transform);
         btRandom.transform.localScale = RANDOM_SCALE;
@@ -165,7 +166,7 @@ internal class ScreenStageStrike
         btRandom.textMesh.transform.localScale = new Vector2(1f / RANDOM_SCALE.x, 1f / RANDOM_SCALE.y);
         btRandom.textMesh.fontSize = RANDOM_FONT_SIZE;
         btRandom.onClick = OnClickRandom;
-        if (SetTracker.Instance.ruleset.randomMode == Ruleset.RandomMode.OFF) btRandom.gameObject.SetActive(false);
+        if (StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode == Ruleset.RandomMode.OFF) btRandom.gameObject.SetActive(false);
 
         CreateStageContainers();
         UpdateStageBans();
@@ -429,7 +430,7 @@ internal class ScreenStageStrike
 
     private void CreateStageContainers()
     {
-        RowLengths rowLengths = GetRowLengths(SetTracker.Instance.ruleset.stagesNeutral.Length, SetTracker.Instance.ruleset.stagesCounterpick.Length);
+        RowLengths rowLengths = GetRowLengths(StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesNeutral.Count, StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesCounterpick.Count);
         
         bool useBothCategories = rowLengths.rowLengthsNeutral.Length > 0 && rowLengths.rowLengthsCounterpick.Length > 0;
         
@@ -448,7 +449,7 @@ internal class ScreenStageStrike
         if (useBothCategories) totalHeight += stageCategorySpacing;
         float startPositionY = STAGES_POSITION.y + totalHeight / 2f - stageSize.y / 2f;
 
-        screenStage.nButtons = SetTracker.Instance.ruleset.stagesNeutral.Length + SetTracker.Instance.ruleset.stagesCounterpick.Length;
+        screenStage.nButtons = StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesNeutral.Count + StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesCounterpick.Count;
         screenStage.btStages = new LLButton[screenStage.nButtons];
 
         int stageIndex = 0;
@@ -456,7 +457,7 @@ internal class ScreenStageStrike
         int colIndex = 0;
         stageContainers = new List<StageContainer>();
         stageContainersNeutral = new List<StageContainer>();
-        foreach (Stage stage in SetTracker.Instance.ruleset.stagesNeutral)
+        foreach (Stage stage in StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesNeutral)
         {
             float startPositionX = STAGES_POSITION.x - GetRowWidth(rowLengths.rowLengthsNeutral[rowIndex], stageSize) / 2f + stageSize.x / 2f;
             
@@ -484,7 +485,7 @@ internal class ScreenStageStrike
         rowIndex = 0;
         colIndex = 0;
         stageContainersCounterpick = new List<StageContainer>();
-        foreach (Stage stage in SetTracker.Instance.ruleset.stagesCounterpick)
+        foreach (Stage stage in StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesCounterpick)
         {
             float startPositionX = STAGES_POSITION.x - GetRowWidth(rowLengths.rowLengthsCounterpick[rowIndex], stageSize) / 2f+ stageSize.x / 2f;
             
@@ -513,34 +514,40 @@ internal class ScreenStageStrike
 
     private void UpdateStageBans()
     {
-        List<SetTracker.StageBan> stageBans = SetTracker.Instance.GetStageBans();
-        foreach (SetTracker.StageBan stageBan in stageBans)
+        List<StageBan> stageBans = StageStrikeTracker.Instance.CurrentStrikeInfo.StageBans;
+        foreach (StageBan stageBan in stageBans)
         {
-            stageContainers.Find((container) => container.StoredStage == stageBan.stage).Button.SetBan(SetTracker.Instance.IsFreePickMode || SetTracker.Instance.IsFreePickForced ? null : stageBan);
+            stageContainers.Find((container) => container.StoredStage == stageBan.stage).Button.SetBan(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced ? null : stageBan);
         }
     }
 
     private void UpdateSetInfo()
     {
-        int gameNumber = SetTracker.Instance.GetGameNumber();
-        int[] winCounts = SetTracker.Instance.GetWinCounts();
+        int gameNumber = 0;
+        int[] winCounts = [0, 0, 0, 0];
+        if (SetTracker.Instance.IsTrackingSet)
+        {
+            gameNumber = SetTracker.Instance.CurrentSet.GameNumber;
+            winCounts = SetTracker.Instance.CurrentSet.WinCounts;
+        }
+        
         TextHandler.SetText(lbSetCount, $"Game {gameNumber} ({winCounts[0]}-{winCounts[1]})");
 
-        if (SetTracker.Instance.IsFreePickMode || SetTracker.Instance.IsFreePickForced)
+        if (StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced)
         {
             TextHandler.SetText(lbBansRemaining, $"Free pick mode");
 
             lbBanStatus.color = Color.white;
-            TextHandler.SetText(lbBanStatus, SetTracker.Instance.CurrentInteractMode == SetTracker.InteractMode.PICK ? "Picking..." : "Banning...");
+            TextHandler.SetText(lbBanStatus, StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentInteractMode == StrikeInfo.InteractMode.PICK ? "Picking..." : "Banning...");
         }
         else
         {
-            TextHandler.SetText(lbBansRemaining, $"Bans remaining: P1 {SetTracker.Instance.TotalBansRemaining[0]}, P2 {SetTracker.Instance.TotalBansRemaining[1]}");
+            TextHandler.SetText(lbBansRemaining, $"Bans remaining: P1 {StageStrikeTracker.Instance.CurrentStrikeInfo.TotalBansRemaining[0]}, P2 {StageStrikeTracker.Instance.CurrentStrikeInfo.TotalBansRemaining[1]}");
 
-            int controllingPlayer = SetTracker.Instance.ControllingPlayer;
+            int controllingPlayer = StageStrikeTracker.Instance.CurrentStrikeInfo.ControllingPlayer;
             lbBanStatus.color = COLOR_PLAYER[controllingPlayer];
-            TextHandler.SetText(lbBanStatus, SetTracker.Instance.CurrentInteractMode == SetTracker.InteractMode.BAN
-                ? $"P{controllingPlayer+1} banning {SetTracker.Instance.CurrentBansRemaining}..."
+            TextHandler.SetText(lbBanStatus, StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentInteractMode == StrikeInfo.InteractMode.BAN
+                ? $"P{controllingPlayer+1} banning {StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentBansRemaining}..."
                 : $"P{controllingPlayer+1} picking...");
         }
         
@@ -549,20 +556,20 @@ internal class ScreenStageStrike
         {
             if (vote) freePickSum++;
         }
-        btFreePick.SetText($"Toggle free pick {freePickSum}/{SetTracker.NumPlayersInMatch}");
+        btFreePick.SetText($"Toggle free pick {freePickSum}/{SetTracker.Instance.NumPlayersInMatch}");
         
         int randomSum = 0;
         foreach (bool vote in randomVotes)
         {
             if (vote) randomSum++;
         }
-        btRandom.SetText($"Random {SetTracker.Instance.ruleset.randomMode switch {
+        btRandom.SetText($"Random {StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode switch {
             Ruleset.RandomMode.OFF => "(off)",
             Ruleset.RandomMode.ANY => "(any 3D/2D)",
             Ruleset.RandomMode.ANY_3D => "(any 3D)",
             Ruleset.RandomMode.ANY_2D => "(any 2D)",
             Ruleset.RandomMode.ANY_LEGAL => "(any legal)",
-        }}" + (SetTracker.Instance.IsFreePickForced ? "" : $" {randomSum}/{SetTracker.NumPlayersInMatch}"));
+        }}" + (StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced ? "" : $" {randomSum}/{SetTracker.Instance.NumPlayersInMatch}"));
     }
 
     // texture editing code from ColorSwap
@@ -609,7 +616,7 @@ internal class ScreenStageStrike
 
     internal static void UpdateCursorColors(int controllingPlayer)
     {
-        if (!IsOpen || SetTracker.Instance.IsFreePickMode || SetTracker.Instance.IsFreePickForced)
+        if (!IsOpen || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced)
         {
             ResetCursorColors();
             return;
@@ -640,16 +647,16 @@ internal class ScreenStageStrike
 
     private void OnClickStage(int playerNumber, Stage stage)
     {
-        if (!SetTracker.Instance.CheckPlayerInteraction(stage, playerNumber)) return;
+        if (!StageStrikeTracker.Instance.CurrentStrikeInfo.CheckPlayerInteraction(stage, playerNumber)) return;
 
-        if (SetTracker.Instance.CurrentInteractMode == SetTracker.InteractMode.PICK)
+        if (StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentInteractMode == StrikeInfo.InteractMode.PICK)
         {
             UIScreen.blockGlobalInput = false;
             screenStage.SelectStage(playerNumber, (int)stage);
         }
         else
         {
-            SetTracker.Instance.BanStage(stage, playerNumber);
+            StageStrikeTracker.Instance.CurrentStrikeInfo.BanStage(stage, playerNumber);
             UpdateStageBans();
         }
         
@@ -666,10 +673,10 @@ internal class ScreenStageStrike
             if (vote) sum++;
         }
 
-        if (sum >= SetTracker.NumPlayersInMatch)
+        if (sum >= SetTracker.Instance.NumPlayersInMatch)
         {
             freePickVotes = [false, false, false, false];
-            SetTracker.Instance.ToggleFreePickMode();
+            StageStrikeTracker.Instance.CurrentStrikeInfo.ToggleFreePickMode();
             UpdateStageBans();
         }
         
@@ -686,11 +693,11 @@ internal class ScreenStageStrike
             if (vote) sum++;
         }
 
-        if (sum >= SetTracker.NumPlayersInMatch || SetTracker.Instance.IsFreePickForced)
+        if (sum >= SetTracker.Instance.NumPlayersInMatch || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced)
         {
             randomVotes = [false, false, false, false];
             List<Stage> randomStagePool = new List<Stage>();
-            switch (SetTracker.Instance.ruleset.randomMode)
+            switch (StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode)
             {
                 case Ruleset.RandomMode.ANY:
                     randomStagePool.AddRange(Ruleset.STAGES_3D);
@@ -706,8 +713,8 @@ internal class ScreenStageStrike
                     break;
                 
                 case Ruleset.RandomMode.ANY_LEGAL:
-                    randomStagePool.AddRange(SetTracker.Instance.ruleset.stagesNeutral);
-                    randomStagePool.AddRange(SetTracker.Instance.ruleset.stagesCounterpick);
+                    randomStagePool.AddRange(StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesNeutral);
+                    randomStagePool.AddRange(StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesCounterpick);
                     break;
                 
                 case Ruleset.RandomMode.OFF:
@@ -715,7 +722,7 @@ internal class ScreenStageStrike
                     break;
             }
 
-            if (SetTracker.Instance.ruleset.randomMode != Ruleset.RandomMode.OFF)
+            if (StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode != Ruleset.RandomMode.OFF)
             {
                 UIScreen.blockGlobalInput = false;
                 screenStage.SelectStage(playerNumber, (int)randomStagePool[Random.RandomRangeInt(0, randomStagePool.Count)]);
@@ -830,7 +837,7 @@ internal class ScreenStageStrike
         ];
 
         private bool[] playersHovering = [false, false, false, false];
-        private SetTracker.StageBan stageBan;
+        private StageBan stageBan;
 
         private bool IsBeingHovered =>
             playersHovering[0] || playersHovering[1] || playersHovering[2] || playersHovering[3];
@@ -861,7 +868,7 @@ internal class ScreenStageStrike
             OnHoverOut(-1);
         }
 
-        public void SetBan(SetTracker.StageBan ban)
+        public void SetBan(StageBan ban)
         {
             stageBan = ban;
             OnHoverOut(stageBan != null ? stageBan.banPlayer : -1);
@@ -871,7 +878,7 @@ internal class ScreenStageStrike
         public override void OnHover(int playerNumber)
         {
             if (playerNumber == -1) playersHovering = [true, true, true, true];
-            else playersHovering[playerNumber] = SetTracker.Instance.CheckPlayerInteraction(stageBan, playerNumber);
+            else playersHovering[playerNumber] = StageStrikeTracker.Instance.CurrentStrikeInfo.CheckPlayerInteraction(stageBan, playerNumber);
             UpdateDisplay();
         }
 
@@ -890,7 +897,7 @@ internal class ScreenStageStrike
             }
             else if (stageBan != null)
             {
-                if (stageBan.reason == SetTracker.StageBan.BanReason.DSR && stageBan.banPlayer != -1)
+                if (stageBan.reason == StageBan.BanReason.DSR && stageBan.banPlayer != -1)
                 {
                     stageImage.color = COLOR_UNFOCUSED;
                 }
@@ -912,17 +919,17 @@ internal class ScreenStageStrike
 
             switch (stageBan.reason)
             {
-                case SetTracker.StageBan.BanReason.COUNTERPICK:
+                case StageBan.BanReason.COUNTERPICK:
                     lockedImage.color = COLOR_LOCK;
                     lbBanReason.color = COLOR_LOCK;
                     TextHandler.SetText(lbBanReason, "Counterpick");
                     break;
-                case SetTracker.StageBan.BanReason.BAN:
+                case StageBan.BanReason.BAN:
                     lockedImage.color = COLOR_LOCK_PLAYER[stageBan.banPlayer];
                     lbBanReason.color = COLOR_LOCK_PLAYER[stageBan.banPlayer];
                     TextHandler.SetText(lbBanReason, $"P{stageBan.banPlayer+1} Ban");
                     break;
-                case SetTracker.StageBan.BanReason.DSR:
+                case StageBan.BanReason.DSR:
                     lockedImage.color = (stageBan.banPlayer == -1) ? COLOR_LOCK : COLOR_SOFTLOCK_PLAYER[stageBan.banPlayer];
                     lbBanReason.color = (stageBan.banPlayer == -1) ? COLOR_LOCK : COLOR_SOFTLOCK_PLAYER[stageBan.banPlayer];
                     TextHandler.SetText(lbBanReason, (stageBan.banPlayer == -1) ? "Both DSR" : $"P{stageBan.banPlayer+1} DSR");

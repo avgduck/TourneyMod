@@ -182,11 +182,11 @@ internal class RulesetPreviewWindow : MonoBehaviour
         tfContainer.gameObject.SetActive(false);
     }
 
-    private string GetStageList(Stage[] stages)
+    private string GetStageList(List<Stage> stages)
     {
         string s = "";
 
-        for (int stageIndex = 0; stageIndex < stages.Length; stageIndex++)
+        for (int stageIndex = 0; stageIndex < stages.Count; stageIndex++)
         {
             if (stageIndex != 0) s += $",{(stageIndex % 2 == 0 ? "\n" : " ")}";
             s += LLBML.Utils.StringUtils.GetStageReadableName(stages[stageIndex]);
@@ -242,7 +242,7 @@ internal class RulesetPreviewWindow : MonoBehaviour
             return;
         }
 
-        Ruleset ruleset = Plugin.Instance.selectedRuleset;
+        Ruleset ruleset = Plugin.Instance.SelectedRuleset;
         tfContainer.gameObject.SetActive(true);
         lbRuleset.color = ruleset == null ? Color.red : Color.green;
         lbRuleset.SetText(ruleset == null ? "NULL" : ruleset.Id);

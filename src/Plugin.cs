@@ -5,6 +5,8 @@ using BepInEx.Logging;
 using LLBML.Utils;
 using TourneyMod.Patches;
 using TourneyMod.Rulesets;
+using TourneyMod.SetTracking;
+using TourneyMod.StageStriking;
 
 namespace TourneyMod;
 
@@ -21,15 +23,19 @@ internal class Plugin : BaseUnityPlugin
     internal static Plugin Instance { get; private set; }
     internal static ManualLogSource LogGlobal { get; private set; }
 
-    internal Ruleset selectedRuleset;
+    internal Ruleset SelectedRuleset;
 
     private void Awake()
     {
         Instance = this;
         LogGlobal = this.Logger;
+        SetTracker.Init();
+        StageStrikeTracker.Init();
         
         HarmonyPatches.PatchAll();
         RulesetIO.Init();
+        
+        StageStrikeTracker.Instance.FindDefaultRuleset();
 
         Configs.BindConfigs();
         Config.SettingChanged += (sender, args) => OnConfigChanged();
@@ -40,9 +46,9 @@ internal class Plugin : BaseUnityPlugin
     private void OnConfigChanged()
     {
         string id = Configs.SelectedRulesetId.Value;
-        selectedRuleset = RulesetIO.GetRulesetById(id);
+        SelectedRuleset = RulesetIO.GetRulesetById(id);
 
-        if (selectedRuleset == null)
+        if (SelectedRuleset == null)
         {
             //Plugin.LogGlobal.LogError($"Ruleset '{id}' does not exist!");
             return;

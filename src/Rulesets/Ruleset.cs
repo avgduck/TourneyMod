@@ -6,8 +6,8 @@ namespace TourneyMod.Rulesets;
 
 public class Ruleset(
     string name,
-    Stage[] stagesNeutral,
-    Stage[] stagesCounterpick,
+    List<Stage> stagesNeutral,
+    List<Stage> stagesCounterpick,
     int[][] banAmounts,
     int game1FirstPlayer,
     Ruleset.FirstPlayer laterGamesFirstPlayer,
@@ -16,8 +16,8 @@ public class Ruleset(
 {
     public string Id { get; private set; }
     public readonly string name = name;
-    public readonly Stage[] stagesNeutral = stagesNeutral;
-    public readonly Stage[] stagesCounterpick = stagesCounterpick;
+    public readonly List<Stage> stagesNeutral = stagesNeutral;
+    public readonly List<Stage> stagesCounterpick = stagesCounterpick;
 
     public readonly int[][] banAmounts = banAmounts;
     public readonly int game1FirstPlayer = game1FirstPlayer;

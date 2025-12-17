@@ -3,6 +3,8 @@ using LLGUI;
 using LLHandlers;
 using LLScreen;
 using TMPro;
+using TourneyMod.SetTracking;
+using TourneyMod.StageStriking;
 using UnityEngine;
 
 namespace TourneyMod.UI;
@@ -104,8 +106,8 @@ public class ScreenLobbyOverlay
 
     internal void UpdateSetCount()
     {
-        int gameNumber = SetTracker.Instance.GetGameNumber();
-        int[] winCounts = SetTracker.Instance.GetWinCounts();
+        int gameNumber = SetTracker.Instance.CurrentSet.GameNumber;
+        int[] winCounts = SetTracker.Instance.CurrentSet.WinCounts;
         TextHandler.SetText(lbGame, $"Game {gameNumber}");
         TextHandler.SetText(lbSetCount, $"({winCounts[0]}-{winCounts[1]})");
         
@@ -114,7 +116,7 @@ public class ScreenLobbyOverlay
         {
             if (vote) sum++;
         }
-        btResetSetCount.SetText($"Reset set count {sum}/{SetTracker.NumPlayersInMatch}");
+        btResetSetCount.SetText($"Reset set count {sum}/{SetTracker.Instance.NumPlayersInMatch}");
     }
 
     private void OnResetClicked(int playerNumber)
@@ -127,10 +129,12 @@ public class ScreenLobbyOverlay
             if (vote) sum++;
         }
         
-        if (sum >= SetTracker.NumPlayersInMatch)
+        if (sum >= SetTracker.Instance.NumPlayersInMatch)
         {
             resetVotes = [false, false, false, false];
-            SetTracker.Instance.ResetSetCount();
+            SetTracker.Instance.Reset();
+            
+            if (StageStrikeTracker.Instance.IsTrackingStrikeInfo) StageStrikeTracker.Instance.Reset();
         }
         
         UpdateSetCount();

@@ -3,6 +3,8 @@ using LLBML.Players;
 using LLBML.Settings;
 using LLGUI;
 using LLScreen;
+using TourneyMod.SetTracking;
+using TourneyMod.StageStriking;
 using TourneyMod.UI;
 
 namespace TourneyMod.Patches;
@@ -17,10 +19,11 @@ internal static class StageScreenPatch
             //IJDANPONMLL localLobby = __instance as IJDANPONMLL;
             //if (localLobby == null || !SetTracker.Is1v1) return;
 
-            if (!SetTracker.IsTrackingSet) return;
+            if (!SetTracker.Instance.IsTrackingSet) return;
+            
             Plugin.LogGlobal.LogInfo($"OpenStageSelect: IsOnline {GameSettings.IsOnline}, OnlineMode {GameSettings.OnlineMode}");
             if (GameSettings.IsOnline && GameSettings.OnlineMode != OnlineMode.HOSTED) return;
-            if (GameSettings.current.gameMode != GameMode._1v1) SetTracker.Instance.ForceAllStages();
+            StageStrikeTracker.Instance.Start();
             ScreenStageStrike.Open();
         }
         // GameStatesLobby.OpenStageSelect(bool canGoBack, bool localSpectator = false, ScreenType = ScreenType.PLAYERS_STAGE)
@@ -32,7 +35,7 @@ internal static class StageScreenPatch
             //if (localLobby == null || !SetTracker.Is1v1) return;
 
             //localLobby.LHCCKNCKCGD(); // GameStatesLobbyLocal.ShowActiveCursors()
-            if (!SetTracker.IsTrackingSet) return;
+            if (!SetTracker.Instance.IsTrackingSet) return;
             if (!ScreenStageStrike.IsOpen) return;
             HPNLMFHPHFD lobby = __instance;
             lobby.LHCCKNCKCGD(); // GameStatesLobby::ShowActiveCursors()
@@ -46,8 +49,9 @@ internal static class StageScreenPatch
             //IJDANPONMLL localLobby = __instance as IJDANPONMLL;
             //if (localLobby == null || !SetTracker.Is1v1) return;
             
-            if (!SetTracker.IsTrackingSet) return;
+            if (!SetTracker.Instance.IsTrackingSet) return;
             if (!ScreenStageStrike.IsOpen) return;
+            StageStrikeTracker.Instance.End();
             ScreenStageStrike.Close();
         }
         
@@ -59,7 +63,7 @@ internal static class StageScreenPatch
             //IJDANPONMLL localLobby = __instance as IJDANPONMLL;
             //if (localLobby == null || !SetTracker.Is1v1) return;
 
-            if (!SetTracker.IsTrackingSet) return;
+            if (!SetTracker.Instance.IsTrackingSet) return;
             if (!ScreenStageStrike.IsOpen) return;
             Message message = EIMJOIEPMNA;
             if (message.msg == Msg.SEL_STAGE) __instance.EKFCNNPDJHH(); // GameStatesLobby.CloseStageSelect()
@@ -69,7 +73,7 @@ internal static class StageScreenPatch
         [HarmonyPrefix]
         private static bool ScreenPlayersStage_OnOpen_Prefix(ScreenPlayersStage __instance)
         {
-            if (!SetTracker.IsTrackingSet) return true;
+            if (!SetTracker.Instance.IsTrackingSet) return true;
             if (!ScreenStageStrike.IsOpen) return true;
             
             ScreenStageStrike.Instance.OnOpen(__instance);
@@ -115,7 +119,7 @@ internal static class StageScreenPatch
                 return;
             }
             
-            ScreenStageStrike.UpdateCursorColors(SetTracker.Instance.ControllingPlayer);
+            ScreenStageStrike.UpdateCursorColors(StageStrikeTracker.Instance.CurrentStrikeInfo.ControllingPlayer);
         }
 
         // GameStatesGameResult.UpdateState(GameState state)
@@ -125,7 +129,7 @@ internal static class StageScreenPatch
         {
             if (GameSettings.IsOnline) return;
             
-            Player.ForAll((Player player) =>
+            Player.ForAll(player =>
             {
                 // KHMFCILNHHH.EOCBBKOIFNO -> RematchChoice.QUIT
                 __instance.DABHMHOCDEN(player.nr, KHMFCILNHHH.EOCBBKOIFNO);
