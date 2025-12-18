@@ -6,7 +6,7 @@ namespace TourneyMod.SetTracking;
 internal class Set
 {
     internal List<Match> CompletedMatches { get; private set; } = new List<Match>();
-    private Match currentMatch;
+    internal Match CurrentMatch { get; private set; }
 
     internal bool IsGame1 => CompletedMatches.Count == 0;
     internal int GameNumber => CompletedMatches.Count + 1;
@@ -20,23 +20,22 @@ internal class Set
         }
     }
 
-    internal void StartMatch(Stage stage)
+    internal void StartMatch(Stage stage, Character[] selectedCharacters, Character[] playedCharacters)
     {
-        SetTracker.Log.LogInfo($"Starting new match on stage {stage}");
-        currentMatch = new Match();
-        currentMatch.Start(stage);
+        SetTracker.Log.LogInfo($"Starting new match: stage {stage}, characters selected {Plugin.PrintArray(selectedCharacters, true)} played {Plugin.PrintArray(playedCharacters, true)}");
+        CurrentMatch = new Match();
+        CurrentMatch.Start(stage, selectedCharacters, playedCharacters);
     }
 
     internal void EndMatch(int[] scores)
     {
-        SetTracker.Log.LogInfo($"Ending match with stocks {string.Join(", ", [scores[0].ToString(), scores[1].ToString(), scores[2].ToString(), scores[3].ToString()])}");
-        currentMatch.End(scores);
-
-        int winner = currentMatch.Winner;
-        if (winner == -1) return;
-        SetTracker.Log.LogInfo($"Match ended with winner P{winner+1}");
+        CurrentMatch.End(scores);
+        int winner = CurrentMatch.Winner;
         
-        CompletedMatches.Add(currentMatch);
-        currentMatch = null;
+        SetTracker.Log.LogInfo($"Ending match with stocks {Plugin.PrintArray(scores, true)}. winner: {(winner != -1 ? $"P{winner+1}" : "none")}");
+        if (winner == -1) return;
+        
+        CompletedMatches.Add(CurrentMatch);
+        CurrentMatch = null;
     }
 }

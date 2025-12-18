@@ -5,6 +5,8 @@ namespace TourneyMod.SetTracking;
 internal class Match
 {
     internal Stage PlayedStage { get; private set; }
+    internal Character[] SelectedCharacters { get; private set; }
+    internal Character[] PlayedCharacters { get; private set; }
     internal int[] FinalScores { get; private set; }
     internal int Winner {
         get {
@@ -22,9 +24,11 @@ internal class Match
         }
     }
 
-    internal void Start(Stage stage)
+    internal void Start(Stage stage, Character[] selectedCharacters, Character[] playedCharacters)
     {
         PlayedStage = stage;
+        SelectedCharacters = selectedCharacters;
+        PlayedCharacters = playedCharacters;
     }
 
     internal void End(int[] scores)
