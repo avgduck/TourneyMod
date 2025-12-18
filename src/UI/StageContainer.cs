@@ -7,8 +7,8 @@ namespace TourneyMod.UI;
 
 internal class StageContainer
 {
-    private TMP_Text lbStageName;
-    private TMP_Text lbStageSize;
+    private TextMeshProUGUI lbStageName;
+    private TextMeshProUGUI lbStageSize;
 
     internal StageButton Button { get; private set; }
     internal Stage StoredStage { get; private set; }
@@ -50,15 +50,12 @@ internal class StageContainer
             Button.UpdateDisplay();
         };
 
-        lbStageName = ScreenStageStrike.Instance.CreateNewText("lbStageName", Button.transform);
+        UI.CreateText(ref lbStageName, "lbStageName", Button.transform, new Vector2(0f, -110f));
         lbStageName.fontSize = 42;
-        lbStageName.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 500f);
-        lbStageName.rectTransform.localPosition = new Vector2(0f, -110f);
         TextHandler.SetText(lbStageName, StageName);
         
-        lbStageSize = ScreenStageStrike.Instance.CreateNewText("lbStageSize", Button.transform);
+        UI.CreateText(ref lbStageSize, "lbStageSize", Button.transform, new Vector2(190f, 110f));
         lbStageSize.fontSize = 22;
-        lbStageSize.rectTransform.localPosition = new Vector2(190f, 110f);
         TextHandler.SetText(lbStageSize, (StageSize != Vector2.zero ? $"{StageSize.x}x{StageSize.y}" : ""));
     }
 }

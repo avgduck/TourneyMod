@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using LLBML.Players;
 using LLBML.Settings;
 using LLBML.States;
-using LLBML.Utils;
 using LLGUI;
 using LLHandlers;
 using LLScreen;
@@ -11,7 +10,6 @@ using TourneyMod.Rulesets;
 using TourneyMod.SetTracking;
 using TourneyMod.StageStriking;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace TourneyMod.UI;
 
@@ -44,11 +42,11 @@ internal class ScreenStageStrike
     private const int BANSTATUS_FONT_SIZE = 42;
     
     private static readonly Vector2 FREEPICK_POSITION = new Vector2(506f, -336f);
-    private static readonly Vector2 FREEPICK_SCALE = new Vector2(1.3f, 0.5f);
+    private static readonly Vector2 FREEPICK_SCALE = new Vector2(234f, 27.5f);
     private const int FREEPICK_FONT_SIZE = 18;
     
     private static readonly Vector2 RANDOM_POSITION = new Vector2(-378f, -336f);
-    private static readonly Vector2 RANDOM_SCALE = new Vector2(1.42f, 0.5f);
+    private static readonly Vector2 RANDOM_SCALE = new Vector2(255.6f, 27.5f);
     private const int RANDOM_FONT_SIZE = 18;
     
     private static readonly Color[] COLOR_PLAYER =
@@ -62,9 +60,9 @@ internal class ScreenStageStrike
     private static readonly Color COLOR_CURSOR_ACTIVE = Color.white;
     private static readonly Color COLOR_CURSOR_INACTIVE = Color.white * 0.6f;
 
-    private TMP_Text lbSetCount;
-    private TMP_Text lbBansRemaining;
-    private TMP_Text lbBanStatus;
+    private TextMeshProUGUI lbSetCount;
+    private TextMeshProUGUI lbBansRemaining;
+    private TextMeshProUGUI lbBanStatus;
 
     private LLButton btFreePick;
     private bool[] freePickVotes = [false, false, false, false];
@@ -115,12 +113,10 @@ internal class ScreenStageStrike
         RectTransform lbBack = btBack.Find("Text").GetComponent<RectTransform>();
         lbBack.localScale = new Vector2(1f / BACK_SCALE.x, 1f / BACK_SCALE.y);
         TMP_Text backText = lbBack.GetComponent<TMP_Text>();
-        backText.fontSize = BACK_FONT_SIZE;
+        if (backText != null) backText.fontSize = BACK_FONT_SIZE;
         
-        lbSetCount = ScreenStageStrike.Instance.CreateNewText("lbSetCount", screenStage.transform);
+        UI.CreateText(ref lbSetCount, "lbSetCount", screenStage.transform, SETCOUNT_POSITION);
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
-        lbSetCount.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1000f);
-        lbSetCount.rectTransform.localPosition = SETCOUNT_POSITION;
         TextHandler.SetText(lbSetCount, "");
         if (GameSettings.current.gameMode != GameMode._1v1 || (GameSettings.IsOnline && GameSettings.OnlineMode == OnlineMode.RANKED))
         {
@@ -128,31 +124,22 @@ internal class ScreenStageStrike
             lbSetCount.gameObject.SetActive(false);
         }
         
-        lbBansRemaining = ScreenStageStrike.Instance.CreateNewText("lbBansRemaining", screenStage.transform);
+        UI.CreateText(ref lbBansRemaining, "lbBansRemaining", screenStage.transform, BANSREMAINING_POSITION);
         lbBansRemaining.fontSize = BANSREMAINING_FONT_SIZE;
-        lbBansRemaining.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1000f);
-        lbBansRemaining.rectTransform.localPosition = BANSREMAINING_POSITION;
         TextHandler.SetText(lbBansRemaining, "");
-        lbBanStatus = ScreenStageStrike.Instance.CreateNewText("lbBanStatus", screenStage.transform);
+        
+        UI.CreateText(ref lbBanStatus, "lbBanStatus", screenStage.transform, BANSTATUS_POSITION);
         lbBanStatus.fontSize = BANSTATUS_FONT_SIZE;
-        lbBanStatus.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1000f);
-        lbBanStatus.rectTransform.localPosition = BANSTATUS_POSITION;
         TextHandler.SetText(lbBanStatus, "");
 
-        btFreePick = ScreenStageStrike.Instance.CreateNewButton("btFreePick", screenStage.transform);
-        btFreePick.transform.localScale = FREEPICK_SCALE;
-        btFreePick.transform.localPosition = FREEPICK_POSITION;
+        UI.CreateButton(ref btFreePick, "btFreePick", screenStage.transform, FREEPICK_POSITION, FREEPICK_SCALE);
         btFreePick.SetText("Toggle free pick 0/0");
-        btFreePick.textMesh.transform.localScale = new Vector2(1f / FREEPICK_SCALE.x, 1f / FREEPICK_SCALE.y);
         btFreePick.textMesh.fontSize = FREEPICK_FONT_SIZE;
         btFreePick.onClick = OnClickFreePick;
         if (StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced) btFreePick.gameObject.SetActive(false);
         
-        btRandom = ScreenStageStrike.Instance.CreateNewButton("btRandom", screenStage.transform);
-        btRandom.transform.localScale = RANDOM_SCALE;
-        btRandom.transform.localPosition = RANDOM_POSITION;
+        UI.CreateButton(ref btRandom, "btRandom", screenStage.transform, RANDOM_POSITION, RANDOM_SCALE);
         btRandom.SetText("Random (off) 0/0");
-        btRandom.textMesh.transform.localScale = new Vector2(1f / RANDOM_SCALE.x, 1f / RANDOM_SCALE.y);
         btRandom.textMesh.fontSize = RANDOM_FONT_SIZE;
         btRandom.onClick = OnClickRandom;
         if (StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode == Ruleset.RandomMode.OFF) btRandom.gameObject.SetActive(false);
@@ -426,28 +413,5 @@ internal class ScreenStageStrike
         }
         
         UpdateSetInfo();
-    }
-
-    internal TMP_Text CreateNewText(string name, Transform parent)
-    {
-        TMP_Text text = Object.Instantiate(titleText, parent);
-        text.gameObject.name = name;
-        text.SetText("");
-        text.color = Color.white;
-        text.fontSize = 32;
-        text.transform.localScale = Vector3.one;
-        text.transform.localPosition = Vector3.zero;
-        return text;
-    }
-
-    internal LLButton CreateNewButton(string name, Transform parent)
-    {
-        LLButton button = Object.Instantiate(screenStage.btBack, parent);
-        button.gameObject.name = name;
-        button.SetText("");
-        button.textMesh.color = Color.white;
-        button.transform.localScale = Vector3.one;
-        button.transform.localPosition = Vector3.zero;
-        return button;
     }
 }

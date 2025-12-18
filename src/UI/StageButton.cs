@@ -38,20 +38,22 @@ internal class StageButton : LLButton
 
     private Image stageImage;
     private Image lockedImage;
-    private TMP_Text lbBanReason;
+    private TextMeshProUGUI lbBanReason;
 
     internal static StageButton CreateStageButton(Transform parent, Stage stage)
     {
         RectTransform rect = LLControl.CreatePanel(parent, $"Button_{stage}");
         StageButton stageButton = rect.gameObject.AddComponent<StageButton>();
+        
         Sprite stageSprite = JPLELOFJOOH.BNFIDCAPPDK($"_spritePreview{stage}"); // Assets.GetMenuSprite()
         stageButton.stageImage = LLControl.CreateImage(rect, stageSprite);
+        
         Sprite lockedSprite = JPLELOFJOOH.BNFIDCAPPDK($"_spritePreviewLOCKED"); // Assets.GetMenuSprite()
         stageButton.lockedImage = LLControl.CreateImage(rect, lockedSprite);
-        stageButton.lbBanReason = ScreenStageStrike.Instance.CreateNewText("lbBanReason", stageButton.transform);
-        stageButton.lbBanReason.color = Color.white;
+        stageButton.lockedImage.raycastTarget = false;
+        
+        UI.CreateText(ref stageButton.lbBanReason, "lbBanReason", stageButton.transform, new Vector2(0f, 13f));
         stageButton.lbBanReason.fontSize = 22;
-        stageButton.lbBanReason.rectTransform.localPosition = new Vector2(0f, 13f);
         TextHandler.SetText(stageButton.lbBanReason, "");
         stageButton.Init();
         return stageButton;
