@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using LLHandlers;
 
 namespace TourneyMod.SetTracking;
@@ -19,6 +20,7 @@ internal class Set
             return winCounts;
         }
     }
+    internal int LastWinner => IsGame1 ? -1 : CompletedMatches.Last().Winner;
 
     internal void StartMatch(Stage stage, Character[] selectedCharacters, Character[] playedCharacters)
     {

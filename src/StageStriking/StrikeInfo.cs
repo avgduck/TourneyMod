@@ -34,8 +34,18 @@ internal class StrikeInfo
     internal StrikeInfo(Ruleset ruleset)
     {
         ActiveRuleset = ruleset;
-        ControlStartPlayer = ActiveRuleset.game1FirstPlayer;
         IsFreePickForced = ActiveRuleset.banAmounts.Length == 0;
+
+        if (SetTracker.Instance.CurrentSet.IsGame1)
+        {
+            ControlStartPlayer = ActiveRuleset.game1FirstPlayer;
+        }
+        else
+        {
+            int winner = SetTracker.Instance.CurrentSet.LastWinner;
+            int loser = winner == 0 ? 1 : 0;
+            ControlStartPlayer = ActiveRuleset.laterGamesFirstPlayer == Ruleset.FirstPlayer.WINNER ? winner : loser;
+        }
         
         randomStagePool = new List<Stage>();
         switch (ActiveRuleset.randomMode)
