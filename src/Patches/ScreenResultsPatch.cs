@@ -11,7 +11,9 @@ internal static class ScreenResultsPatch
     [HarmonyPostfix]
     private static void ResultUpdateState_Postfix(OEAINNHEMKA __instance)
     {
+        if (Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE) return;
         if (GameSettings.IsOnline) return;
+        
         PostScreen screenResults = __instance.APFKDEMGLHJ;
         if (screenResults == null) return;
             
@@ -27,6 +29,7 @@ internal static class ScreenResultsPatch
     [HarmonyPostfix]
     private static void SetRematchChoice_Postfix(OEAINNHEMKA __instance, int BKEOPDPFFPM, KHMFCILNHHH ONPJANKJDJH)
     {
+        if (Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE) return;
         if (GameSettings.IsOnline) return;
             
         int playerNumber = BKEOPDPFFPM;
