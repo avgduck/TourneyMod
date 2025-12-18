@@ -128,6 +128,8 @@ internal static class StageScreenPatch
         private static void ResultUpdateState_Postfix(OEAINNHEMKA __instance)
         {
             if (GameSettings.IsOnline) return;
+            PostScreen screenResults = __instance.APFKDEMGLHJ;
+            if (screenResults == null) return;
             
             Player.ForAll(player =>
             {
