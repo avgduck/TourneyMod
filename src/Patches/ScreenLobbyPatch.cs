@@ -24,4 +24,14 @@ internal static class ScreenLobbyPatch
             
         ScreenLobbyOverlay.Instance.UpdateSetCount();
     }
+
+    [HarmonyPatch(typeof(ScreenPlayers), nameof(ScreenPlayers.ShowCpuButtons))]
+    [HarmonyPrefix]
+    private static bool ShowCpuButtons(ScreenPlayers __instance, bool visible)
+    {
+        if (!visible || Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE) return true;
+
+        __instance.ShowCpuButtons(false);
+        return false;
+    }
 }

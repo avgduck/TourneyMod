@@ -28,6 +28,7 @@ internal class Plugin : BaseUnityPlugin
     internal static ManualLogSource LogGlobal { get; private set; }
 
     internal Ruleset SelectedRuleset;
+    internal TourneyMode ActiveTourneyMode = TourneyMode.NONE;
 
     private void Awake()
     {

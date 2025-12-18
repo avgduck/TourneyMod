@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using LLBML.Players;
-using LLBML.Settings;
 using LLBML.States;
 using LLGUI;
 using LLHandlers;
@@ -118,9 +117,9 @@ internal class ScreenStageStrike
         UI.CreateText(ref lbSetCount, "lbSetCount", screenStage.transform, SETCOUNT_POSITION);
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
         TextHandler.SetText(lbSetCount, "");
-        if (GameSettings.current.gameMode != GameMode._1v1 || (GameSettings.IsOnline && GameSettings.OnlineMode == OnlineMode.RANKED))
+        if (Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE)
         {
-            //Plugin.LogGlobal.LogInfo("Game mode is not local 1v1! Hiding stage select set count");
+            //Plugin.LogGlobal.LogInfo("Tourney mode not active! Hiding stage select set count");
             lbSetCount.gameObject.SetActive(false);
         }
         

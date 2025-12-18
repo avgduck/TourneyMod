@@ -12,6 +12,8 @@ internal static class HarmonyPatches
         harmony.PatchAll(typeof(SetTrackingPatch));
         Plugin.LogGlobal.LogInfo("Set tracking patch applied");
         
+        harmony.PatchAll(typeof(ScreenMenuPatch));
+        Plugin.LogGlobal.LogInfo("Menu screen patch applied");
         harmony.PatchAll(typeof(ScreenStageSelectPatch));
         Plugin.LogGlobal.LogInfo("Stage select screen patch applied");
         harmony.PatchAll(typeof(ScreenLobbyPatch));

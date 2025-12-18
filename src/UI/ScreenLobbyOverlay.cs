@@ -1,4 +1,3 @@
-using LLBML.Settings;
 using LLGUI;
 using LLHandlers;
 using LLScreen;
@@ -44,9 +43,9 @@ public class ScreenLobbyOverlay
 
     internal void OnOpen(ScreenPlayers screenPlayers)
     {
-        if (GameSettings.current.gameMode != GameMode._1v1 || (GameSettings.IsOnline && GameSettings.OnlineMode == OnlineMode.RANKED))
+        if (Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE)
         {
-            //Plugin.LogGlobal.LogInfo("Game mode is not local 1v1! Hiding lobby overlay set count");
+            //Plugin.LogGlobal.LogInfo("Tourney mode not active! Hiding lobby overlay set count");
             return;
         }
         

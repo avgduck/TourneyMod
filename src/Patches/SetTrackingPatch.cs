@@ -5,7 +5,6 @@ using LLBML.Settings;
 using LLBML.States;
 using LLHandlers;
 using TourneyMod.SetTracking;
-using TourneyMod.StageStriking;
 using TourneyMod.UI;
 
 namespace TourneyMod.Patches;
@@ -24,6 +23,7 @@ internal static class SetTrackingPatch
             {
                 ScreenLobbyOverlay.Close();
                 SetTracker.Instance.End();
+                Plugin.Instance.ActiveTourneyMode = TourneyMode.NONE;
             }
             else if (newState == GameState.GAME_INTRO)
             {
