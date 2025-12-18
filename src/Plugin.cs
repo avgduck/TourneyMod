@@ -57,6 +57,21 @@ internal class Plugin : BaseUnityPlugin
         Plugin.LogGlobal.LogInfo($"Loaded ruleset {id}");
     }
 
+    internal static string PrintArray<T>(T[] arr, bool includeBrackets)
+    {
+        string s = "";
+        if (includeBrackets) s += "[";
+
+        for (int i = 0; i < arr.Length; i++)
+        {
+            if (i != 0) s += ", ";
+            s += arr[i].ToString();
+        }
+        
+        if (includeBrackets) s += "]";
+        return s;
+    }
+
     private List<string> GetModMenuText()
     {
         List<string> text = new List<string>();

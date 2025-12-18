@@ -11,8 +11,8 @@ internal class SetTracker
     internal static void Init()
     {
         Instance = new SetTracker();
-        Log = BepInEx.Logging.Logger.CreateLogSource("TourneyMod SetTracking");
-        Log.LogInfo("Initialized");
+        Log = BepInEx.Logging.Logger.CreateLogSource("TM SetTracking");
+        Log.LogInfo("TourneyMod set tracking initialized");
     }
     
     internal Set CurrentSet { get; private set; }

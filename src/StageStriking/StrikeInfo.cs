@@ -1,7 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using LLBML.Utils;
 using LLHandlers;
+using LLScreen;
 using TourneyMod.Rulesets;
 using TourneyMod.SetTracking;
+using Random = UnityEngine.Random;
 
 namespace TourneyMod.StageStriking;
 
@@ -12,6 +17,7 @@ internal class StrikeInfo
     internal bool IsFreePickForced { get; private set; }
 
     internal List<StageBan> StageBans { get; private set; }
+    private List<Stage> randomStagePool;
     internal int[] TotalBansRemaining { get; private set; }
     internal int CurrentBansRemaining { get; private set; }
     private int banIndex = 0;
@@ -31,8 +37,36 @@ internal class StrikeInfo
         ControlStartPlayer = ActiveRuleset.game1FirstPlayer;
         IsFreePickForced = ActiveRuleset.banAmounts.Length == 0;
         
-        InitBans();
+        randomStagePool = new List<Stage>();
+        switch (ActiveRuleset.randomMode)
+        {
+            case Ruleset.RandomMode.ANY:
+                randomStagePool.AddRange(Ruleset.STAGES_3D);
+                randomStagePool.AddRange(Ruleset.STAGES_2D);
+                break;
+                
+            case Ruleset.RandomMode.ANY_3D:
+                randomStagePool.AddRange(Ruleset.STAGES_3D);
+                break;
+                
+            case Ruleset.RandomMode.ANY_2D:
+                randomStagePool.AddRange(Ruleset.STAGES_2D);
+                break;
+                
+            case Ruleset.RandomMode.ANY_LEGAL:
+                randomStagePool.AddRange(ActiveRuleset.stagesNeutral);
+                randomStagePool.AddRange(ActiveRuleset.stagesCounterpick);
+                break;
+                
+            case Ruleset.RandomMode.OFF:
+            default:
+                break;
+        }
+        
         UpdateInteractMode();
+        StageStrikeTracker.Log.LogInfo($"Striking started with ruleset '{ActiveRuleset.Id}', game {SetTracker.Instance.CurrentSet.GameNumber}: {(IsFreePickMode || IsFreePickForced ? "free pick mode active" : $"P{ControllingPlayer+1} first {CurrentInteractMode}. bans remaining ({TotalBansRemaining[0]}, {TotalBansRemaining[1]})")}");
+        
+        InitBans();
     }
 
     private void InitBans()
@@ -40,12 +74,14 @@ internal class StrikeInfo
         banIndex = 0;
         StageBans = new List<StageBan>();
 
+        if (IsFreePickForced) return;
         if (!SetTracker.Instance.IsTrackingSet) return;
         Set set = SetTracker.Instance.CurrentSet;
-
+        
         if (set.IsGame1)
         {
             ActiveRuleset.stagesCounterpick.ForEach(stage => StageBans.Add(new StageBan(stage, StageBan.BanReason.COUNTERPICK)));
+            StageStrikeTracker.Log.LogInfo("Counterpick bans applied: " + Plugin.PrintArray(StageBans.Map(ban => ban.stage).ToArray(), false));
             return;
         }
 
@@ -65,6 +101,27 @@ internal class StrikeInfo
             if (previousBan == null) StageBans.Add(new StageBan(match.PlayedStage, StageBan.BanReason.DSR, winner));
             else if (previousBan.banPlayer != winner) previousBan.banPlayer = -1;
         });
+        
+        StageStrikeTracker.Log.LogInfo("DSR bans applied: " + Plugin.PrintArray(StageBans.Map(ban => $"{ban.stage} ({ban.banPlayer switch {
+            -1 => "both",
+            _ => $"P{ban.banPlayer+1}"
+        }})").ToArray(), false));
+    }
+
+    internal void PickStage(ScreenPlayersStage screenStage, Stage stage, int playerNumber)
+    {
+        if (screenStage == null) return;
+        screenStage.SelectStage(playerNumber, (int)stage);
+        StageStrikeTracker.Log.LogInfo($"P{playerNumber+1} picks {stage}");
+    }
+
+    internal void PickRandomStage(ScreenPlayersStage screenStage, int playerNumber)
+    {
+        if (screenStage == null) return;
+        if (randomStagePool.Count == 0) return;
+        Stage stage = randomStagePool[Random.RandomRangeInt(0, randomStagePool.Count)];
+        screenStage.SelectStage(playerNumber, (int)stage);
+        StageStrikeTracker.Log.LogInfo($"P{playerNumber+1} picks random: got {stage}");
     }
 
     internal void BanStage(Stage stage, int playerNumber)
@@ -76,6 +133,7 @@ internal class StrikeInfo
 
         banIndex++;
         UpdateInteractMode();
+        StageStrikeTracker.Log.LogInfo($"P{playerNumber+1} bans {stage}. bans remaining ({TotalBansRemaining[0]}, {TotalBansRemaining[1]}). P{ControllingPlayer+1} next {CurrentInteractMode}");
     }
     
     private void SwapControllingPlayer()
@@ -87,6 +145,7 @@ internal class StrikeInfo
     {
         IsFreePickMode = !IsFreePickMode;
         UpdateInteractMode();
+        StageStrikeTracker.Log.LogInfo($"Free pick mode toggled {(IsFreePickMode ? "ON" : $"OFF: P{ControllingPlayer+1} next {CurrentInteractMode}. bans remaining ({TotalBansRemaining[0]}, {TotalBansRemaining[1]})")}");
     }
 
     private void UpdateInteractMode()

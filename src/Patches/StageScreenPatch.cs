@@ -21,7 +21,7 @@ internal static class StageScreenPatch
 
             if (!SetTracker.Instance.IsTrackingSet) return;
             
-            Plugin.LogGlobal.LogInfo($"OpenStageSelect: IsOnline {GameSettings.IsOnline}, OnlineMode {GameSettings.OnlineMode}");
+            //Plugin.LogGlobal.LogInfo($"OpenStageSelect: IsOnline {GameSettings.IsOnline}, OnlineMode {GameSettings.OnlineMode}");
             if (GameSettings.IsOnline && GameSettings.OnlineMode != OnlineMode.HOSTED) return;
             StageStrikeTracker.Instance.Start();
             ScreenStageStrike.Open();

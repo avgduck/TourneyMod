@@ -32,13 +32,13 @@ public class ScreenLobbyOverlay
 
     internal static void Open()
     {
-        Plugin.LogGlobal.LogInfo("Opening lobby overlay screen");
+        //Plugin.LogGlobal.LogInfo("Opening lobby overlay screen");
         Instance = new ScreenLobbyOverlay();
     }
 
     internal static void Close()
     {
-        Plugin.LogGlobal.LogInfo("Closing lobby overlay screen");
+        //Plugin.LogGlobal.LogInfo("Closing lobby overlay screen");
         Instance = null;
     }
     
@@ -72,7 +72,7 @@ public class ScreenLobbyOverlay
     {
         if (GameSettings.current.gameMode != GameMode._1v1 || (GameSettings.IsOnline && GameSettings.OnlineMode == OnlineMode.RANKED))
         {
-            Plugin.LogGlobal.LogInfo("Game mode is not local 1v1! Hiding lobby overlay set count");
+            //Plugin.LogGlobal.LogInfo("Game mode is not local 1v1! Hiding lobby overlay set count");
             return;
         }
         

@@ -85,14 +85,14 @@ internal class ScreenStageStrike
 
     internal static void Open()
     {
-        Plugin.LogGlobal.LogInfo("Opening stage strike screen");
+        //Plugin.LogGlobal.LogInfo("Opening stage strike screen");
         Instance = new ScreenStageStrike();
         UIScreen.blockGlobalInput = true;
     }
 
     internal static void Close()
     {
-        Plugin.LogGlobal.LogInfo("Closing stage strike screen");
+        //Plugin.LogGlobal.LogInfo("Closing stage strike screen");
         Instance = null;
         UIScreen.blockGlobalInput = false;
     }
@@ -135,7 +135,7 @@ internal class ScreenStageStrike
         TextHandler.SetText(lbSetCount, "");
         if (GameSettings.current.gameMode != GameMode._1v1 || (GameSettings.IsOnline && GameSettings.OnlineMode == OnlineMode.RANKED))
         {
-            Plugin.LogGlobal.LogInfo("Game mode is not local 1v1! Hiding stage select set count");
+            //Plugin.LogGlobal.LogInfo("Game mode is not local 1v1! Hiding stage select set count");
             lbSetCount.gameObject.SetActive(false);
         }
         
@@ -654,7 +654,7 @@ internal class ScreenStageStrike
         if (StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentInteractMode == StrikeInfo.InteractMode.PICK)
         {
             UIScreen.blockGlobalInput = false;
-            screenStage.SelectStage(playerNumber, (int)stage);
+            StageStrikeTracker.Instance.CurrentStrikeInfo.PickStage(screenStage, stage, playerNumber);
         }
         else
         {
@@ -698,36 +698,11 @@ internal class ScreenStageStrike
         if (sum >= SetTracker.Instance.NumPlayersInMatch || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced)
         {
             randomVotes = [false, false, false, false];
-            List<Stage> randomStagePool = new List<Stage>();
-            switch (StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode)
-            {
-                case Ruleset.RandomMode.ANY:
-                    randomStagePool.AddRange(Ruleset.STAGES_3D);
-                    randomStagePool.AddRange(Ruleset.STAGES_2D);
-                    break;
-                
-                case Ruleset.RandomMode.ANY_3D:
-                    randomStagePool.AddRange(Ruleset.STAGES_3D);
-                    break;
-                
-                case Ruleset.RandomMode.ANY_2D:
-                    randomStagePool.AddRange(Ruleset.STAGES_2D);
-                    break;
-                
-                case Ruleset.RandomMode.ANY_LEGAL:
-                    randomStagePool.AddRange(StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesNeutral);
-                    randomStagePool.AddRange(StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesCounterpick);
-                    break;
-                
-                case Ruleset.RandomMode.OFF:
-                default:
-                    break;
-            }
 
             if (StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode != Ruleset.RandomMode.OFF)
             {
                 UIScreen.blockGlobalInput = false;
-                screenStage.SelectStage(playerNumber, (int)randomStagePool[Random.RandomRangeInt(0, randomStagePool.Count)]);
+                StageStrikeTracker.Instance.CurrentStrikeInfo.PickRandomStage(screenStage, playerNumber);
             }
         }
         

@@ -11,8 +11,8 @@ internal class StageStrikeTracker
     internal static void Init()
     {
         Instance = new StageStrikeTracker();
-        Log = BepInEx.Logging.Logger.CreateLogSource("TourneyMod StageStriking");
-        Log.LogInfo("Initialized");
+        Log = BepInEx.Logging.Logger.CreateLogSource("TM StageStriking");
+        Log.LogInfo("TourneyMod stage striking initialized");
     }
 
     private Ruleset defaultRuleset;
@@ -28,8 +28,8 @@ internal class StageStrikeTracker
     {
         Log.LogInfo("Starting new strike info");
         bool forceDefault = !SetTracker.Instance.Is1v1;
-        if (forceDefault) Log.LogInfo("Game mode is not 1v1! Forcing default ruleset 'all_stages'");
-        if (Plugin.Instance.SelectedRuleset == null) Log.LogWarning("No valid ruleset selected! Forcing default ruleset 'all_stages'");
+        //if (forceDefault) Log.LogInfo("Game mode is not 1v1! Forcing default ruleset 'all_stages'");
+        if (Plugin.Instance.SelectedRuleset == null) Log.LogError("No valid ruleset selected! Forcing default ruleset 'all_stages'");
         CurrentStrikeInfo = new StrikeInfo(Plugin.Instance.SelectedRuleset != null && !forceDefault ? Plugin.Instance.SelectedRuleset : defaultRuleset);
     }
 
