@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using LLBML.States;
 using LLBML.Utils;
 using LLHandlers;
-using LLScreen;
 using TourneyMod.Rulesets;
 using TourneyMod.SetTracking;
+using TourneyMod.UI;
 using Random = UnityEngine.Random;
 
 namespace TourneyMod.StageStriking;
@@ -90,14 +91,15 @@ internal class StrikeInfo
         }})").ToArray(), false));
     }
 
-    internal void PickStage(ScreenPlayersStage screenStage, Stage stage, int playerNumber)
+    internal Stage PickStage(ScreenStageStrike screenStageStrike, Stage stage, int playerNumber)
     {
-        if (screenStage == null) return;
-        screenStage.SelectStage(playerNumber, (int)stage);
+        if (screenStageStrike == null) return Stage.NONE;
+        GameStates.Send(Msg.SEL_STAGE, playerNumber, (int)stage);
         StageStrikeTracker.Log.LogInfo($"P{playerNumber+1} picks {stage}");
+        return stage;
     }
 
-    internal void PickRandomStage(ScreenPlayersStage screenStage, Ruleset.RandomMode randomMode)
+    internal Stage PickRandomStage(ScreenStageStrike screenStageStrike, Ruleset.RandomMode randomMode)
     {
         List<Stage> randomStagePool = new List<Stage>();
         switch (randomMode)
@@ -124,11 +126,12 @@ internal class StrikeInfo
                 break;
         }
         
-        if (screenStage == null) return;
-        if (randomStagePool.Count == 0) return;
+        if (screenStageStrike == null) return Stage.NONE;
+        if (randomStagePool.Count == 0) return Stage.NONE;
         Stage stage = randomStagePool[Random.RandomRangeInt(0, randomStagePool.Count)];
-        screenStage.SelectStage(-1, (int)stage);
+        GameStates.Send(Msg.SEL_STAGE, -1, (int)stage);
         StageStrikeTracker.Log.LogInfo($"Players voted random {randomMode}: picked {stage}");
+        return stage;
     }
 
     internal void BanStage(Stage stage, int playerNumber)

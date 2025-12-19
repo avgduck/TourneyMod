@@ -38,6 +38,7 @@ internal class Plugin : BaseUnityPlugin
         LogGlobal = this.Logger;
         SetTracker.Init();
         StageStrikeTracker.Init();
+        UIUtils.Init();
         
         HarmonyPatches.PatchAll();
         RulesetIO.Init();

@@ -62,6 +62,9 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
     private VoteButton btRandomMain;
     private VoteButton btRandomBoth3D;
     private VoteButton btRandomBoth2D;
+
+    private Stage selectedStage = Stage.NONE;
+    private Ruleset.RandomMode selectedRandom = Ruleset.RandomMode.OFF;
     
     public void Init(ScreenPlayersStage screenPlayersStage)
     {
@@ -323,7 +326,8 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         if (StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentInteractMode == StrikeInfo.InteractMode.PICK)
         {
             UIScreen.blockGlobalInput = false;
-            StageStrikeTracker.Instance.CurrentStrikeInfo.PickStage(this, stage, playerNumber);
+            AudioHandler.PlaySfx(Sfx.LOBBY_START_GAME);
+            selectedStage = StageStrikeTracker.Instance.CurrentStrikeInfo.PickStage(this, stage, playerNumber);
         }
         else
         {
@@ -332,6 +336,61 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         }
         
         UpdateSetInfo();
+    }
+
+    internal void OnStageSelected()
+    {
+        if (selectedStage == Stage.NONE) return;
+        
+        TextHandler.SetTextCode(lbTitle, "PLAYER_STAGE_VOTED");
+        
+        stageContainers.ForEach(container =>
+        {
+            container.Button.OnHoverOut(-1);
+            container.Button.SetActive(false);
+            container.Button.UpdateDisplay();
+        });
+        
+        btRandomMain.SetActive(false);
+        btRandomBoth3D.SetActive(false);
+        btRandomBoth2D.SetActive(false);
+        btFreePick.SetActive(false);
+
+        if (selectedRandom == Ruleset.RandomMode.OFF || selectedRandom == Ruleset.RandomMode.BOTH)
+        {
+            StageContainer container = stageContainers.Find(container => container.StoredStage == selectedStage);
+            Plugin.LogGlobal.LogInfo(container);
+            if (container == null) return;
+            container.Button.Select(true);
+            container.Button.UpdateDisplay();
+        }
+        else
+        {
+            Ruleset.RandomMode randomMode = StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode;
+            if (randomMode == Ruleset.RandomMode.BOTH)
+            {
+                if (selectedRandom == Ruleset.RandomMode.ANY_3D)
+                {
+                    btRandomBoth3D.imgBorder.color = Color.white;
+                    btRandomBoth3D.colDisabled = btRandomBoth3D.colHover;
+                    btRandomBoth3D.UpdateColor();
+                }
+                else if (selectedRandom == Ruleset.RandomMode.ANY_2D)
+                {
+                    btRandomBoth2D.imgBorder.color = Color.white;
+                    btRandomBoth2D.colDisabled = btRandomBoth2D.colHover;
+                    btRandomBoth2D.UpdateColor();
+                }
+            }
+            else
+            {
+                btRandomMain.imgBorder.color = Color.white;
+                btRandomMain.colDisabled = btRandomMain.colHover;
+                btRandomMain.UpdateColor();
+            }
+        }
+        
+        Plugin.LogGlobal.LogWarning("OnStageSelected");
     }
 
     private void OnVoteFreePick()
@@ -348,6 +407,8 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
     {
         if (randomMode == Ruleset.RandomMode.OFF || randomMode == Ruleset.RandomMode.BOTH) return;
         UIScreen.blockGlobalInput = false;
-        StageStrikeTracker.Instance.CurrentStrikeInfo.PickRandomStage(this, randomMode);
+        AudioHandler.PlaySfx(Sfx.LOBBY_START_GAME);
+        selectedStage = StageStrikeTracker.Instance.CurrentStrikeInfo.PickRandomStage(this, randomMode);
+        selectedRandom = randomMode;
     }
 }

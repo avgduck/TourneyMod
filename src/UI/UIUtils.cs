@@ -9,13 +9,28 @@ namespace TourneyMod.UI;
 
 internal static class UIUtils
 {
-    private static Sprite buttonBG
+    private static Sprite buttonBG;
+    internal static Sprite spriteStageSelected;
+
+    internal static void Init()
     {
-        get
+        buttonBG = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
+        spriteStageSelected = Sprite.Create(CreateBorderTexture(Color.yellow, 8, 500, 250), new Rect(0, 0, 500, 250), new Vector2(0.5f, 0.5f));
+    }
+
+    internal static Texture2D CreateBorderTexture(Color color, int thickness, int width, int height)
+    {
+        Texture2D tex = new Texture2D(width, height);
+        for (int x = 0; x < width; x++)
         {
-            Sprite bg = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
-            return bg;
+            for (int y = 0; y < height; y++)
+            {
+                if (x <= thickness || x >= width - thickness - 1 || y <= thickness || y >= height - thickness - 1) tex.SetPixel(x, y, color);
+                else tex.SetPixel(x, y, Color.clear);
+            }
         }
+        tex.Apply();
+        return tex;
     }
     
     internal static void CreateText(ref TextMeshProUGUI text, string name, Transform parent)
@@ -99,6 +114,7 @@ internal static class UIUtils
         button = panel.gameObject.AddComponent<VoteButton>();
         button.keepIconColor = true;
         button.colHover = new Color(0.902f, 0.9529f, 0.051f);
+        button.colDisabled = new Color(0.5f, 0.5f, 0.5f);
         button.soundClick = true;
         
         Image bg = LLControl.CreateImage(button.transform, buttonBG);
@@ -108,6 +124,16 @@ internal static class UIUtils
         bg.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scale.y);
         bg.color = Color.black;
         bg.raycastTarget = false;
+
+        int borderThickness = 2;
+        Image border = LLControl.CreateImage(button.transform, Sprite.Create(CreateBorderTexture(Color.white, borderThickness, (int)scale.x, (int)scale.y), new Rect(0, 0, (int)scale.x, (int)scale.y), new Vector2(0.5f, 0.5f)));
+        border.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        border.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        border.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scale.x);
+        border.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scale.y);
+        border.color = Color.clear;
+        border.raycastTarget = false;
+        button.imgBorder = border;
         
         CreateText(ref button.textMesh, "Text", button.transform);
         button.textMesh.rectTransform.anchorMin = new Vector2(0f, 0f);

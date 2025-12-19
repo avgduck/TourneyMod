@@ -36,8 +36,10 @@ internal class StageButton : LLButton
     private bool IsBeingHovered =>
         playersHovering[0] || playersHovering[1] || playersHovering[2] || playersHovering[3];
 
+    private bool selected;
     private Image stageImage;
     private Image lockedImage;
+    private Image selectedImage;
     private TextMeshProUGUI lbBanReason;
 
     internal static StageButton CreateStageButton(Transform tfParent, Stage stage)
@@ -54,6 +56,9 @@ internal class StageButton : LLButton
         Sprite lockedSprite = JPLELOFJOOH.BNFIDCAPPDK($"_spritePreviewLOCKED"); // Assets.GetMenuSprite()
         stageButton.lockedImage = LLControl.CreateImage(rect, lockedSprite);
         stageButton.lockedImage.raycastTarget = false;
+
+        stageButton.selectedImage = LLControl.CreateImage(rect, UIUtils.spriteStageSelected);
+        stageButton.selectedImage.raycastTarget = false;
         
         UIUtils.CreateText(ref stageButton.lbBanReason, "lbBanReason", stageButton.transform, new Vector2(0f, 13f));
         stageButton.lbBanReason.fontSize = 22;
@@ -98,9 +103,25 @@ internal class StageButton : LLButton
         UpdateDisplay();
     }
 
+    internal void Select(bool selected)
+    {
+        this.selected = selected;
+    }
+
     internal void UpdateDisplay()
     {
-        if (IsBeingHovered)
+        selectedImage.color = Color.clear;
+        
+        if (selected)
+        {
+            stageImage.color = COLOR_FOCUSED;
+            selectedImage.color = Color.white;
+        }
+        else if (!isActive)
+        {
+            stageImage.color = COLOR_BANNED;
+        }
+        else if (IsBeingHovered)
         {
             stageImage.color = COLOR_FOCUSED;
         }

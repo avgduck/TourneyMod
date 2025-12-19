@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LLGUI;
 using TourneyMod.SetTracking;
+using UnityEngine.UI;
 
 namespace TourneyMod.UI;
 
@@ -12,6 +13,8 @@ internal class VoteButton : LLButton
     internal Action onVote;
     internal bool enableVoting;
     internal string label;
+
+    internal Image imgBorder;
 
     internal VoteButton()
     {
