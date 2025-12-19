@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace TourneyMod.UI;
 
-internal class ScreenStageStrike : ScreenPlayersStage
+internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlayersStage>
 {
     private static readonly Vector2 BG_SCALE = new Vector2(1f, 2f);
     private static readonly Vector2 BG_POSITION = new Vector2(0f, -20f);
@@ -61,7 +61,7 @@ internal class ScreenStageStrike : ScreenPlayersStage
     private LLButton btRandom;
     private bool[] randomVotes = [false, false, false, false];
     
-    internal void Init(ScreenPlayersStage screenPlayersStage)
+    public void Init(ScreenPlayersStage screenPlayersStage)
     {
         screenType = screenPlayersStage.screenType;
         layer = screenPlayersStage.layer;

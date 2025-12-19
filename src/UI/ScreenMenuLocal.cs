@@ -6,11 +6,11 @@ using UnityEngine;
 
 namespace TourneyMod.UI;
 
-internal class ScreenMenuLocal : ScreenMenuVersus
+internal class ScreenMenuLocal : ScreenMenuVersus, ICustomScreen<ScreenMenuVersus>
 {
     private LLButton btTourney;
     
-    internal void Init(ScreenMenuVersus screenMenuVersus)
+    public void Init(ScreenMenuVersus screenMenuVersus)
     {
         screenType = screenMenuVersus.screenType;
         layer = screenMenuVersus.layer;
