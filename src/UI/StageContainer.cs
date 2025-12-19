@@ -1,4 +1,5 @@
 using LLBML.Utils;
+using LLGUI;
 using LLHandlers;
 using TMPro;
 using UnityEngine;
@@ -38,23 +39,23 @@ internal class StageContainer
         _ => Vector2.zero
     };
 
-    internal StageContainer(Stage stage)
+    internal StageContainer(ScreenStageStrike screenStageStrike, Stage stage)
     {
         StoredStage = stage;
         
-        Button = StageButton.CreateStageButton(ScreenStageStrike.Instance.screenStage.stageButtonsContainer, stage);
+        Button = StageButton.CreateStageButton(screenStageStrike.stageButtonsContainer, stage);
         Button.SetActive(true);
         Button.onClick = (playerNumber) =>
         {
-            ScreenStageStrike.Instance.OnClickStage(playerNumber, StoredStage);
+            screenStageStrike.OnClickStage(playerNumber, StoredStage);
             Button.UpdateDisplay();
         };
 
-        UI.CreateText(ref lbStageName, "lbStageName", Button.transform, new Vector2(0f, -110f));
+        UIUtils.CreateText(ref lbStageName, "lbStageName", Button.transform, new Vector2(0f, -110f));
         lbStageName.fontSize = 42;
         TextHandler.SetText(lbStageName, StageName);
         
-        UI.CreateText(ref lbStageSize, "lbStageSize", Button.transform, new Vector2(190f, 110f));
+        UIUtils.CreateText(ref lbStageSize, "lbStageSize", Button.transform, new Vector2(190f, 110f));
         lbStageSize.fontSize = 22;
         TextHandler.SetText(lbStageSize, (StageSize != Vector2.zero ? $"{StageSize.x}x{StageSize.y}" : ""));
     }

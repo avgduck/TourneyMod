@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using LLBML.Players;
 using LLBML.States;
 using LLGUI;
 using LLHandlers;
@@ -12,16 +11,8 @@ using UnityEngine;
 
 namespace TourneyMod.UI;
 
-internal class ScreenStageStrike
+internal class ScreenStageStrike : ScreenPlayersStage
 {
-    internal static ScreenStageStrike Instance { get; private set; }
-    internal static bool IsOpen => Instance != null;
-    internal ScreenPlayersStage screenStage;
-    private List<StageContainer> stageContainersNeutral;
-    private List<StageContainer> stageContainersCounterpick;
-    private List<StageContainer> stageContainers;
-    private TMP_Text titleText;
-
     private static readonly Vector2 BG_SCALE = new Vector2(1f, 2f);
     private static readonly Vector2 BG_POSITION = new Vector2(0f, -20f);
 
@@ -55,10 +46,11 @@ internal class ScreenStageStrike
         new Color(255/255f, 255/255f, 61/255f),
         new Color(90/255f, 244/255f, 90/255f)
     ];
-
-    private static readonly Color COLOR_CURSOR_ACTIVE = Color.white;
-    private static readonly Color COLOR_CURSOR_INACTIVE = Color.white * 0.6f;
-
+    
+    private List<StageContainer> stageContainersNeutral;
+    private List<StageContainer> stageContainersCounterpick;
+    private List<StageContainer> stageContainers;
+    
     private TextMeshProUGUI lbSetCount;
     private TextMeshProUGUI lbBansRemaining;
     private TextMeshProUGUI lbBanStatus;
@@ -68,53 +60,74 @@ internal class ScreenStageStrike
     
     private LLButton btRandom;
     private bool[] randomVotes = [false, false, false, false];
-
-    internal static void Open()
+    
+    internal void Init(ScreenPlayersStage screenPlayersStage)
     {
-        //Plugin.LogGlobal.LogInfo("Opening stage strike screen");
-        Instance = new ScreenStageStrike();
+        screenType = screenPlayersStage.screenType;
+        layer = screenPlayersStage.layer;
+        isActive = screenPlayersStage.isActive;
+        msgEsc = screenPlayersStage.msgEsc;
+        msgMenu = screenPlayersStage.msgMenu;
+        msgCancel = screenPlayersStage.msgCancel;
+        
+        btBack = screenPlayersStage.btBack;
+        btLeft = screenPlayersStage.btLeft;
+        btRight = screenPlayersStage.btRight;
+        lbTitle = screenPlayersStage.lbTitle;
+        lbPlayersSelectingStage = screenPlayersStage.lbPlayersSelectingStage;
+        obSpectator = screenPlayersStage.obSpectator;
+        obNotSpectator = screenPlayersStage.obNotSpectator;
+        stageButtonsContainer = screenPlayersStage.stageButtonsContainer;
+        btStages = screenPlayersStage.btStages;
+        posMid = screenPlayersStage.posMid;
+        posLeft = screenPlayersStage.posLeft;
+        posLeft2 = screenPlayersStage.posLeft2;
+        posRight = screenPlayersStage.posRight;
+        posRight2 = screenPlayersStage.posRight2;
+        scaleSmall = screenPlayersStage.scaleSmall;
+        scaleBig = screenPlayersStage.scaleBig;
+        nButtons = screenPlayersStage.nButtons;
+        curIndex = screenPlayersStage.curIndex;
+        isMoving = screenPlayersStage.isMoving;
+        queuedMove = screenPlayersStage.queuedMove;
+    }
+
+    public override void OnOpen(ScreenType screenPrev)
+    {
+        Plugin.LogGlobal.LogInfo("Custom stage select OnOpen");
+        StageStrikeTracker.Instance.Start();
         UIScreen.blockGlobalInput = true;
-    }
+        Plugin.Instance.RecolorCursors = true;
+        
+        // manually do ScreenBase::OnOpen to avoid going through ScreenPlayersStage::OnOpen
+        if (TextHandler.isInited)
+        {
+            UpdateText();
+        }
 
-    internal static void Close()
-    {
-        //Plugin.LogGlobal.LogInfo("Closing stage strike screen");
-        Instance = null;
-        UIScreen.blockGlobalInput = false;
-    }
-
-    internal void OnOpen(ScreenPlayersStage screenStage)
-    {
-        this.screenStage = screenStage;
-        screenStage.UpdateText();
-        screenStage.msgMenu = Msg.NONE;
-
-        RectTransform bar_top = screenStage.transform.Find("bar_top").GetComponent<RectTransform>();
+        msgMenu = Msg.NONE;
+        
+        RectTransform bar_top = transform.Find("bar_top").GetComponent<RectTransform>();
         bar_top.anchoredPosition = TITLE_POSITION;
         bar_top.localScale = TITLE_SCALE;
+        
+        lbTitle.rectTransform.localScale = new Vector2(1f / TITLE_SCALE.x, 1f / TITLE_SCALE.y);
+        lbTitle.fontSize = TITLE_FONT_SIZE;
 
-        RectTransform lbTitle = bar_top.Find("lbTitle").GetComponent<RectTransform>();
-        lbTitle.localScale = new Vector2(1f / TITLE_SCALE.x, 1f / TITLE_SCALE.y);
-        titleText = lbTitle.GetComponent<TMP_Text>();
-        titleText.fontSize = TITLE_FONT_SIZE;
-
-        RectTransform bar_mid = screenStage.transform.Find("bar_mid").GetComponent<RectTransform>();
+        RectTransform bar_mid = transform.Find("bar_mid").GetComponent<RectTransform>();
         bar_mid.anchoredPosition = BG_POSITION;
         bar_mid.localScale = BG_SCALE;
 
-        screenStage.btLeft.visible = false;
-        screenStage.btRight.visible = false;
-        screenStage.btBack.onClick = (playerNumber) => { GameStates.Send(Msg.BACK, playerNumber, -1); };
+        btLeft.visible = false;
+        btRight.visible = false;
+        btBack.onClick = (playerNumber) => { GameStates.Send(Msg.BACK, playerNumber, -1); };
 
-        RectTransform btBack = screenStage.btBack.GetComponent<RectTransform>();
-        btBack.anchoredPosition = BACK_POSITION;
-        btBack.localScale = BACK_SCALE;
-        RectTransform lbBack = btBack.Find("Text").GetComponent<RectTransform>();
-        lbBack.localScale = new Vector2(1f / BACK_SCALE.x, 1f / BACK_SCALE.y);
-        TMP_Text backText = lbBack.GetComponent<TMP_Text>();
-        if (backText != null) backText.fontSize = BACK_FONT_SIZE;
+        btBack.transform.localPosition = BACK_POSITION;
+        btBack.transform.localScale = BACK_SCALE;
+        btBack.textMesh.rectTransform.localScale = new Vector2(1f / BACK_SCALE.x, 1f / BACK_SCALE.y);
+        if (btBack.textMesh != null) btBack.textMesh.fontSize = BACK_FONT_SIZE;
         
-        UI.CreateText(ref lbSetCount, "lbSetCount", screenStage.transform, SETCOUNT_POSITION);
+        UIUtils.CreateText(ref lbSetCount, "lbSetCount", transform, SETCOUNT_POSITION);
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
         TextHandler.SetText(lbSetCount, "");
         if (Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE)
@@ -123,21 +136,21 @@ internal class ScreenStageStrike
             lbSetCount.gameObject.SetActive(false);
         }
         
-        UI.CreateText(ref lbBansRemaining, "lbBansRemaining", screenStage.transform, BANSREMAINING_POSITION);
+        UIUtils.CreateText(ref lbBansRemaining, "lbBansRemaining", transform, BANSREMAINING_POSITION);
         lbBansRemaining.fontSize = BANSREMAINING_FONT_SIZE;
         TextHandler.SetText(lbBansRemaining, "");
         
-        UI.CreateText(ref lbBanStatus, "lbBanStatus", screenStage.transform, BANSTATUS_POSITION);
+        UIUtils.CreateText(ref lbBanStatus, "lbBanStatus", transform, BANSTATUS_POSITION);
         lbBanStatus.fontSize = BANSTATUS_FONT_SIZE;
         TextHandler.SetText(lbBanStatus, "");
 
-        UI.CreateButton(ref btFreePick, "btFreePick", screenStage.transform, FREEPICK_POSITION, FREEPICK_SCALE);
+        UIUtils.CreateButton(ref btFreePick, "btFreePick", transform, FREEPICK_POSITION, FREEPICK_SCALE);
         btFreePick.SetText("Toggle free pick 0/0");
         btFreePick.textMesh.fontSize = FREEPICK_FONT_SIZE;
         btFreePick.onClick = OnClickFreePick;
         if (StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced) btFreePick.gameObject.SetActive(false);
         
-        UI.CreateButton(ref btRandom, "btRandom", screenStage.transform, RANDOM_POSITION, RANDOM_SCALE);
+        UIUtils.CreateButton(ref btRandom, "btRandom", transform, RANDOM_POSITION, RANDOM_SCALE);
         btRandom.SetText("Random (off) 0/0");
         btRandom.textMesh.fontSize = RANDOM_FONT_SIZE;
         btRandom.onClick = OnClickRandom;
@@ -148,14 +161,24 @@ internal class ScreenStageStrike
         UpdateSetInfo();
     }
 
+    public override void OnClose(ScreenType screenTypeNext)
+    {
+        Plugin.LogGlobal.LogInfo("Custom stage select OnClose");
+        StageStrikeTracker.Instance.End();
+        UIScreen.blockGlobalInput = false;
+        Plugin.Instance.RecolorCursors = false;
+        
+        base.OnClose(screenTypeNext);
+    }
+    
     private void CreateStageContainers()
     {
         StageLayout layout = StageLayout.Create(StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesNeutral.Count, StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesCounterpick.Count);
         
         float startPositionY = layout.position.y + layout.totalHeight / 2f - layout.stageSize.y / 2f;
 
-        screenStage.nButtons = StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesNeutral.Count + StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesCounterpick.Count;
-        screenStage.btStages = new LLButton[screenStage.nButtons];
+        nButtons = StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesNeutral.Count + StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.stagesCounterpick.Count;
+        btStages = new LLButton[nButtons];
 
         int stageIndex = 0;
         int rowIndex = 0;
@@ -166,7 +189,7 @@ internal class ScreenStageStrike
         {
             float startPositionX = layout.position.x - layout.GetRowWidth(layout.rowLengthsNeutral[rowIndex]) / 2f + layout.stageSize.x / 2f;
             
-            StageContainer container = new StageContainer(stage);
+            StageContainer container = new StageContainer(this, stage);
             stageContainers.Add(container);
             stageContainersNeutral.Add(container);
 
@@ -176,7 +199,7 @@ internal class ScreenStageStrike
             buttonRect.anchoredPosition = new Vector2(posX, posY);
             buttonRect.localScale = Vector2.one * layout.stageScaleFactor;
 
-            screenStage.btStages[stageIndex] = container.Button;
+            btStages[stageIndex] = container.Button;
 
             stageIndex++;
             colIndex++;
@@ -194,7 +217,7 @@ internal class ScreenStageStrike
         {
             float startPositionX = layout.position.x - layout.GetRowWidth(layout.rowLengthsCounterpick[rowIndex]) / 2f+ layout.stageSize.x / 2f;
             
-            StageContainer container = new StageContainer(stage);
+            StageContainer container = new StageContainer(this, stage);
             stageContainers.Add(container);
             stageContainersCounterpick.Add(container);
 
@@ -205,7 +228,7 @@ internal class ScreenStageStrike
             buttonRect.anchoredPosition = new Vector2(posX, posY);
             buttonRect.localScale = Vector2.one * layout.stageScaleFactor;
             
-            screenStage.btStages[stageIndex] = container.Button;
+            btStages[stageIndex] = container.Button;
 
             stageIndex++;
             colIndex++;
@@ -216,7 +239,7 @@ internal class ScreenStageStrike
             }
         }
     }
-
+    
     private void UpdateStageBans()
     {
         List<StageBan> stageBans = StageStrikeTracker.Instance.CurrentStrikeInfo.StageBans;
@@ -227,7 +250,7 @@ internal class ScreenStageStrike
             stageContainer.Button.SetBan(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced ? null : ban);
         });
     }
-
+    
     private void UpdateSetInfo()
     {
         int gameNumber = 0;
@@ -279,79 +302,6 @@ internal class ScreenStageStrike
         }}" + (StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced ? "" : $" {randomSum}/{SetTracker.Instance.NumPlayersInMatch}"));
     }
 
-    // texture editing code from ColorSwap
-    private static void SetTextureCopy(ref Texture2D destination, Texture2D source)
-    {
-        RenderTexture temp = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
-        
-        Graphics.Blit(source, temp);
-        
-        RenderTexture prev = RenderTexture.active;
-        RenderTexture.active = temp;
-        destination = new Texture2D(source.width, source.height, source.format, false);
-        destination.ReadPixels(new Rect(0, 0, temp.width, temp.height), 0, 0);
-        destination.Apply();
-        RenderTexture.active = prev;
-        RenderTexture.ReleaseTemporary(temp);
-    }
-    private static void SetTextureColor(ref Texture2D texture, Color color)
-    {
-        Color[] pixels = texture.GetPixels();
-        for (int pixelIndex = 0; pixelIndex < pixels.Length; pixelIndex++)
-        {
-            Color imgColor = pixels[pixelIndex];
-            pixels[pixelIndex] = new Color(imgColor.r * color.r, imgColor.g * color.g, imgColor.b * color.b, imgColor.a * color.a);
-        }
-        texture.SetPixels(pixels);
-        texture.Apply();
-    }
-
-    internal static readonly Texture2D[] cursorImagesActive = new Texture2D[4];
-    internal static readonly Texture2D[] cursorImagesInactive = new Texture2D[4];
-    internal static void GenerateCursorImages(LLCursor cursor)
-    {
-        Texture2D source = cursor.texCursor;
-        Texture2D cursorActive = new Texture2D(0, 0);
-        Texture2D cursorInactive = new Texture2D(0, 0);
-        SetTextureCopy(ref cursorActive, source);
-        SetTextureCopy(ref cursorInactive, source);
-        SetTextureColor(ref cursorInactive, COLOR_CURSOR_INACTIVE);
-        Player player = cursor.player;
-        cursorImagesActive[player.nr] = cursorActive;
-        cursorImagesInactive[player.nr] = cursorInactive;
-    }
-
-    internal static void UpdateCursorColors(int controllingPlayer)
-    {
-        if (!IsOpen || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced)
-        {
-            ResetCursorColors();
-            return;
-        }
-        
-        Player.ForAll((Player player) =>
-        {
-            player.cursor.image.color = player.nr == controllingPlayer ? COLOR_CURSOR_ACTIVE : COLOR_CURSOR_INACTIVE;
-            
-            if (player.cursor.state != CursorState.POINTER_HW) return;
-            Texture2D activeCursor = cursorImagesActive[player.nr];
-            Texture2D inactiveCursor = cursorImagesInactive[player.nr];
-            Cursor.SetCursor(player.nr == controllingPlayer ? activeCursor : inactiveCursor, new Vector2(0f, 0f), CursorMode.ForceSoftware);
-        });
-    }
-
-    internal static void ResetCursorColors()
-    {
-        Player.ForAll((Player player) =>
-        {
-            player.cursor.image.color = COLOR_CURSOR_ACTIVE;
-            
-            if (player.cursor.state != CursorState.POINTER_HW) return;
-            Texture2D activeCursor = cursorImagesActive[player.nr];
-            Cursor.SetCursor(activeCursor, new Vector2(0f, 0f), CursorMode.ForceSoftware);
-        });
-    }
-
     internal void OnClickStage(int playerNumber, Stage stage)
     {
         if (!StageStrikeTracker.Instance.CurrentStrikeInfo.CheckPlayerInteraction(stage, playerNumber)) return;
@@ -359,7 +309,7 @@ internal class ScreenStageStrike
         if (StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentInteractMode == StrikeInfo.InteractMode.PICK)
         {
             UIScreen.blockGlobalInput = false;
-            StageStrikeTracker.Instance.CurrentStrikeInfo.PickStage(screenStage, stage, playerNumber);
+            StageStrikeTracker.Instance.CurrentStrikeInfo.PickStage(this, stage, playerNumber);
         }
         else
         {
@@ -407,7 +357,7 @@ internal class ScreenStageStrike
             if (StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode != Ruleset.RandomMode.OFF)
             {
                 UIScreen.blockGlobalInput = false;
-                StageStrikeTracker.Instance.CurrentStrikeInfo.PickRandomStage(screenStage, playerNumber);
+                StageStrikeTracker.Instance.CurrentStrikeInfo.PickRandomStage(this, playerNumber);
             }
         }
         

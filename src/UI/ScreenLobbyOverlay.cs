@@ -51,15 +51,15 @@ public class ScreenLobbyOverlay
         
         this.screenPlayers = screenPlayers;
 
-        UI.CreateText(ref lbGame, "lbGame", screenPlayers.transform, GAME_POSITION);
+        UIUtils.CreateText(ref lbGame, "lbGame", screenPlayers.transform, GAME_POSITION);
         lbGame.fontSize = GAME_FONT_SIZE;
         
-        UI.CreateText(ref lbSetCount, "lbSetCount", screenPlayers.transform, SETCOUNT_POSITION);
+        UIUtils.CreateText(ref lbSetCount, "lbSetCount", screenPlayers.transform, SETCOUNT_POSITION);
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
 
         resetVotes = [false, false, false, false];
-        UI.CreateButton(ref btResetSetCount, "btResetSetCount", screenPlayers.transform, RESET_POSITION, RESET_SCALE);
-        UI.SetButtonBGVisibility(btResetSetCount, false);
+        UIUtils.CreateButton(ref btResetSetCount, "btResetSetCount", screenPlayers.transform, RESET_POSITION, RESET_SCALE);
+        UIUtils.SetButtonBGVisibility(btResetSetCount, false);
         btResetSetCount.textMesh.fontSize = RESET_FONT_SIZE;
         btResetSetCount.SetText("Reset set count 0/0");
         btResetSetCount.onClick = (playerNumber) =>

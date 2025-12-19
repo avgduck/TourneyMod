@@ -12,6 +12,13 @@ internal class ScreenMenuLocal : ScreenMenuVersus
     
     internal void Init(ScreenMenuVersus screenMenuVersus)
     {
+        screenType = screenMenuVersus.screenType;
+        layer = screenMenuVersus.layer;
+        isActive = screenMenuVersus.isActive;
+        msgEsc = screenMenuVersus.msgEsc;
+        msgMenu = screenMenuVersus.msgMenu;
+        msgCancel = screenMenuVersus.msgCancel;
+        
         btRoyale = screenMenuVersus.btRoyale;
         bt1v1 = screenMenuVersus.bt1v1;
         btTeams = screenMenuVersus.btTeams;
