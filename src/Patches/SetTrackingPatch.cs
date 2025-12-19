@@ -5,7 +5,6 @@ using LLBML.Settings;
 using LLBML.States;
 using LLHandlers;
 using TourneyMod.SetTracking;
-using TourneyMod.UI;
 
 namespace TourneyMod.Patches;
 
@@ -21,7 +20,6 @@ internal static class SetTrackingPatch
         {
             if (newState == GameState.MENU)
             {
-                ScreenLobbyOverlay.Close();
                 SetTracker.Instance.End();
                 Plugin.Instance.ActiveTourneyMode = TourneyMode.NONE;
             }
@@ -54,7 +52,6 @@ internal static class SetTrackingPatch
         else if (newState == GameState.LOBBY_LOCAL || newState == GameState.LOBBY_ONLINE || newState == GameState.LOBBY_TRAINING)
         {
             SetTracker.Instance.Start();
-            ScreenLobbyOverlay.Open();
         }
     }
 }

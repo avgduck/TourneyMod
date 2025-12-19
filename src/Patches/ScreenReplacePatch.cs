@@ -17,6 +17,17 @@ internal static class ScreenReplacePatch
         {
             ReplaceScreen<ScreenMenuVersus, ScreenMenuLocal>(ref __result);
         }
+        else if (FLMBCGMOCKC == ScreenType.PLAYERS && SetTracker.Instance.IsTrackingSet)
+        {
+            if (Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE)
+            {
+                // TODO: add custom lobby screen with win tracking to other game modes
+            }
+            else
+            {
+                ReplaceScreen<ScreenPlayers, ScreenLobbyTourney>(ref __result);
+            }
+        }
         else if (FLMBCGMOCKC == ScreenType.PLAYERS_STAGE && SetTracker.Instance.IsTrackingSet)
         {
             ReplaceScreen<ScreenPlayersStage, ScreenStageStrike>(ref __result);

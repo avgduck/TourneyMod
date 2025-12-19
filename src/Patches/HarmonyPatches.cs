@@ -16,8 +16,6 @@ internal static class HarmonyPatches
         Plugin.LogGlobal.LogInfo("Screen replacement patch applied");
         harmony.PatchAll(typeof(CursorPatch));
         Plugin.LogGlobal.LogInfo("Cursor patch applied");
-        harmony.PatchAll(typeof(ScreenLobbyPatch));
-        Plugin.LogGlobal.LogInfo("Lobby screen patch applied");
         harmony.PatchAll(typeof(ScreenResultsPatch));
         Plugin.LogGlobal.LogInfo("Results screen patch applied");
         
