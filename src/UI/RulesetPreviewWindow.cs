@@ -266,9 +266,10 @@ internal class RulesetPreviewWindow : MonoBehaviour
         lbRandomMode2.SetText(ruleset.randomMode switch
         {
             Ruleset.RandomMode.OFF => "OFF",
-            Ruleset.RandomMode.ANY => "ON, any stage (3D/2D)",
-            Ruleset.RandomMode.ANY_3D => "ON, any 3D stage (vanilla)",
+            Ruleset.RandomMode.ANY_3D => "ON, any 3D stage",
             Ruleset.RandomMode.ANY_2D => "ON, any 2D stage",
+            Ruleset.RandomMode.BOTH => "ON, both any 3D/any 2D options",
+            Ruleset.RandomMode.ANY => "ON, any stage (3D/2D)",
             Ruleset.RandomMode.ANY_LEGAL => "ON, any legal stage"
         });
        lbBanOrder2.SetText(GetBanOrder(ruleset));

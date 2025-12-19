@@ -16,7 +16,6 @@ internal class StrikeInfo
     internal bool IsFreePickForced { get; private set; }
 
     internal List<StageBan> StageBans { get; private set; }
-    private List<Stage> randomStagePool;
     internal int[] TotalBansRemaining { get; private set; }
     internal int CurrentBansRemaining { get; private set; }
     private int banIndex = 0;
@@ -44,32 +43,6 @@ internal class StrikeInfo
             int winner = SetTracker.Instance.CurrentSet.LastWinner;
             int loser = winner == 0 ? 1 : 0;
             ControlStartPlayer = ActiveRuleset.laterGamesFirstPlayer == Ruleset.FirstPlayer.WINNER ? winner : loser;
-        }
-        
-        randomStagePool = new List<Stage>();
-        switch (ActiveRuleset.randomMode)
-        {
-            case Ruleset.RandomMode.ANY:
-                randomStagePool.AddRange(Ruleset.STAGES_3D);
-                randomStagePool.AddRange(Ruleset.STAGES_2D);
-                break;
-                
-            case Ruleset.RandomMode.ANY_3D:
-                randomStagePool.AddRange(Ruleset.STAGES_3D);
-                break;
-                
-            case Ruleset.RandomMode.ANY_2D:
-                randomStagePool.AddRange(Ruleset.STAGES_2D);
-                break;
-                
-            case Ruleset.RandomMode.ANY_LEGAL:
-                randomStagePool.AddRange(ActiveRuleset.stagesNeutral);
-                randomStagePool.AddRange(ActiveRuleset.stagesCounterpick);
-                break;
-                
-            case Ruleset.RandomMode.OFF:
-            default:
-                break;
         }
         
         UpdateInteractMode();
@@ -124,13 +97,38 @@ internal class StrikeInfo
         StageStrikeTracker.Log.LogInfo($"P{playerNumber+1} picks {stage}");
     }
 
-    internal void PickRandomStage(ScreenPlayersStage screenStage)
+    internal void PickRandomStage(ScreenPlayersStage screenStage, Ruleset.RandomMode randomMode)
     {
+        List<Stage> randomStagePool = new List<Stage>();
+        switch (randomMode)
+        {
+            case Ruleset.RandomMode.ANY:
+                randomStagePool.AddRange(Ruleset.STAGES_3D);
+                randomStagePool.AddRange(Ruleset.STAGES_2D);
+                break;
+                
+            case Ruleset.RandomMode.ANY_3D:
+                randomStagePool.AddRange(Ruleset.STAGES_3D);
+                break;
+                
+            case Ruleset.RandomMode.ANY_2D:
+                randomStagePool.AddRange(Ruleset.STAGES_2D);
+                break;
+                
+            case Ruleset.RandomMode.ANY_LEGAL:
+                randomStagePool.AddRange(ActiveRuleset.stagesNeutral);
+                randomStagePool.AddRange(ActiveRuleset.stagesCounterpick);
+                break;
+                
+            case Ruleset.RandomMode.OFF or Ruleset.RandomMode.BOTH:
+                break;
+        }
+        
         if (screenStage == null) return;
         if (randomStagePool.Count == 0) return;
         Stage stage = randomStagePool[Random.RandomRangeInt(0, randomStagePool.Count)];
         screenStage.SelectStage(-1, (int)stage);
-        StageStrikeTracker.Log.LogInfo($"Players voted random: picked {stage}");
+        StageStrikeTracker.Log.LogInfo($"Players voted random {randomMode}: picked {stage}");
     }
 
     internal void BanStage(Stage stage, int playerNumber)

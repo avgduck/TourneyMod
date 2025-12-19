@@ -25,5 +25,5 @@
   "game1FirstPlayer": 0,
   "laterGamesFirstPlayer": "WINNER",
   "dsrMode": "OFF",
-  "randomMode": "ANY_3D"
+  "randomMode": "BOTH"
 }

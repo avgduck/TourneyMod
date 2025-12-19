@@ -41,9 +41,10 @@ public class Ruleset(
     public enum RandomMode
     {
         OFF,
-        ANY,
         ANY_3D,
         ANY_2D,
+        BOTH,
+        ANY,
         ANY_LEGAL
     }
 
