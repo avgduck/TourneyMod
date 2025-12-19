@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using LLBML.Utils;
@@ -125,13 +124,13 @@ internal class StrikeInfo
         StageStrikeTracker.Log.LogInfo($"P{playerNumber+1} picks {stage}");
     }
 
-    internal void PickRandomStage(ScreenPlayersStage screenStage, int playerNumber)
+    internal void PickRandomStage(ScreenPlayersStage screenStage)
     {
         if (screenStage == null) return;
         if (randomStagePool.Count == 0) return;
         Stage stage = randomStagePool[Random.RandomRangeInt(0, randomStagePool.Count)];
-        screenStage.SelectStage(playerNumber, (int)stage);
-        StageStrikeTracker.Log.LogInfo($"P{playerNumber+1} picks random: got {stage}");
+        screenStage.SelectStage(-1, (int)stage);
+        StageStrikeTracker.Log.LogInfo($"Players voted random: picked {stage}");
     }
 
     internal void BanStage(Stage stage, int playerNumber)

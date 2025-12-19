@@ -20,9 +20,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     
     private TextMeshProUGUI lbGame;
     private TextMeshProUGUI lbSetCount;
-    private LLButton btResetSetCount;
-    
-    private bool[] resetVotes;
+    private VoteButton btResetSetCount;
     
     public void Init(ScreenPlayers screenPlayers)
     {
@@ -80,12 +78,11 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         UIUtils.CreateText(ref lbSetCount, "lbSetCount", transform, SETCOUNT_POSITION);
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
 
-        resetVotes = [false, false, false, false];
-        UIUtils.CreateButton(ref btResetSetCount, "btResetSetCount", transform, RESET_POSITION, RESET_SCALE);
+        UIUtils.CreateVoteButton(ref btResetSetCount, "btResetSetCount", transform, RESET_POSITION, RESET_SCALE);
         UIUtils.SetButtonBGVisibility(btResetSetCount, false);
         btResetSetCount.textMesh.fontSize = RESET_FONT_SIZE;
-        btResetSetCount.SetText("Reset set count 0/0");
-        btResetSetCount.onClick = OnResetClicked;
+        btResetSetCount.label = "Reset set count";
+        btResetSetCount.onVote = OnVoteReset;
         
         UpdateSetCount();
     }
@@ -100,7 +97,6 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     {
         base.DoUpdate();
         ShowCpuButtons(false);
-        UpdateSetCount();
     }
     
     private void UpdateSetCount()
@@ -109,33 +105,11 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         int[] winCounts = SetTracker.Instance.CurrentSet.WinCounts;
         TextHandler.SetText(lbGame, $"Game {gameNumber}");
         TextHandler.SetText(lbSetCount, $"({winCounts[0]}-{winCounts[1]})");
-        
-        int sum = 0;
-        foreach (bool vote in resetVotes)
-        {
-            if (vote) sum++;
-        }
-        btResetSetCount.SetText($"Reset set count {sum}/{SetTracker.Instance.NumPlayersInMatch}");
     }
     
-    private void OnResetClicked(int playerNumber)
+    private void OnVoteReset()
     {
-        resetVotes[playerNumber] = true;
-        
-        int sum = 0;
-        foreach (bool vote in resetVotes)
-        {
-            if (vote) sum++;
-        }
-        
-        if (sum >= SetTracker.Instance.NumPlayersInMatch)
-        {
-            resetVotes = [false, false, false, false];
-            SetTracker.Instance.Reset();
-            
-            if (StageStrikeTracker.Instance.IsTrackingStrikeInfo) StageStrikeTracker.Instance.Reset();
-        }
-        
+        SetTracker.Instance.Reset();
         UpdateSetCount();
     }
 }

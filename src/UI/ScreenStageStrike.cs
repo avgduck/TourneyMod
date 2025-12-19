@@ -55,11 +55,8 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
     private TextMeshProUGUI lbBansRemaining;
     private TextMeshProUGUI lbBanStatus;
 
-    private LLButton btFreePick;
-    private bool[] freePickVotes = [false, false, false, false];
-    
-    private LLButton btRandom;
-    private bool[] randomVotes = [false, false, false, false];
+    private VoteButton btFreePick;
+    private VoteButton btRandom;
     
     public void Init(ScreenPlayersStage screenPlayersStage)
     {
@@ -144,16 +141,23 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         lbBanStatus.fontSize = BANSTATUS_FONT_SIZE;
         TextHandler.SetText(lbBanStatus, "");
 
-        UIUtils.CreateButton(ref btFreePick, "btFreePick", transform, FREEPICK_POSITION, FREEPICK_SCALE);
-        btFreePick.SetText("Toggle free pick 0/0");
+        UIUtils.CreateVoteButton(ref btFreePick, "btFreePick", transform, FREEPICK_POSITION, FREEPICK_SCALE);
+        btFreePick.label = "Toggle free pick";
         btFreePick.textMesh.fontSize = FREEPICK_FONT_SIZE;
-        btFreePick.onClick = OnClickFreePick;
+        btFreePick.onVote = OnVoteFreePick;
         if (StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced) btFreePick.gameObject.SetActive(false);
         
-        UIUtils.CreateButton(ref btRandom, "btRandom", transform, RANDOM_POSITION, RANDOM_SCALE);
-        btRandom.SetText("Random (off) 0/0");
+        UIUtils.CreateVoteButton(ref btRandom, "btRandom", transform, RANDOM_POSITION, RANDOM_SCALE);
+        btRandom.label = $"Random {StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode switch {
+            Ruleset.RandomMode.OFF => "(off)",
+            Ruleset.RandomMode.ANY => "(any 3D/2D)",
+            Ruleset.RandomMode.ANY_3D => "(any 3D)",
+            Ruleset.RandomMode.ANY_2D => "(any 2D)",
+            Ruleset.RandomMode.ANY_LEGAL => "(any legal)",
+        }}";
         btRandom.textMesh.fontSize = RANDOM_FONT_SIZE;
-        btRandom.onClick = OnClickRandom;
+        btRandom.onVote = OnVoteRandom;
+        btRandom.enableVoting = !(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
         if (StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode == Ruleset.RandomMode.OFF) btRandom.gameObject.SetActive(false);
 
         CreateStageContainers();
@@ -280,26 +284,6 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
                 ? $"P{controllingPlayer+1} banning {StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentBansRemaining}..."
                 : $"P{controllingPlayer+1} picking...");
         }
-        
-        int freePickSum = 0;
-        foreach (bool vote in freePickVotes)
-        {
-            if (vote) freePickSum++;
-        }
-        btFreePick.SetText($"Toggle free pick {freePickSum}/{SetTracker.Instance.NumPlayersInMatch}");
-        
-        int randomSum = 0;
-        foreach (bool vote in randomVotes)
-        {
-            if (vote) randomSum++;
-        }
-        btRandom.SetText($"Random {StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode switch {
-            Ruleset.RandomMode.OFF => "(off)",
-            Ruleset.RandomMode.ANY => "(any 3D/2D)",
-            Ruleset.RandomMode.ANY_3D => "(any 3D)",
-            Ruleset.RandomMode.ANY_2D => "(any 2D)",
-            Ruleset.RandomMode.ANY_LEGAL => "(any legal)",
-        }}" + (StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced ? "" : $" {randomSum}/{SetTracker.Instance.NumPlayersInMatch}"));
     }
 
     internal void OnClickStage(int playerNumber, Stage stage)
@@ -320,47 +304,18 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         UpdateSetInfo();
     }
 
-    private void OnClickFreePick(int playerNumber)
+    private void OnVoteFreePick()
     {
-        freePickVotes[playerNumber] = true;
-
-        int sum = 0;
-        foreach (bool vote in freePickVotes)
-        {
-            if (vote) sum++;
-        }
-
-        if (sum >= SetTracker.Instance.NumPlayersInMatch)
-        {
-            freePickVotes = [false, false, false, false];
-            StageStrikeTracker.Instance.CurrentStrikeInfo.ToggleFreePickMode();
-            UpdateStageBans();
-        }
-        
+        StageStrikeTracker.Instance.CurrentStrikeInfo.ToggleFreePickMode();
+        btRandom.enableVoting = !(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
+        UpdateStageBans();
         UpdateSetInfo();
     }
 
-    private void OnClickRandom(int playerNumber)
+    private void OnVoteRandom()
     {
-        if (playerNumber != -1) randomVotes[playerNumber] = true;
-
-        int sum = 0;
-        foreach (bool vote in randomVotes)
-        {
-            if (vote) sum++;
-        }
-
-        if (sum >= SetTracker.Instance.NumPlayersInMatch || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced)
-        {
-            randomVotes = [false, false, false, false];
-
-            if (StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode != Ruleset.RandomMode.OFF)
-            {
-                UIScreen.blockGlobalInput = false;
-                StageStrikeTracker.Instance.CurrentStrikeInfo.PickRandomStage(this, playerNumber);
-            }
-        }
-        
-        UpdateSetInfo();
+        if (StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode == Ruleset.RandomMode.OFF) return;
+        UIScreen.blockGlobalInput = false;
+        StageStrikeTracker.Instance.CurrentStrikeInfo.PickRandomStage(this);
     }
 }
