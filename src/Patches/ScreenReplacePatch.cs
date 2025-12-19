@@ -1,4 +1,5 @@
 using HarmonyLib;
+using LLBML.Players;
 using LLScreen;
 using TourneyMod.SetTracking;
 using TourneyMod.UI;
@@ -32,6 +33,15 @@ internal static class ScreenReplacePatch
         {
             ReplaceScreen<ScreenPlayersStage, ScreenStageStrike>(ref __result);
         }
+    }
+    
+    // GameStatesLobby.RemovePlayer(Player p)
+    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.GNBKBMENOMO))]
+    [HarmonyPostfix]
+    private static void RemovePlayer_Postfix(ALDOKEMAOMB LGACHGEPNNH)
+    {
+        Player player = LGACHGEPNNH;
+        VoteButton.RemovePlayer(player.nr);
     }
 
     private static void ReplaceScreen<T1, T2>(ref GameObject screen)

@@ -7,6 +7,7 @@ using TourneyMod.Patches;
 using TourneyMod.Rulesets;
 using TourneyMod.SetTracking;
 using TourneyMod.StageStriking;
+using TourneyMod.UI;
 
 namespace TourneyMod;
 
@@ -40,6 +41,8 @@ internal class Plugin : BaseUnityPlugin
         
         HarmonyPatches.PatchAll();
         RulesetIO.Init();
+
+        VoteButton.ActiveVoteButtons = new List<VoteButton>();
         
         StageStrikeTracker.Instance.FindDefaultRuleset();
 

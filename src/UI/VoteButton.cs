@@ -18,13 +18,13 @@ internal class VoteButton : LLButton
         votes = new bool[4];
         enableVoting = true;
         label = "";
-        onClick = PlayerVote;
+        onClick = playerNr => SetPlayerVote(playerNr, true);
     }
 
-    private void PlayerVote(int playerNr)
+    private void SetPlayerVote(int playerNr, bool vote)
     {
-        if (playerNr == -1) SetAllVotes(true);
-        else votes[playerNr] = true;
+        if (playerNr == -1) SetAllVotes(vote);
+        else votes[playerNr] = vote;
     }
 
     private void SetAllVotes(bool vote)
@@ -51,5 +51,12 @@ internal class VoteButton : LLButton
     {
         SetAllVotes(false);
         onVote();
+    }
+
+    internal static List<VoteButton> ActiveVoteButtons;
+
+    internal static void RemovePlayer(int playerNr)
+    {
+        ActiveVoteButtons.ForEach(button => button.SetPlayerVote(playerNr, false));
     }
 }

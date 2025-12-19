@@ -142,12 +142,14 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         TextHandler.SetText(lbBanStatus, "");
 
         UIUtils.CreateVoteButton(ref btFreePick, "btFreePick", transform, FREEPICK_POSITION, FREEPICK_SCALE);
+        VoteButton.ActiveVoteButtons.Add(btFreePick);
         btFreePick.label = "Toggle free pick";
         btFreePick.textMesh.fontSize = FREEPICK_FONT_SIZE;
         btFreePick.onVote = OnVoteFreePick;
         if (StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced) btFreePick.gameObject.SetActive(false);
         
         UIUtils.CreateVoteButton(ref btRandom, "btRandom", transform, RANDOM_POSITION, RANDOM_SCALE);
+        VoteButton.ActiveVoteButtons.Add(btRandom);
         btRandom.label = $"Random {StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode switch {
             Ruleset.RandomMode.OFF => "(off)",
             Ruleset.RandomMode.ANY => "(any 3D/2D)",
@@ -171,6 +173,9 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         StageStrikeTracker.Instance.End();
         UIScreen.blockGlobalInput = false;
         Plugin.Instance.RecolorCursors = false;
+        
+        VoteButton.ActiveVoteButtons.Remove(btFreePick);
+        VoteButton.ActiveVoteButtons.Remove(btRandom);
         
         base.OnClose(screenTypeNext);
     }

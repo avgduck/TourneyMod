@@ -79,6 +79,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
 
         UIUtils.CreateVoteButton(ref btResetSetCount, "btResetSetCount", transform, RESET_POSITION, RESET_SCALE);
+        VoteButton.ActiveVoteButtons.Add(btResetSetCount);
         UIUtils.SetButtonBGVisibility(btResetSetCount, false);
         btResetSetCount.textMesh.fontSize = RESET_FONT_SIZE;
         btResetSetCount.label = "Reset set count";
@@ -89,6 +90,8 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
 
     public override void OnClose(ScreenType screenTypeNext)
     {
+        VoteButton.ActiveVoteButtons.Remove(btResetSetCount);
+        
         base.OnClose(screenTypeNext);
         Plugin.LogGlobal.LogInfo("Custom tourney lobby OnClose");
     }
