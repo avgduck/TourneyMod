@@ -44,6 +44,9 @@ internal class StageButton : LLButton
     {
         RectTransform rect = LLControl.CreatePanel(tfParent, $"Button_{stage}");
         StageButton stageButton = rect.gameObject.AddComponent<StageButton>();
+
+        stageButton.soundClick = true;
+        stageButton.soundHover = true;
         
         Sprite stageSprite = JPLELOFJOOH.BNFIDCAPPDK($"_spritePreview{stage}"); // Assets.GetMenuSprite()
         stageButton.stageImage = LLControl.CreateImage(rect, stageSprite);
@@ -73,8 +76,18 @@ internal class StageButton : LLButton
 
     public override void OnHover(int playerNumber)
     {
-        if (playerNumber == -1) playersHovering = [true, true, true, true];
-        else playersHovering[playerNumber] = StageStrikeTracker.Instance.CurrentStrikeInfo.CheckPlayerInteraction(stageBan, playerNumber);
+        if (playerNumber == -1)
+        {
+            playersHovering = [true, true, true, true];
+            if (soundHover) AudioHandler.PlayMenuSfx(Sfx.MENU_SCROLL);
+        }
+        else
+        {
+            bool doHover = StageStrikeTracker.Instance.CurrentStrikeInfo.CheckPlayerInteraction(stageBan, playerNumber);
+            playersHovering[playerNumber] = doHover;
+            if (doHover && soundHover) AudioHandler.PlayMenuSfx(Sfx.MENU_SCROLL);
+        }
+        
         UpdateDisplay();
     }
 

@@ -63,6 +63,7 @@ internal static class UIUtils
         button = panel.gameObject.AddComponent<LLButton>();
         button.keepIconColor = true;
         button.colHover = new Color(0.902f, 0.9529f, 0.051f);
+        button.soundClick = true;
         
         Image bg = LLControl.CreateImage(button.transform, buttonBG);
         bg.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
@@ -98,6 +99,7 @@ internal static class UIUtils
         button = panel.gameObject.AddComponent<VoteButton>();
         button.keepIconColor = true;
         button.colHover = new Color(0.902f, 0.9529f, 0.051f);
+        button.soundClick = true;
         
         Image bg = LLControl.CreateImage(button.transform, buttonBG);
         bg.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using LLGUI;
 using TourneyMod.SetTracking;
@@ -7,15 +8,21 @@ namespace TourneyMod.UI;
 
 internal class VoteButton : LLButton
 {
-    private bool[] votes = new bool[4];
+    private bool[] votes;
     internal Action onVote;
-    internal bool enableVoting = true;
-    internal string label = "";
+    internal bool enableVoting;
+    internal string label;
 
-    public override void OnClick(int playerNr)
+    internal VoteButton()
     {
-        base.OnClick(playerNr);
+        votes = new bool[4];
+        enableVoting = true;
+        label = "";
+        onClick = PlayerVote;
+    }
 
+    private void PlayerVote(int playerNr)
+    {
         if (playerNr == -1) SetAllVotes(true);
         else votes[playerNr] = true;
     }

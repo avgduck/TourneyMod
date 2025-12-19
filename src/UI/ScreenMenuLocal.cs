@@ -69,6 +69,7 @@ internal class ScreenMenuLocal : ScreenMenuVersus, ICustomScreen<ScreenMenuVersu
             if (curFocus == btTourney && sign < 0)
             {
                 UIScreen.SetFocus(bt1v1);
+                AudioHandler.PlayMenuSfx(Sfx.MENU_SCROLL);
                 return true;
             }
         }
@@ -76,11 +77,13 @@ internal class ScreenMenuLocal : ScreenMenuVersus, ICustomScreen<ScreenMenuVersu
         if (curFocus == btTourney)
         {
             UIScreen.SetFocus(btRoyale);
+            AudioHandler.PlayMenuSfx(Sfx.MENU_SCROLL);
             return true;
         }
         else
         {
             UIScreen.SetFocus(btTourney);
+            AudioHandler.PlayMenuSfx(Sfx.MENU_SCROLL);
             return true;
         }
     }
