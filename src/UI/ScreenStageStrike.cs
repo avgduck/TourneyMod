@@ -92,7 +92,7 @@ internal class ScreenStageStrike : ScreenPlayersStage
         queuedMove = screenPlayersStage.queuedMove;
     }
 
-    public override void OnOpen(ScreenType screenPrev)
+    public override void OnOpen(ScreenType screenTypePrev)
     {
         Plugin.LogGlobal.LogInfo("Custom stage select OnOpen");
         StageStrikeTracker.Instance.Start();

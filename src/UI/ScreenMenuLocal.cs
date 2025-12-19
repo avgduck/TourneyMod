@@ -26,7 +26,7 @@ internal class ScreenMenuLocal : ScreenMenuVersus
         btStrikers = screenMenuVersus.btStrikers;
     }
     
-    public override void OnOpen(ScreenType screenPrev)
+    public override void OnOpen(ScreenType screenTypePrev)
     {
         btTourney = Instantiate(btRoyale, transform);
         btTourney.name = "btTourney";
@@ -37,7 +37,7 @@ internal class ScreenMenuLocal : ScreenMenuVersus
             bt1v1.onClick(playerNr);
         };
         
-        base.OnOpen(screenPrev);
+        base.OnOpen(screenTypePrev);
     }
 
     public override void UpdateText()
