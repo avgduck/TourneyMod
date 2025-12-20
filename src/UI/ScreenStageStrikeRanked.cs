@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using GameplayEntities;
+using LLBML.Players;
 using LLBML.States;
 using LLGUI;
 using LLHandlers;
@@ -8,10 +10,11 @@ using TourneyMod.Rulesets;
 using TourneyMod.SetTracking;
 using TourneyMod.StageStriking;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TourneyMod.UI;
 
-internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlayersStage>, IStageSelect
+internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<ScreenPlayersStageComp>, IStageSelect
 {
     private static readonly Vector2 BG_SCALE = new Vector2(1f, 2f);
     private static readonly Vector2 BG_POSITION = new Vector2(0f, -20f);
@@ -41,6 +44,10 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
     private static readonly Vector2 RANDOM_BOTH_OFFSET = new Vector2(60f, 0f);
     private static readonly Vector2 RANDOM_BOTH_SCALE = new Vector2(100f, 34f);
     private const int RANDOM_BOTH_FONT_SIZE = 16;
+
+    private static readonly Vector2 USER_INFO_POSITION = new Vector2(-580f, -250f);
+    private static readonly Vector2 OPPONENT_INFO_POSITION = new Vector2(580f, -250f);
+    private static readonly Vector2 INFO_SCALE = Vector2.one * 0.65f;
     
     private static readonly Color[] COLOR_PLAYER =
     [
@@ -66,40 +73,49 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
     private Stage selectedStage = Stage.NONE;
     private Ruleset.RandomMode selectedRandom = Ruleset.RandomMode.OFF;
     
-    public void Init(ScreenPlayersStage screenPlayersStage)
+    public void Init(ScreenPlayersStageComp screenPlayersStageComp)
     {
-        screenType = screenPlayersStage.screenType;
-        layer = screenPlayersStage.layer;
-        isActive = screenPlayersStage.isActive;
-        msgEsc = screenPlayersStage.msgEsc;
-        msgMenu = screenPlayersStage.msgMenu;
-        msgCancel = screenPlayersStage.msgCancel;
+        screenType = screenPlayersStageComp.screenType;
+        layer = screenPlayersStageComp.layer;
+        isActive = screenPlayersStageComp.isActive;
+        msgEsc = screenPlayersStageComp.msgEsc;
+        msgMenu = screenPlayersStageComp.msgMenu;
+        msgCancel = screenPlayersStageComp.msgCancel;
         
-        btBack = screenPlayersStage.btBack;
-        btLeft = screenPlayersStage.btLeft;
-        btRight = screenPlayersStage.btRight;
-        lbTitle = screenPlayersStage.lbTitle;
-        lbPlayersSelectingStage = screenPlayersStage.lbPlayersSelectingStage;
-        obSpectator = screenPlayersStage.obSpectator;
-        obNotSpectator = screenPlayersStage.obNotSpectator;
-        stageButtonsContainer = screenPlayersStage.stageButtonsContainer;
-        btStages = screenPlayersStage.btStages;
-        posMid = screenPlayersStage.posMid;
-        posLeft = screenPlayersStage.posLeft;
-        posLeft2 = screenPlayersStage.posLeft2;
-        posRight = screenPlayersStage.posRight;
-        posRight2 = screenPlayersStage.posRight2;
-        scaleSmall = screenPlayersStage.scaleSmall;
-        scaleBig = screenPlayersStage.scaleBig;
-        nButtons = screenPlayersStage.nButtons;
-        curIndex = screenPlayersStage.curIndex;
-        isMoving = screenPlayersStage.isMoving;
-        queuedMove = screenPlayersStage.queuedMove;
+        btBack = screenPlayersStageComp.btBack;
+        btLeft = screenPlayersStageComp.btLeft;
+        btRight = screenPlayersStageComp.btRight;
+        lbTitle = screenPlayersStageComp.lbTitle;
+        lbPlayersSelectingStage = screenPlayersStageComp.lbPlayersSelectingStage;
+        obSpectator = screenPlayersStageComp.obSpectator;
+        obNotSpectator = screenPlayersStageComp.obNotSpectator;
+        stageButtonsContainer = screenPlayersStageComp.stageButtonsContainer;
+        btStages = screenPlayersStageComp.btStages;
+        posMid = screenPlayersStageComp.posMid;
+        posLeft = screenPlayersStageComp.posLeft;
+        posLeft2 = screenPlayersStageComp.posLeft2;
+        posRight = screenPlayersStageComp.posRight;
+        posRight2 = screenPlayersStageComp.posRight2;
+        scaleSmall = screenPlayersStageComp.scaleSmall;
+        scaleBig = screenPlayersStageComp.scaleBig;
+        nButtons = screenPlayersStageComp.nButtons;
+        curIndex = screenPlayersStageComp.curIndex;
+        isMoving = screenPlayersStageComp.isMoving;
+        queuedMove = screenPlayersStageComp.queuedMove;
+
+        userInfo = screenPlayersStageComp.userInfo;
+        opponentInfo = screenPlayersStageComp.opponentInfo;
+        userNameLabel = screenPlayersStageComp.userNameLabel;
+        userPlayerRender = screenPlayersStageComp.userPlayerRender;
+        userCharacterIcon = screenPlayersStageComp.userCharacterIcon;
+        opponentNameLabel = screenPlayersStageComp.opponentNameLabel;
+        opponentPlayerRender = screenPlayersStageComp.opponentPlayerRender;
+        opponentCharacterIcon = screenPlayersStageComp.opponentCharacterIcon;
     }
 
     public override void OnOpen(ScreenType screenTypePrev)
     {
-        Plugin.LogGlobal.LogInfo("Custom stage select OnOpen");
+        Plugin.LogGlobal.LogInfo("Custom stage select ranked OnOpen");
         StageStrikeTracker.Instance.Start();
         UIScreen.blockGlobalInput = true;
         Plugin.Instance.RecolorCursors = true;
@@ -109,6 +125,8 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         {
             UpdateText();
         }
+        // manually do ScreenPlayersStageComp::OnOpen for the same reason
+        RankedOnOpen();
 
         msgMenu = Msg.NONE;
         
@@ -129,8 +147,6 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
 
         btBack.transform.localPosition = BACK_POSITION;
         btBack.transform.localScale = BACK_SCALE;
-        btBack.textMesh.rectTransform.localScale = new Vector2(1f / BACK_SCALE.x, 1f / BACK_SCALE.y);
-        btBack.textMesh.fontSize = BACK_FONT_SIZE;
         
         UIUtils.CreateText(ref lbSetCount, "lbSetCount", transform, SETCOUNT_POSITION);
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
@@ -191,6 +207,62 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         CreateStageContainers();
         UpdateStageBans();
         UpdateSetInfo();
+    }
+
+    private void RankedOnOpen()
+    {
+        Plugin.LogGlobal.LogInfo("Custom stage select ranked RankedOnOpen");
+        ScreenPlayers screenPlayers = GameObject.FindObjectOfType<ScreenPlayers>();
+        if (screenPlayers == null) Plugin.LogGlobal.LogFatal("Could not find lobby screen ScreenPlayers");
+
+        Character userCharacter = Player.GetPlayer(0).CharacterSelected;
+        userNameLabel = userInfo.Find("lbName").GetComponent<TextMeshProUGUI>();
+        userNameLabel.text = screenPlayers.playerSelections[0].btPlayerName.GetText();
+        userPlayerRender = userInfo.GetComponentInChildren<RawImage>();
+        userPlayerRender.texture = screenPlayers.playerSelections[0].modelPreview.renderTex;
+        userPlayerRender.rectTransform.sizeDelta = screenPlayers.playerSelections[0].modelPreview.image.rectTransform.sizeDelta;
+        userPlayerRender.rectTransform.anchoredPosition = GetCharacterRenderCustomPosition(userCharacter, out Vector3 userScale, Side.LEFT);
+        userPlayerRender.rectTransform.localScale = userScale;
+        userCharacterIcon = userInfo.Find("characterIcon").GetComponent<Image>();
+        if (userCharacter != Character.RANDOM)
+        {
+            int symbol = JPLELOFJOOH.LPCPPJOIIEF(userCharacter);
+            userCharacterIcon.gameObject.SetActive(true);
+            userCharacterIcon.sprite = JPLELOFJOOH.BNFIDCAPPDK("_spriteCharacterSymbols", symbol);
+        }
+        else
+        {
+            userCharacterIcon.gameObject.SetActive(false);
+        }
+
+        Character opponentCharacter = Player.GetPlayer(1).CharacterSelected;
+        opponentNameLabel = opponentInfo.Find("lbName").GetComponent<TextMeshProUGUI>();
+        opponentNameLabel.text = screenPlayers.playerSelections[1].btPlayerName.GetText();
+        opponentPlayerRender = opponentInfo.GetComponentInChildren<RawImage>();
+        opponentPlayerRender.texture = screenPlayers.playerSelections[1].modelPreview.renderTex;
+        opponentPlayerRender.rectTransform.sizeDelta = screenPlayers.playerSelections[1].modelPreview.image.rectTransform.sizeDelta;
+        opponentPlayerRender.rectTransform.anchoredPosition = GetCharacterRenderCustomPosition(opponentCharacter, out Vector3 opponentScale, Side.RIGHT);
+        opponentPlayerRender.rectTransform.localScale = opponentScale;
+        opponentCharacterIcon = opponentInfo.Find("characterIcon").GetComponent<Image>();
+        if (opponentCharacter != Character.RANDOM)
+        {
+            int symbol = JPLELOFJOOH.LPCPPJOIIEF(opponentCharacter);
+            opponentCharacterIcon.gameObject.SetActive(true);
+            opponentCharacterIcon.sprite = JPLELOFJOOH.BNFIDCAPPDK("_spriteCharacterSymbols", symbol);
+        }
+        else
+        {
+            opponentCharacterIcon.gameObject.SetActive(false);
+        }
+
+        stageButtonsContainer.localPosition = Vector2.zero;
+        Transform lbVersus = transform.Find("lbVersus");
+        lbVersus.gameObject.SetActive(false);
+
+        userInfo.localPosition = USER_INFO_POSITION;
+        userInfo.localScale = INFO_SCALE;
+        opponentInfo.localPosition = OPPONENT_INFO_POSITION;
+        opponentInfo.localScale = INFO_SCALE;
     }
 
     public override void OnClose(ScreenType screenTypeNext)

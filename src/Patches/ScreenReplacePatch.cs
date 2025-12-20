@@ -14,11 +14,12 @@ internal static class ScreenReplacePatch
     [HarmonyPostfix]
     private static void Assets_SpawnScreen_Postfix(ref GameObject __result, ScreenType FLMBCGMOCKC)
     {
-        if (FLMBCGMOCKC == ScreenType.MENU_VERSUS)
+        ScreenType screenType = FLMBCGMOCKC;
+        if (screenType == ScreenType.MENU_VERSUS)
         {
             ReplaceScreen<ScreenMenuVersus, ScreenMenuLocal>(ref __result);
         }
-        else if (FLMBCGMOCKC == ScreenType.PLAYERS && SetTracker.Instance.IsTrackingSet)
+        else if (screenType == ScreenType.PLAYERS && SetTracker.Instance.IsTrackingSet)
         {
             if (Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE)
             {
@@ -29,9 +30,13 @@ internal static class ScreenReplacePatch
                 ReplaceScreen<ScreenPlayers, ScreenLobbyTourney>(ref __result);
             }
         }
-        else if (FLMBCGMOCKC == ScreenType.PLAYERS_STAGE && SetTracker.Instance.IsTrackingSet)
+        else if (screenType == ScreenType.PLAYERS_STAGE && SetTracker.Instance.IsTrackingSet)
         {
             ReplaceScreen<ScreenPlayersStage, ScreenStageStrike>(ref __result);
+        }
+        else if (screenType == ScreenType.PLAYERS_STAGE_RANKED && SetTracker.Instance.IsTrackingSet)
+        {
+            ReplaceScreen<ScreenPlayersStageComp, ScreenStageStrikeRanked>(ref __result);
         }
     }
     
@@ -64,9 +69,9 @@ internal static class ScreenReplacePatch
     [HarmonyPrefix]
     private static bool ScreenPlayersStage_SelectionDone_Prefix(ScreenPlayersStage __instance)
     {
-        ScreenStageStrike screenStageStrike = __instance as ScreenStageStrike;
-        if (screenStageStrike == null) return true;
-        screenStageStrike.OnStageSelected();
+        IStageSelect stageSelect = __instance as IStageSelect;
+        if (stageSelect == null) return true;
+        stageSelect.OnStageSelected();
         return false;
     }
     

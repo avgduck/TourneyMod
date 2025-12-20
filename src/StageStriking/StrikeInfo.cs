@@ -91,15 +91,14 @@ internal class StrikeInfo
         }})").ToArray(), false));
     }
 
-    internal Stage PickStage(ScreenStageStrike screenStageStrike, Stage stage, int playerNumber)
+    internal Stage PickStage(Stage stage, int playerNumber)
     {
-        if (screenStageStrike == null) return Stage.NONE;
         GameStates.Send(Msg.SEL_STAGE, playerNumber, (int)stage);
         StageStrikeTracker.Log.LogInfo($"P{playerNumber+1} picks {stage}");
         return stage;
     }
 
-    internal Stage PickRandomStage(ScreenStageStrike screenStageStrike, Ruleset.RandomMode randomMode)
+    internal Stage PickRandomStage(Ruleset.RandomMode randomMode)
     {
         List<Stage> randomStagePool = new List<Stage>();
         switch (randomMode)
@@ -126,7 +125,6 @@ internal class StrikeInfo
                 break;
         }
         
-        if (screenStageStrike == null) return Stage.NONE;
         if (randomStagePool.Count == 0) return Stage.NONE;
         Stage stage = randomStagePool[Random.RandomRangeInt(0, randomStagePool.Count)];
         GameStates.Send(Msg.SEL_STAGE, -1, (int)stage);

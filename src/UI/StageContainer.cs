@@ -39,15 +39,15 @@ internal class StageContainer
         _ => Vector2.zero
     };
 
-    internal StageContainer(ScreenStageStrike screenStageStrike, Stage stage)
+    internal StageContainer(IStageSelect stageSelect, Transform tfParent, Stage stage)
     {
         StoredStage = stage;
         
-        Button = StageButton.CreateStageButton(screenStageStrike.stageButtonsContainer, stage);
+        Button = StageButton.CreateStageButton(tfParent, stage);
         Button.SetActive(true);
         Button.onClick = (playerNumber) =>
         {
-            screenStageStrike.OnClickStage(playerNumber, StoredStage);
+            stageSelect.OnClickStage(playerNumber, StoredStage);
             Button.UpdateDisplay();
         };
 
