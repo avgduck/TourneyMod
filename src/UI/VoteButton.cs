@@ -46,7 +46,9 @@ internal class VoteButton : LLButton
 
     private void UpdateVoteStatus()
     {
-        int requiredVotes = enableVoting ? SetTracker.Instance.NumPlayersInMatch : 1;
+        int numPlayers = SetTracker.Instance.NumPlayersInMatch;
+        if (numPlayers < 1) return;
+        int requiredVotes = enableVoting ? numPlayers : 1;
         if (votes.Count(vote => vote) >= requiredVotes) OnVote();
     }
 
