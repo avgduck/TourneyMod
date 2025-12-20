@@ -23,10 +23,6 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
     private static readonly Vector2 TITLE_POSITION = new Vector2(0f, 328f);
     private const int TITLE_FONT_SIZE = 36;
 
-    private static readonly Vector2 BACK_SCALE = new Vector2(0.6f, 0.5f);
-    private static readonly Vector2 BACK_POSITION = new Vector2(-570f, -336f);
-    private const int BACK_FONT_SIZE = 22;
-
     private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 270f);
     private const int SETCOUNT_FONT_SIZE = 32;
     private static readonly Vector2 BANSREMAINING_POSITION = new Vector2(0f, -276f);
@@ -117,7 +113,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
     {
         Plugin.LogGlobal.LogInfo("Custom stage select ranked OnOpen");
         StageStrikeTracker.Instance.Start();
-        UIScreen.blockGlobalInput = true;
+        //UIScreen.blockGlobalInput = true;
         Plugin.Instance.RecolorCursors = true;
         
         // manually do ScreenBase::OnOpen to avoid going through ScreenPlayersStage::OnOpen
@@ -144,9 +140,6 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         btLeft.visible = false;
         btRight.visible = false;
         btBack.onClick = (playerNumber) => { GameStates.Send(Msg.BACK, playerNumber, -1); };
-
-        btBack.transform.localPosition = BACK_POSITION;
-        btBack.transform.localScale = BACK_SCALE;
         
         UIUtils.CreateText(ref lbSetCount, "lbSetCount", transform, SETCOUNT_POSITION);
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
@@ -269,7 +262,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
     {
         Plugin.LogGlobal.LogInfo("Custom stage select OnClose");
         StageStrikeTracker.Instance.End();
-        UIScreen.blockGlobalInput = false;
+        //UIScreen.blockGlobalInput = false;
         Plugin.Instance.RecolorCursors = false;
         
         VoteButton.ActiveVoteButtons.Remove(btFreePick);
@@ -278,6 +271,94 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         VoteButton.ActiveVoteButtons.Remove(btRandomBoth2D);
         
         base.OnClose(screenTypeNext);
+    }
+    
+    public override void DoUpdate()
+    {
+        // manually do void ScreenBase::DoUpdate() to skip void ScreenPlayersStage::DoUpdate()
+        if (!UIScreen.blockGlobalInput)
+        {
+            if (Controller.all.GetButtonDown(InputAction.ESC))
+            {
+                this.SendGlobal(this.msgEsc, -1);
+            }
+            if (this.msgMenu != Msg.NONE || this.msgCancel != Msg.NONE)
+            {
+                if (UIInput.uiControl == UIControl.PLAYER_POINTERS)
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        ALDOKEMAOMB aldokemaomb = ALDOKEMAOMB.BJDPHEHJJJK(i);
+                        if (UIInput.uiControl != UIControl.PLAYER_POINTERS || (aldokemaomb.OBELDJGOOIJ != null && aldokemaomb.OBELDJGOOIJ.state != CursorState.HIDDEN))
+                        {
+                            if (aldokemaomb.GDEMBCKIDMA.GetButtonDown(InputAction.MENU))
+                            {
+                                this.SendGlobal(this.msgMenu, i);
+                            }
+                            if (aldokemaomb.GDEMBCKIDMA.GetButtonDown(InputAction.BACK) || (aldokemaomb.GDEMBCKIDMA.IncludesMouse() && Input.GetMouseButtonDown(1)))
+                            {
+                                this.SendGlobal(this.msgCancel, i);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (Controller.all.GetButtonDown(InputAction.MENU))
+                    {
+                        this.SendGlobal(this.msgMenu, -1);
+                    }
+                    if (Controller.all.GetButtonDown(InputAction.BACK) || (CGLLJHHAJAK.GIGAKBJGFDI.hasMouseKeyboard && Input.GetMouseButtonDown(1)))
+                    {
+                        this.SendGlobal(this.msgCancel, -1);
+                    }
+                }
+            }
+        }
+
+        if (UIScreen.blockGlobalInput) return;
+        
+        if (UIInput.uiControl == UIControl.PLAYER_POINTERS)
+        {
+            Player.ForAll(player =>
+            {
+                if (player.cursor == null || player.cursor.state == CursorState.HIDDEN) return;
+                if (player.controller.GetButtonDown(InputAction.MENU)) GetDefaultFocus(player.cursor)?.OnClick(player.nr);
+            });
+        }
+        else
+        {
+            if (Controller.all.GetButtonDown(InputAction.MENU)) GetDefaultFocus(UIInput.mainCursor)?.OnClick(-1);
+        }
+    }
+
+    public override LLClickable GetDefaultFocus(LLCursor cursor)
+    {
+        return StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode switch
+        {
+            Ruleset.RandomMode.OFF => null,
+            Ruleset.RandomMode.BOTH => btRandomBoth3D,
+            _ => btRandomMain
+        };
+    }
+
+    public override void GetControls(ref List<LLClickable> list, bool vert, LLClickable curFocus, LLCursor cursor)
+    {
+        list.AddRange(btStages);
+        list.Add(btBack);
+        switch (StageStrikeTracker.Instance.CurrentStrikeInfo.ActiveRuleset.randomMode)
+        {
+            case Ruleset.RandomMode.OFF:
+                break;
+            case Ruleset.RandomMode.BOTH:
+                list.Add(btRandomBoth3D);
+                list.Add(btRandomBoth2D);
+                break;
+            default:
+                list.Add(btRandomMain);
+                break;
+        }
+        if (!StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced) list.Add(btFreePick);
     }
     
     private void CreateStageContainers()
