@@ -259,12 +259,20 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
             Player.ForAll(player =>
             {
                 if (player.cursor == null || player.cursor.state == CursorState.HIDDEN) return;
-                if (player.controller.GetButtonDown(InputAction.MENU)) GetDefaultFocus(player.cursor)?.OnClick(player.nr);
+                if (player.controller.GetButtonDown(InputAction.MENU))
+                {
+                    LLClickable button = GetDefaultFocus(player.cursor);
+                    if (button != null && button.isActive) button.OnClick(player.nr);
+                }
             });
         }
         else
         {
-            if (Controller.all.GetButtonDown(InputAction.MENU)) GetDefaultFocus(UIInput.mainCursor)?.OnClick(-1);
+            if (Controller.all.GetButtonDown(InputAction.MENU))
+            {
+                LLClickable button = GetDefaultFocus(UIInput.mainCursor);
+                if (button != null && button.isActive) button.OnClick(-1);
+            }
         }
     }
 
