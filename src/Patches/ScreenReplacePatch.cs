@@ -1,9 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection.Emit;
 using HarmonyLib;
 using LLBML.Players;
 using LLScreen;
 using TourneyMod.SetTracking;
 using TourneyMod.UI;
 using UnityEngine;
+using ScreenMenuMain = LLScreen.ScreenMenuMain;
 
 namespace TourneyMod.Patches;
 
@@ -15,9 +19,13 @@ internal static class ScreenReplacePatch
     private static void Assets_SpawnScreen_Postfix(ref GameObject __result, ScreenType FLMBCGMOCKC)
     {
         ScreenType screenType = FLMBCGMOCKC;
-        if (screenType == ScreenType.MENU_VERSUS)
+        if (screenType == ScreenType.MENU_MAIN)
         {
-            ReplaceScreen<ScreenMenuVersus, ScreenMenuLocal>(ref __result);
+            ReplaceScreen<LLScreen.ScreenMenuMain, UI.ScreenMenuMain>(ref __result);
+        }
+        else if (screenType == ScreenType.MENU_VERSUS && Plugin.Instance.TourneyMenuOpen)
+        {
+            ReplaceScreen<ScreenMenuVersus, ScreenMenuTourney>(ref __result);
         }
         else if (screenType == ScreenType.PLAYERS && SetTracker.Instance.IsTrackingSet)
         {
@@ -55,6 +63,16 @@ internal static class ScreenReplacePatch
         screenCustom.Init(screenVanilla);
         GameObject.DestroyImmediate(screenVanilla);
     }
+
+    [HarmonyPatch(typeof(IOGKKINMEFB), nameof(IOGKKINMEFB.CJAOMBCFJJO))]
+    [HarmonyPostfix]
+    private static void GameStatesMenu_SetMenu_Postfix()
+    {
+        IMenuTitle menu = UIScreen.GetScreen(1) as IMenuTitle;
+        if (menu == null) return;
+        // ScreenMenu GameStatesMenu.screenMenu
+        IOGKKINMEFB.PPGAIOHGPAK.SetTitle(menu.GetCustomTitle());
+    }
     
     // GameStatesLobby.RemovePlayer(Player p)
     [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.GNBKBMENOMO))]
@@ -63,6 +81,61 @@ internal static class ScreenReplacePatch
     {
         Player player = LGACHGEPNNH;
         VoteButton.RemovePlayer(player.nr);
+    }
+
+    [HarmonyPatch(typeof(LLScreen.ScreenMenuMain), nameof(LLScreen.ScreenMenuMain.Awake))]
+    [HarmonyPrefix]
+    private static bool ScreenMenuMain_Awake_Prefix(LLScreen.ScreenMenuMain __instance)
+    {
+        UI.ScreenMenuMain menu = __instance as UI.ScreenMenuMain;
+        if (menu == null) return true;
+        return false;
+    }
+    
+    //void GameStatesMenu::MenuProcessMsg(Message message)
+    [HarmonyPatch(typeof(IOGKKINMEFB), nameof(IOGKKINMEFB.DAHCMIOPGDM))]
+    [HarmonyTranspiler]
+    private static IEnumerable<CodeInstruction> GameStatesMenu_MenuProcessMsg_Transpiler(IEnumerable<CodeInstruction> instructions)
+    {
+        CodeMatcher cm = new CodeMatcher(instructions);
+        cm.End();
+        cm.MatchBack(false,
+            new CodeMatch(OpCodes.Ldloc_S),
+            new CodeMatch(OpCodes.Ldfld, typeof(ScreenMenuMain).GetField("btVersus")),
+            new CodeMatch(OpCodes.Call)
+        );
+        CodeInstruction instruction = cm.Instruction;
+        cm.Advance(3);
+        cm.Insert(
+            instruction,
+            Transpilers.EmitDelegate<Action<LLScreen.ScreenMenuMain>>(screenMenuMain =>
+            {
+                if (!Plugin.Instance.TourneyMenuOpen) return;
+                UI.ScreenMenuMain menu = screenMenuMain as UI.ScreenMenuMain;
+                if (menu == null) return;
+                UIScreen.SetFocus(menu.btTourney);
+                Plugin.Instance.TourneyMenuOpen = false;
+            })
+        );
+        return cm.InstructionEnumeration();
+    }
+
+    /*
+    // IEnumerator GameStatesLobbyOnline::CLeaveLobby()
+    [HarmonyPatch(typeof(HDLIJDBFGKN), nameof(HDLIJDBFGKN.CNPOCEPGNCM))]
+    [HarmonyTranspiler]
+    private static IEnumerable<CodeInstruction> GameStatesLobbyOnline_CLeaveLobby_Transpiler(IEnumerable<CodeInstruction> instructions)
+    {
+        CodeMatcher cm = new CodeMatcher(instructions);
+        return cm.InstructionEnumeration();
+    }
+    */
+    // void GameStatesMenu::JumpTo(ScreenType subMenu, ScreenTransition transition = ScreenTransition.NONE, bool backSound = false, string errorTitle = "", string errorMessage = "", int errorTitleSize = -1, string focusButton = null, bool toIntro = false)
+    [HarmonyPatch(typeof(IOGKKINMEFB), nameof(IOGKKINMEFB.CDAGGNOHLNK))]
+    [HarmonyPrefix]
+    private static void GameStatesMenu_JumpTo_Prefix(ref ScreenType FJOFNHPCBPD)
+    {
+        if (FJOFNHPCBPD == ScreenType.MENU_ONLINE && Plugin.Instance.TourneyMenuOpen) FJOFNHPCBPD = ScreenType.MENU_VERSUS;
     }
 
     [HarmonyPatch(typeof(ScreenPlayersStage), nameof(ScreenPlayersStage.SelectionDone))]

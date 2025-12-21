@@ -30,6 +30,7 @@ internal class Plugin : BaseUnityPlugin
 
     internal Ruleset SelectedRuleset;
     internal TourneyMode ActiveTourneyMode = TourneyMode.NONE;
+    internal bool TourneyMenuOpen = false;
     internal bool RecolorCursors = false;
 
     private void Awake()
