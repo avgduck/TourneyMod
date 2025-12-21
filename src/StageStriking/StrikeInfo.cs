@@ -27,7 +27,6 @@ internal class StrikeInfo
         BAN
     }
     internal InteractMode CurrentInteractMode { get; private set; }
-    internal bool IsFreePickMode { get; private set; }
     internal int ControllingPlayer { get; private set; }
 
     internal StrikeInfo(Ruleset ruleset)
@@ -47,7 +46,7 @@ internal class StrikeInfo
         }
         
         UpdateInteractMode();
-        StageStrikeTracker.Log.LogInfo($"Striking started with ruleset '{ActiveRuleset.Id}', game {SetTracker.Instance.CurrentSet.GameNumber}: {(IsFreePickMode || IsFreePickForced ? "free pick mode active" : $"P{ControllingPlayer+1} first {CurrentInteractMode}. bans remaining ({TotalBansRemaining[0]}, {TotalBansRemaining[1]})")}");
+        StageStrikeTracker.Log.LogInfo($"Striking started with ruleset '{ActiveRuleset.Id}', game {SetTracker.Instance.CurrentSet.GameNumber}: {(SetTracker.Instance.CurrentSet.IsFreePickMode || IsFreePickForced ? "free pick mode active" : $"P{ControllingPlayer+1} first {CurrentInteractMode}. bans remaining ({TotalBansRemaining[0]}, {TotalBansRemaining[1]})")}");
         
         InitBans();
     }
@@ -151,15 +150,15 @@ internal class StrikeInfo
     
     internal void ToggleFreePickMode()
     {
-        IsFreePickMode = !IsFreePickMode;
+        SetTracker.Instance.CurrentSet.IsFreePickMode = !SetTracker.Instance.CurrentSet.IsFreePickMode;
         UpdateInteractMode();
-        StageStrikeTracker.Log.LogInfo($"Free pick mode toggled {(IsFreePickMode ? "ON" : $"OFF: P{ControllingPlayer+1} next {CurrentInteractMode}. bans remaining ({TotalBansRemaining[0]}, {TotalBansRemaining[1]})")}");
+        StageStrikeTracker.Log.LogInfo($"Free pick mode toggled {(SetTracker.Instance.CurrentSet.IsFreePickMode ? "ON" : $"OFF: P{ControllingPlayer+1} next {CurrentInteractMode}. bans remaining ({TotalBansRemaining[0]}, {TotalBansRemaining[1]})")}");
     }
 
     private void UpdateInteractMode()
     {
         TotalBansRemaining = [0, 0, 0, 0];
-        if (IsFreePickMode || IsFreePickForced)
+        if (SetTracker.Instance.CurrentSet.IsFreePickMode || IsFreePickForced)
         {
             CurrentInteractMode = InteractMode.PICK;
             return;
@@ -209,7 +208,7 @@ internal class StrikeInfo
 
     internal bool CheckPlayerInteraction(StageBan stageBan, int playerNumber)
     {
-        if (IsFreePickMode || IsFreePickForced) return true;
+        if (SetTracker.Instance.CurrentSet.IsFreePickMode || IsFreePickForced) return true;
         if (playerNumber != ControllingPlayer) return false;
         if (stageBan == null) return true;
         if (stageBan.reason != StageBan.BanReason.DSR) return false;

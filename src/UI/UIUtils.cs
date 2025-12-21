@@ -1,6 +1,7 @@
 using LLBML.Players;
 using LLGUI;
 using TMPro;
+using TourneyMod.SetTracking;
 using TourneyMod.StageStriking;
 using UnityEngine;
 using UnityEngine.UI;
@@ -199,7 +200,7 @@ internal static class UIUtils
 
     internal static void UpdateCursorColors(int controllingPlayer)
     {
-        if (!StageStrikeTracker.Instance.IsTrackingStrikeInfo || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced)
+        if (!StageStrikeTracker.Instance.IsTrackingStrikeInfo || SetTracker.Instance.CurrentSet.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced)
         {
             ResetCursorColors();
             return;

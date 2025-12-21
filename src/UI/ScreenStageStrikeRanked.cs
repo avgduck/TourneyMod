@@ -177,7 +177,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         }}";
         btRandomMain.textMesh.fontSize = RANDOM_FONT_SIZE;
         btRandomMain.onVote = () => OnVoteRandom(randomMode);
-        btRandomMain.enableVoting = !(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
+        btRandomMain.enableVoting = !(SetTracker.Instance.CurrentSet.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
         if (randomMode == Ruleset.RandomMode.OFF || randomMode == Ruleset.RandomMode.BOTH) btRandomMain.gameObject.SetActive(false);
         
         UIUtils.CreateVoteButton(ref btRandomBoth3D, "btRandomBoth3D", transform, RANDOM_POSITION - RANDOM_BOTH_OFFSET, RANDOM_BOTH_SCALE);
@@ -185,7 +185,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         btRandomBoth3D.label = $"Random\n(3D)";
         btRandomBoth3D.textMesh.fontSize = RANDOM_BOTH_FONT_SIZE;
         btRandomBoth3D.onVote = () => OnVoteRandom(Ruleset.RandomMode.ANY_3D);
-        btRandomBoth3D.enableVoting = !(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
+        btRandomBoth3D.enableVoting = !(SetTracker.Instance.CurrentSet.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
         if (randomMode != Ruleset.RandomMode.BOTH) btRandomBoth3D.gameObject.SetActive(false);
         
         UIUtils.CreateVoteButton(ref btRandomBoth2D, "btRandomBoth2D", transform, RANDOM_POSITION + RANDOM_BOTH_OFFSET, RANDOM_BOTH_SCALE);
@@ -193,7 +193,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         btRandomBoth2D.label = $"Random\n(2D)";
         btRandomBoth2D.textMesh.fontSize = RANDOM_BOTH_FONT_SIZE;
         btRandomBoth2D.onVote = () => OnVoteRandom(Ruleset.RandomMode.ANY_2D);
-        btRandomBoth2D.enableVoting = !(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
+        btRandomBoth2D.enableVoting = !(SetTracker.Instance.CurrentSet.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
         if (randomMode != Ruleset.RandomMode.BOTH) btRandomBoth2D.gameObject.SetActive(false);
 
         CreateStageContainers();
@@ -443,7 +443,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         {
             StageContainer stageContainer = stageContainers.Find(container => container.StoredStage == ban.stage);
             if (stageContainer == null) return;
-            stageContainer.Button.SetBan(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced ? null : ban);
+            stageContainer.Button.SetBan(SetTracker.Instance.CurrentSet.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced ? null : ban);
         });
     }
     
@@ -459,7 +459,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         
         TextHandler.SetText(lbSetCount, $"Game {gameNumber} ({winCounts[0]}-{winCounts[1]})");
 
-        if (StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced)
+        if (SetTracker.Instance.CurrentSet.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced)
         {
             TextHandler.SetText(lbBansRemaining, $"Free pick mode");
 
@@ -555,9 +555,9 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
     private void OnVoteFreePick()
     {
         StageStrikeTracker.Instance.CurrentStrikeInfo.ToggleFreePickMode();
-        btRandomMain.enableVoting = !(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
-        btRandomBoth3D.enableVoting = !(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
-        btRandomBoth2D.enableVoting = !(StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
+        btRandomMain.enableVoting = !(SetTracker.Instance.CurrentSet.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
+        btRandomBoth3D.enableVoting = !(SetTracker.Instance.CurrentSet.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
+        btRandomBoth2D.enableVoting = !(SetTracker.Instance.CurrentSet.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced);
         UpdateStageBans();
         UpdateSetInfo();
     }

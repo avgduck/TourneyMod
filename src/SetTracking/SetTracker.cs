@@ -31,21 +31,6 @@ internal class SetTracker
         }
     }
 
-    internal bool Is1v1
-    {
-        get
-        {
-            if (GameSettings.current.gameMode != GameMode._1v1) return false;
-            
-            bool anyAIs = false;
-            Player.ForAllInMatch(player =>
-            {
-                if (player.IsAI) anyAIs = true;
-            });
-            return !anyAIs;
-        }
-    }
-
     internal void Start()
     {
         Log.LogInfo("Starting new set");

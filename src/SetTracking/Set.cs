@@ -9,6 +9,7 @@ internal class Set
     internal List<Match> CompletedMatches { get; private set; } = new List<Match>();
     internal Match CurrentMatch { get; private set; }
 
+    internal bool IsFreePickMode = false;
     internal bool IsGame1 => CompletedMatches.Count == 0;
     internal int GameNumber => CompletedMatches.Count + 1;
     internal int[] WinCounts
