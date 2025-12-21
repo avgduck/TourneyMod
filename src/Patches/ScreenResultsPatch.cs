@@ -1,3 +1,4 @@
+using System.Collections;
 using HarmonyLib;
 using LLBML.Players;
 using LLBML.Settings;
@@ -45,5 +46,21 @@ internal static class ScreenResultsPatch
             // NIPJFJKNGHO.EOCBBKOIFNO -> ResultButtons.QUIT
             screenResults.ShowButtons(NIPJFJKNGHO.EOCBBKOIFNO);
         }
+    }
+
+    [HarmonyPatch(typeof(PostScreen), nameof(PostScreen.CFillXpBar))]
+    [HarmonyPostfix]
+    private static IEnumerator CFillXpBar_Wrapper(IEnumerator __result)
+    {
+        //while (__result.MoveNext()) yield return __result.Current;
+        yield break;
+    }
+    
+    [HarmonyPatch(typeof(CPNJEILDILH), nameof(CPNJEILDILH.PEORFKFKGGGG))]
+    [HarmonyPostfix]
+    private static IEnumerator CShowCurrencyGain_Wrapper(IEnumerator __result)
+    {
+        //while (__result.MoveNext()) yield return __result.Current;
+        yield break;
     }
 }
