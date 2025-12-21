@@ -25,7 +25,7 @@ internal class StageStrikeTracker
 
     internal void Start()
     {
-        Log.LogInfo("Starting new strike info");
+        //Log.LogInfo("Starting new strike info");
         bool forceDefault = Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE;
         if (forceDefault) Log.LogInfo("Tourney mode not active! Forcing default ruleset 'all_stages'");
         if (Plugin.Instance.SelectedRuleset == null) Log.LogError("No valid ruleset selected! Forcing default ruleset 'all_stages'");
@@ -40,13 +40,7 @@ internal class StageStrikeTracker
             return;
         }
         
-        Log.LogInfo("Ending strike info");
+        //Log.LogInfo("Ending strike info");
         CurrentStrikeInfo = null;
-    }
-
-    internal void Reset()
-    {
-        End();
-        Start();
     }
 }
