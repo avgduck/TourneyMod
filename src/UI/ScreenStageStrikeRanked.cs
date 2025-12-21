@@ -111,9 +111,8 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
 
     public override void OnOpen(ScreenType screenTypePrev)
     {
-        Plugin.LogGlobal.LogInfo("Custom stage select ranked OnOpen");
+        //Plugin.LogGlobal.LogInfo("Custom stage select ranked OnOpen");
         StageStrikeTracker.Instance.Start();
-        //UIScreen.blockGlobalInput = true;
         Plugin.Instance.RecolorCursors = true;
         
         // manually do ScreenBase::OnOpen to avoid going through ScreenPlayersStage::OnOpen
@@ -204,7 +203,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
 
     private void RankedOnOpen()
     {
-        Plugin.LogGlobal.LogInfo("Custom stage select ranked RankedOnOpen");
+        //Plugin.LogGlobal.LogInfo("Custom stage select ranked RankedOnOpen");
         ScreenPlayers screenPlayers = GameObject.FindObjectOfType<ScreenPlayers>();
         if (screenPlayers == null) Plugin.LogGlobal.LogFatal("Could not find lobby screen ScreenPlayers");
 
@@ -260,9 +259,8 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
 
     public override void OnClose(ScreenType screenTypeNext)
     {
-        Plugin.LogGlobal.LogInfo("Custom stage select OnClose");
+        //Plugin.LogGlobal.LogInfo("Custom stage select OnClose");
         StageStrikeTracker.Instance.End();
-        //UIScreen.blockGlobalInput = false;
         Plugin.Instance.RecolorCursors = false;
         
         VoteButton.ActiveVoteButtons.Remove(btFreePick);

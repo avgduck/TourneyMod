@@ -70,7 +70,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     public override void OnOpen(ScreenType screenTypePrev)
     {
         base.OnOpen(screenTypePrev);
-        Plugin.LogGlobal.LogInfo("Custom tourney lobby OnOpen");
+        //Plugin.LogGlobal.LogInfo("Custom tourney lobby OnOpen");
         
         UIUtils.CreateText(ref lbGame, "lbGame", transform, GAME_POSITION);
         lbGame.fontSize = GAME_FONT_SIZE;
@@ -93,7 +93,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         VoteButton.ActiveVoteButtons.Remove(btResetSetCount);
         
         base.OnClose(screenTypeNext);
-        Plugin.LogGlobal.LogInfo("Custom tourney lobby OnClose");
+        //Plugin.LogGlobal.LogInfo("Custom tourney lobby OnClose");
     }
 
     public override void DoUpdate()
