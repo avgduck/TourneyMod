@@ -143,7 +143,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         UIUtils.CreateText(ref lbSetCount, "lbSetCount", transform, SETCOUNT_POSITION);
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
         TextHandler.SetText(lbSetCount, "");
-        if (Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE)
+        if (SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE)
         {
             //Plugin.LogGlobal.LogInfo("Tourney mode not active! Hiding stage select set count");
             lbSetCount.gameObject.SetActive(false);

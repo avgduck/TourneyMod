@@ -1,5 +1,6 @@
 using BepInEx.Logging;
 using TourneyMod.Rulesets;
+using TourneyMod.SetTracking;
 
 namespace TourneyMod.StageStriking;
 
@@ -26,7 +27,7 @@ internal class StageStrikeTracker
     internal void Start()
     {
         //Log.LogInfo("Starting new strike info");
-        bool forceDefault = Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE;
+        bool forceDefault = SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE;
         if (forceDefault) Log.LogInfo("Tourney mode not active! Forcing default ruleset 'all_stages'");
         if (Plugin.Instance.SelectedRuleset == null) Log.LogError("No valid ruleset selected! Forcing default ruleset 'all_stages'");
         CurrentStrikeInfo = new StrikeInfo(Plugin.Instance.SelectedRuleset != null && !forceDefault ? Plugin.Instance.SelectedRuleset : defaultRuleset);

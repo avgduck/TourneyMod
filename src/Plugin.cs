@@ -29,7 +29,6 @@ internal class Plugin : BaseUnityPlugin
     internal static ManualLogSource LogGlobal { get; private set; }
 
     internal Ruleset SelectedRuleset;
-    internal TourneyMode ActiveTourneyMode = TourneyMode.NONE;
     internal bool TourneyMenuOpen = false;
     internal bool RecolorCursors = false;
 

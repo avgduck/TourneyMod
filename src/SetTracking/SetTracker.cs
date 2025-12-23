@@ -17,6 +17,7 @@ internal class SetTracker
     
     internal Set CurrentSet { get; private set; }
     internal bool IsTrackingSet => CurrentSet != null;
+    internal TourneyMode ActiveTourneyMode { get; private set; } = TourneyMode.NONE;
     
     internal int NumPlayersInMatch
     {
@@ -51,7 +52,17 @@ internal class SetTracker
 
     internal void Reset()
     {
-        End();
+        if (IsTrackingSet) End();
         Start();
+    }
+
+    internal void SetTourneyMode(TourneyMode tourneyMode)
+    {
+        if (ActiveTourneyMode == tourneyMode) return;
+
+        ActiveTourneyMode = tourneyMode;
+        
+        if (ActiveTourneyMode == TourneyMode.NONE) End();
+        else Reset();
     }
 }

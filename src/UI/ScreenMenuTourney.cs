@@ -3,6 +3,7 @@ using LLBML.States;
 using LLGUI;
 using LLHandlers;
 using LLScreen;
+using TourneyMod.SetTracking;
 using UnityEngine;
 
 namespace TourneyMod.UI;
@@ -46,7 +47,7 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         btLocal1v1.name = "btLocal1v1";
         btLocal1v1.onClick = (playerNr) =>
         {
-            Plugin.Instance.ActiveTourneyMode = TourneyMode.LOCAL_1V1;
+            SetTracker.Instance.SetTourneyMode(TourneyMode.LOCAL_1V1);
             GameStates.Send(Msg.SEL_1V1, playerNr, -1);
         };
         btLocal1v1.SetText("local 1v1");
@@ -55,7 +56,7 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         btLocalDoubles.name = "btLocalDoubles";
         btLocalDoubles.onClick = (playerNr) =>
         {
-            Plugin.Instance.ActiveTourneyMode = TourneyMode.LOCAL_DOUBLES;
+            SetTracker.Instance.SetTourneyMode(TourneyMode.LOCAL_DOUBLES);
             GameStates.Send(Msg.SEL_TEAMS, playerNr, -1);
         };
         btLocalDoubles.SetText("local doubles");
@@ -64,7 +65,7 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         btLocalCrew.name = "btLocalCrew";
         btLocalCrew.onClick = (playerNr) =>
         {
-            Plugin.Instance.ActiveTourneyMode = TourneyMode.LOCAL_CREW;
+            SetTracker.Instance.SetTourneyMode(TourneyMode.LOCAL_CREW);
             GameStates.Send(Msg.SEL_1V1, playerNr, -1);
         };
         btLocalCrew.SetText("crew battle");
@@ -74,7 +75,7 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         btOnline1v1.name = "btOnline1v1";
         btOnline1v1.onClick = (playerNr) =>
         {
-            Plugin.Instance.ActiveTourneyMode = TourneyMode.ONLINE_1V1;
+            SetTracker.Instance.SetTourneyMode(TourneyMode.ONLINE_1V1);
             GameStates.Send(Msg.SEL_RANKED, playerNr, -1);
         };
         btOnline1v1.SetText("online 1v1");

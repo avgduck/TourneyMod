@@ -29,7 +29,7 @@ internal static class ScreenReplacePatch
         }
         else if (screenType == ScreenType.PLAYERS && SetTracker.Instance.IsTrackingSet)
         {
-            if (Plugin.Instance.ActiveTourneyMode == TourneyMode.NONE)
+            if (SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE)
             {
                 // TODO: add custom lobby screen with win tracking to other game modes
             }
