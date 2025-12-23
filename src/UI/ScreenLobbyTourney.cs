@@ -15,7 +15,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 204f);
     private const int SETCOUNT_FONT_SIZE = 52;
     private static readonly Vector2 RESET_SCALE = new Vector2(220f, 26f);
-    private static readonly Vector2 RESET_POSITION = new Vector2(0f, 346f);
+    private static readonly Vector2 RESET_POSITION = new Vector2(0f, -346f);
     private const int RESET_FONT_SIZE = 18;
     
     private TextMeshProUGUI lbGame;
