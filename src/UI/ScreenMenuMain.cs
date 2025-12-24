@@ -9,7 +9,7 @@ namespace TourneyMod.UI;
 
 internal class ScreenMenuMain : LLScreen.ScreenMenuMain, ICustomScreen<LLScreen.ScreenMenuMain>
 {
-    private static readonly Vector3 OFFSET_RIGHTCOL = new Vector2(412.3f, 0f);
+    private static readonly Vector3 OFFSET_RIGHTCOL = new Vector2(406.3f, 0f);
     //private static readonly Vector2 TOURNEY_POSITION = new Vector2(-166.1f, 259.2f);
     internal LLButton btTourney;
     

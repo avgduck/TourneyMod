@@ -26,6 +26,6 @@ internal static class RulesetPreviewPatch
     [HarmonyPostfix]
     private static void OnOpen_Postfix(ScreenMenu __instance)
     {
-        RulesetPreviewWindow.Create(__instance.gameObject.transform);
+        RulesetPreviewWindow.Create(__instance.gameObject.transform, false);
     }
 }

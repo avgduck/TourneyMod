@@ -10,7 +10,8 @@ namespace TourneyMod.UI;
 
 internal class RulesetPreviewWindow : MonoBehaviour
 {
-    private static readonly Vector2 POSITION = new Vector2(530f, 200f);
+    private static readonly Vector2 POSITION_MODMENU = new Vector2(530f, 200f);
+    private static readonly Vector2 POSITION_TOURNEYMENU = new Vector2(536f, 128f);
     private const float FONT_SIZE = 12f;
     private const float FONT_SIZE_2 = 10f;
     private const float SPACING = 20f;
@@ -19,12 +20,17 @@ internal class RulesetPreviewWindow : MonoBehaviour
     private const float RIGHTCOL = 63f;
     private const float LEFT = 6f;
 
-    internal static void Create(Transform tfParent)
+    private bool tourneyMenu = false;
+
+    internal static RulesetPreviewWindow Create(Transform tfParent, bool tourneyMenu)
     {
-        RectTransform tf = LLControl.CreatePanel(tfParent, "rulesetPreviewUI", POSITION.x, POSITION.y);
+        Vector2 position = tourneyMenu ? POSITION_TOURNEYMENU : POSITION_MODMENU;
+        RectTransform tf = LLControl.CreatePanel(tfParent, "rulesetPreviewUI", position.x, position.y);
         RulesetPreviewWindow window = tf.gameObject.AddComponent<RulesetPreviewWindow>();
         window.rectTransform = tf;
+        window.tourneyMenu = tourneyMenu;
         window.Init();
+        return window;
     }
 
     private RectTransform rectTransform;
@@ -236,7 +242,7 @@ internal class RulesetPreviewWindow : MonoBehaviour
     
     private void Update()
     {
-        if (!Patches.RulesetPreviewPatch.isInModMenu)
+        if (!Patches.RulesetPreviewPatch.isInModMenu && !tourneyMenu)
         {
             tfContainer.gameObject.SetActive(false);
             return;

@@ -5,18 +5,27 @@ using LLHandlers;
 using LLScreen;
 using TourneyMod.SetTracking;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TourneyMod.UI;
 
 internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVersus>, IMenuTitle
 {
-    private static readonly Vector3 OFFSET_RIGHTCOL = new Vector2(412.3f, 0f);
+    private static readonly Vector3 OFFSET_BUTTON_1DOWN = new Vector2(-16.3f, -88.8f);
+    private static readonly Vector3 OFFSET_RIGHTCOL = new Vector2(406.3f, 0f);
+    
+    private static readonly Vector3 SETPREVIEW_OFFSET = new Vector2(60f, 0f);
     
     private LLButton btLocal1v1;
     private LLButton btLocalDoubles;
     private LLButton btLocalCrew;
 
     private LLButton btOnline1v1;
+
+    private LLButton btEndSet;
+
+    private SetPreviewWindow pnSetPreview;
+    private RulesetPreviewWindow pnRulesetPreview;
 
     public string GetCustomTitle()
     {
@@ -79,16 +88,29 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
             GameStates.Send(Msg.SEL_RANKED, playerNr, -1);
         };
         btOnline1v1.SetText("online 1v1");
+
+        btEndSet = Instantiate(btTeams, transform);
+        btEndSet.transform.localPosition += OFFSET_BUTTON_1DOWN * 2;
+        btEndSet.name = "btEndSet";
+        btEndSet.onClick = (playerNr) =>
+        {
+            SetTracker.Instance.SetTourneyMode(TourneyMode.NONE);
+        };
+        btEndSet.SetText("end set");
         
-        btLocalDoubles.SetActive(false);
-        btLocalCrew.SetActive(false);
-        btOnline1v1.SetActive(false);
+        btEndSet.SetActive(SetTracker.Instance.IsTrackingSet && SetTracker.Instance.ActiveTourneyMode != TourneyMode.NONE);
         
         btRoyale.visible = false;
         bt1v1.visible = false;
         btTeams.visible = false;
         btVolley.visible = false;
         btStrikers.visible = false;
+        
+        //btLocalCrew.SetActive(false);
+        //btOnline1v1.SetActive(false);
+
+        SetPreviewWindow.Create(ref pnSetPreview, transform, btEndSet.transform.localPosition + OFFSET_RIGHTCOL + SETPREVIEW_OFFSET);
+        pnRulesetPreview = RulesetPreviewWindow.Create(transform, true);
     }
 
     public override void GetControls(ref List<LLClickable> list, bool vert, LLClickable curFocus, LLCursor cursor)
@@ -96,6 +118,9 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         list.Add(btLocal1v1);
         list.Add(btLocalDoubles);
         list.Add(btLocalCrew);
+        
+        list.Add(btEndSet);
+        
         list.Add(btOnline1v1);
     }
 
