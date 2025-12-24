@@ -36,7 +36,7 @@ internal class SetTracker
 
     internal void Start()
     {
-        Log.LogInfo($"Starting new set in tourney mode {ActiveTourneyMode}, using ruleset {Plugin.Instance.SelectedRulesets[ActiveTourneyMode].Id}");
+        Log.LogInfo($"Starting new set in tourney mode {Plugin.GetModeName(ActiveTourneyMode)}, using ruleset {Plugin.Instance.SelectedRulesets[ActiveTourneyMode].Id}");
         CurrentSet = new Set(Plugin.Instance.SelectedRulesets[ActiveTourneyMode]);
     }
 

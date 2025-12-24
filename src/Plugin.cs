@@ -78,7 +78,7 @@ internal class Plugin : BaseUnityPlugin
                 //LogGlobal.LogError($"Error loading ruleset for tourney mode {mode}: ruleset `{id}` does not exist! Loading ruleset `{defaultRulesetId}` instead...");
                 ruleset = RulesetIO.GetRulesetById(defaultRulesetId);
             }
-            else if (!SelectedRulesets.ContainsKey(mode) || SelectedRulesets[mode] != ruleset) LogGlobal.LogInfo($"Loaded ruleset for tourney mode {mode}: `{id}`");
+            if (!SelectedRulesets.ContainsKey(mode) || SelectedRulesets[mode] != ruleset) LogGlobal.LogInfo($"Loaded ruleset for tourney mode {GetModeName(mode)}: `{ruleset.Id}`");
 
             SelectedRulesets[mode] = ruleset;
         });
@@ -97,6 +97,18 @@ internal class Plugin : BaseUnityPlugin
         
         if (includeBrackets) s += "]";
         return s;
+    }
+
+    internal static string GetModeName(TourneyMode tourneyMode)
+    {
+        return tourneyMode switch
+        {
+            TourneyMode.LOCAL_1V1 => "local 1v1",
+            TourneyMode.LOCAL_DOUBLES => "local doubles",
+            TourneyMode.LOCAL_CREW => "crew battle",
+            TourneyMode.ONLINE_1V1 => "online 1v1",
+            _ => "none"
+        };
     }
 
     private List<string> GetModMenuText()

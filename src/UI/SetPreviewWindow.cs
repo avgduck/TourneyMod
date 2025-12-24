@@ -62,14 +62,7 @@ internal class SetPreviewWindow
     internal void UpdateText()
     {
         lbActiveSet2.color = SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE ? Color.red : Color.green;
-        lbActiveSet2.SetText(SetTracker.Instance.ActiveTourneyMode switch
-        {
-            TourneyMode.LOCAL_1V1 => "local 1v1",
-            TourneyMode.LOCAL_DOUBLES => "local doubles",
-            TourneyMode.LOCAL_CREW => "crew battle",
-            TourneyMode.ONLINE_1V1 => "online 1v1",
-            _ => "none"
-        });
+        lbActiveSet2.SetText(Plugin.GetModeName(SetTracker.Instance.ActiveTourneyMode));
         
         lbScore2.SetText(SetTracker.Instance.IsTrackingSet ? $"Game {SetTracker.Instance.CurrentSet.GameNumber}, {SetTracker.Instance.CurrentSet.WinCounts[0]}-{SetTracker.Instance.CurrentSet.WinCounts[1]}" : "");
     }
