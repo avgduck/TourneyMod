@@ -28,14 +28,22 @@ internal class Plugin : BaseUnityPlugin
     internal static Plugin Instance { get; private set; }
     internal static ManualLogSource LogGlobal { get; private set; }
 
-    internal Ruleset SelectedRuleset;
+    private const string defaultRulesetId = "all_stages";
+    internal Dictionary<TourneyMode, string> SelectedRulesetIds;
+    internal Dictionary<TourneyMode, Ruleset> SelectedRulesets;
+    
     internal bool TourneyMenuOpen = false;
+    internal bool RulesetsMenuOpen = false;
     internal bool RecolorCursors = false;
 
     private void Awake()
     {
         Instance = this;
         LogGlobal = this.Logger;
+
+        SelectedRulesetIds = new Dictionary<TourneyMode, string>();
+        SelectedRulesets = new Dictionary<TourneyMode, Ruleset>();
+        
         SetTracker.Init();
         StageStrikeTracker.Init();
         UIUtils.Init();
@@ -44,8 +52,6 @@ internal class Plugin : BaseUnityPlugin
         RulesetIO.Init();
 
         VoteButton.ActiveVoteButtons = new List<VoteButton>();
-        
-        SetTracker.Instance.FindDefaultRuleset();
 
         Configs.BindConfigs();
         Config.SettingChanged += (sender, args) => OnConfigChanged();
@@ -55,16 +61,27 @@ internal class Plugin : BaseUnityPlugin
 
     private void OnConfigChanged()
     {
-        string id = Configs.SelectedRulesetId.Value;
-        SelectedRuleset = RulesetIO.GetRulesetById(id);
-
-        if (SelectedRuleset == null)
-        {
-            //Plugin.LogGlobal.LogError($"Ruleset '{id}' does not exist!");
-            return;
-        }
+        SelectedRulesetIds[TourneyMode.NONE] = defaultRulesetId;
+        SelectedRulesetIds[TourneyMode.LOCAL_1V1] = Configs.RulesetLocal1v1.Value;
+        SelectedRulesetIds[TourneyMode.LOCAL_DOUBLES] = Configs.RulesetLocalDoubles.Value;
+        SelectedRulesetIds[TourneyMode.LOCAL_CREW] = Configs.RulesetLocalCrew.Value;
+        SelectedRulesetIds[TourneyMode.ONLINE_1V1] = Configs.RulesetOnline1v1.Value;
         
-        Plugin.LogGlobal.LogInfo($"Loaded ruleset {id}");
+        SelectedRulesetIds.ToList().ForEach(entry =>
+        {
+            TourneyMode mode = entry.Key;
+            string id = entry.Value;
+
+            Ruleset ruleset = RulesetIO.GetRulesetById(id);
+            if (ruleset == null)
+            {
+                //LogGlobal.LogError($"Error loading ruleset for tourney mode {mode}: ruleset `{id}` does not exist! Loading ruleset `{defaultRulesetId}` instead...");
+                ruleset = RulesetIO.GetRulesetById(defaultRulesetId);
+            }
+            else if (!SelectedRulesets.ContainsKey(mode) || SelectedRulesets[mode] != ruleset) LogGlobal.LogInfo($"Loaded ruleset for tourney mode {mode}: `{id}`");
+
+            SelectedRulesets[mode] = ruleset;
+        });
     }
 
     internal static string PrintArray<T>(T[] arr, bool includeBrackets)

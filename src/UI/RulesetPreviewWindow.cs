@@ -243,7 +243,7 @@ internal class RulesetPreviewWindow : MonoBehaviour
             return;
         }
 
-        Ruleset ruleset = Plugin.Instance.SelectedRuleset;
+        Ruleset ruleset = Plugin.Instance.SelectedRulesets[TourneyMode.NONE];
         tfContainer.gameObject.SetActive(true);
         lbRuleset.color = ruleset == null ? Color.red : Color.green;
         lbRuleset.SetText(ruleset == null ? "NULL" : ruleset.Id);

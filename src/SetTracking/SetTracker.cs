@@ -19,12 +19,6 @@ internal class SetTracker
     internal Set CurrentSet { get; private set; }
     internal bool IsTrackingSet => CurrentSet != null;
     
-    internal Ruleset DefaultRuleset { get; private set; }
-    internal void FindDefaultRuleset()
-    {
-        DefaultRuleset = RulesetIO.GetRulesetById("all_stages");
-    }
-    
     internal TourneyMode ActiveTourneyMode = TourneyMode.NONE;
     
     internal int NumPlayersInMatch
@@ -42,12 +36,8 @@ internal class SetTracker
 
     internal void Start()
     {
-        Log.LogInfo("Starting new set");
-        bool forceDefault = ActiveTourneyMode == TourneyMode.NONE;
-        if (forceDefault) Log.LogInfo("Tourney mode not active! Forcing default ruleset 'all_stages'");
-        else if (Plugin.Instance.SelectedRuleset == null) Log.LogError("No valid ruleset selected! Forcing default ruleset 'all_stages'");
-        else Log.LogInfo($"Using ruleset `{Plugin.Instance.SelectedRuleset.Id}`");
-        CurrentSet = new Set(Plugin.Instance.SelectedRuleset != null && !forceDefault ? Plugin.Instance.SelectedRuleset : DefaultRuleset);
+        Log.LogInfo($"Starting new set in tourney mode {ActiveTourneyMode}, using ruleset {Plugin.Instance.SelectedRulesets[ActiveTourneyMode].Id}");
+        CurrentSet = new Set(Plugin.Instance.SelectedRulesets[ActiveTourneyMode]);
     }
 
     internal void End()
