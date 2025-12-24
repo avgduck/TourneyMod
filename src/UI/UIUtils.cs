@@ -10,11 +10,13 @@ namespace TourneyMod.UI;
 
 internal static class UIUtils
 {
+    private static Sprite panelBG;
     private static Sprite buttonBG;
     internal static Sprite spriteStageSelected;
 
     internal static void Init()
     {
+        panelBG = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
         buttonBG = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
         spriteStageSelected = Sprite.Create(CreateBorderTexture(Color.yellow, 8, 500, 250), new Rect(0, 0, 500, 250), new Vector2(0.5f, 0.5f));
     }
@@ -33,6 +35,20 @@ internal static class UIUtils
         tex.Apply();
         return tex;
     }
+
+    internal static void CreatePanel(ref RectTransform panel, string name, Transform parent, Vector2 position, Vector2 scale)
+    {
+        Image img = LLControl.CreateImage(parent, buttonBG);
+        img.color = Color.black;
+        panel = img.rectTransform;
+        panel.name = name;
+        panel.anchorMin = new Vector2(0f, 0f);
+        panel.anchorMax = new Vector2(1f, 1f);
+        panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scale.x);
+        panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scale.y);
+
+        panel.anchoredPosition = position;
+    }
     
     internal static void CreateText(ref TextMeshProUGUI text, string name, Transform parent)
     {
@@ -40,7 +56,7 @@ internal static class UIUtils
     }
     internal static void CreateText(ref TextMeshProUGUI text, string name, Transform parent, Vector2 position)
     {
-        CreateText(ref text, name, parent, position, new Vector2(200f, 50f));
+        CreateText(ref text, name, parent, position, Vector2.zero);
     }
 
     internal static void CreateText(ref TextMeshProUGUI text, string name, Transform parent, Vector2 position, Vector2 scale)
@@ -200,7 +216,7 @@ internal static class UIUtils
 
     internal static void UpdateCursorColors(int controllingPlayer)
     {
-        if (!StageStrikeTracker.Instance.IsTrackingStrikeInfo || SetTracker.Instance.CurrentSet.IsFreePickMode || StageStrikeTracker.Instance.CurrentStrikeInfo.IsFreePickForced)
+        if (!StageStrikeTracker.Instance.IsTrackingStrikeInfo || SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced)
         {
             ResetCursorColors();
             return;

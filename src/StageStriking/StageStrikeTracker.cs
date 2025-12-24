@@ -14,12 +14,6 @@ internal class StageStrikeTracker
         Log = BepInEx.Logging.Logger.CreateLogSource("TM StageStriking");
         Log.LogInfo("TourneyMod stage striking initialized");
     }
-
-    private Ruleset defaultRuleset;
-    internal void FindDefaultRuleset()
-    {
-        defaultRuleset = RulesetIO.GetRulesetById("all_stages");
-    }
     
     internal StrikeInfo CurrentStrikeInfo { get; private set; }
     internal bool IsTrackingStrikeInfo => CurrentStrikeInfo != null;
@@ -27,10 +21,7 @@ internal class StageStrikeTracker
     internal void Start()
     {
         //Log.LogInfo("Starting new strike info");
-        bool forceDefault = SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE;
-        if (forceDefault) Log.LogInfo("Tourney mode not active! Forcing default ruleset 'all_stages'");
-        if (Plugin.Instance.SelectedRuleset == null) Log.LogError("No valid ruleset selected! Forcing default ruleset 'all_stages'");
-        CurrentStrikeInfo = new StrikeInfo(Plugin.Instance.SelectedRuleset != null && !forceDefault ? Plugin.Instance.SelectedRuleset : defaultRuleset);
+        CurrentStrikeInfo = new StrikeInfo();
     }
 
     internal void End()

@@ -45,7 +45,7 @@ internal class Plugin : BaseUnityPlugin
 
         VoteButton.ActiveVoteButtons = new List<VoteButton>();
         
-        StageStrikeTracker.Instance.FindDefaultRuleset();
+        SetTracker.Instance.FindDefaultRuleset();
 
         Configs.BindConfigs();
         Config.SettingChanged += (sender, args) => OnConfigChanged();

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using LLHandlers;
+using TourneyMod.Rulesets;
 
 namespace TourneyMod.SetTracking;
 
@@ -8,8 +9,10 @@ internal class Set
 {
     internal List<Match> CompletedMatches { get; private set; } = new List<Match>();
     internal Match CurrentMatch { get; private set; }
+    internal Ruleset ActiveRuleset { get; private set; }
 
     internal bool IsFreePickMode = false;
+    internal bool IsFreePickForced => ActiveRuleset.banAmounts.Length == 0;
     internal bool IsGame1 => CompletedMatches.Count == 0;
     internal int GameNumber => CompletedMatches.Count + 1;
     internal int[] WinCounts
@@ -22,6 +25,11 @@ internal class Set
         }
     }
     internal int LastWinner => IsGame1 ? -1 : CompletedMatches.Last().Winner;
+
+    internal Set(Ruleset ruleset)
+    {
+        ActiveRuleset = ruleset;
+    }
 
     internal void StartMatch(Stage stage, Character[] selectedCharacters, Character[] playedCharacters)
     {

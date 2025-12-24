@@ -1,6 +1,7 @@
 using BepInEx.Logging;
 using LLBML.Players;
 using LLBML.Settings;
+using TourneyMod.Rulesets;
 
 namespace TourneyMod.SetTracking;
 
@@ -17,6 +18,13 @@ internal class SetTracker
     
     internal Set CurrentSet { get; private set; }
     internal bool IsTrackingSet => CurrentSet != null;
+    
+    private Ruleset defaultRuleset;
+    internal void FindDefaultRuleset()
+    {
+        defaultRuleset = RulesetIO.GetRulesetById("all_stages");
+    }
+    
     internal TourneyMode ActiveTourneyMode { get; private set; } = TourneyMode.NONE;
     
     internal int NumPlayersInMatch
@@ -35,7 +43,11 @@ internal class SetTracker
     internal void Start()
     {
         Log.LogInfo("Starting new set");
-        CurrentSet = new Set();
+        bool forceDefault = ActiveTourneyMode == TourneyMode.NONE;
+        if (forceDefault) Log.LogInfo("Tourney mode not active! Forcing default ruleset 'all_stages'");
+        else if (Plugin.Instance.SelectedRuleset == null) Log.LogError("No valid ruleset selected! Forcing default ruleset 'all_stages'");
+        else Log.LogInfo($"Using ruleset `{Plugin.Instance.SelectedRuleset.Id}`");
+        CurrentSet = new Set(Plugin.Instance.SelectedRuleset != null && !forceDefault ? Plugin.Instance.SelectedRuleset : defaultRuleset);
     }
 
     internal void End()

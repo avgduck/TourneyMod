@@ -12,9 +12,7 @@ namespace TourneyMod.StageStriking;
 
 internal class StrikeInfo
 {
-    internal Ruleset ActiveRuleset { get; private set; }
     internal int ControlStartPlayer { get; private set; }
-    internal bool IsFreePickForced { get; private set; }
 
     internal List<StageBan> StageBans { get; private set; }
     internal int[] TotalBansRemaining { get; private set; }
@@ -29,24 +27,21 @@ internal class StrikeInfo
     internal InteractMode CurrentInteractMode { get; private set; }
     internal int ControllingPlayer { get; private set; }
 
-    internal StrikeInfo(Ruleset ruleset)
+    internal StrikeInfo()
     {
-        ActiveRuleset = ruleset;
-        IsFreePickForced = ActiveRuleset.banAmounts.Length == 0;
-
         if (SetTracker.Instance.CurrentSet.IsGame1)
         {
-            ControlStartPlayer = ActiveRuleset.game1FirstPlayer;
+            ControlStartPlayer = SetTracker.Instance.CurrentSet.ActiveRuleset.game1FirstPlayer;
         }
         else
         {
             int winner = SetTracker.Instance.CurrentSet.LastWinner;
             int loser = winner == 0 ? 1 : 0;
-            ControlStartPlayer = ActiveRuleset.laterGamesFirstPlayer == Ruleset.FirstPlayer.WINNER ? winner : loser;
+            ControlStartPlayer = SetTracker.Instance.CurrentSet.ActiveRuleset.laterGamesFirstPlayer == Ruleset.FirstPlayer.WINNER ? winner : loser;
         }
         
         UpdateInteractMode();
-        StageStrikeTracker.Log.LogInfo($"Striking started with ruleset '{ActiveRuleset.Id}', game {SetTracker.Instance.CurrentSet.GameNumber}: {(SetTracker.Instance.CurrentSet.IsFreePickMode || IsFreePickForced ? "free pick mode active" : $"P{ControllingPlayer+1} first {CurrentInteractMode}. bans remaining ({TotalBansRemaining[0]}, {TotalBansRemaining[1]})")}");
+        StageStrikeTracker.Log.LogInfo($"Striking started with ruleset '{SetTracker.Instance.CurrentSet.ActiveRuleset.Id}', game {SetTracker.Instance.CurrentSet.GameNumber}: {(SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced ? "free pick mode active" : $"P{ControllingPlayer+1} first {CurrentInteractMode}. bans remaining ({TotalBansRemaining[0]}, {TotalBansRemaining[1]})")}");
         
         InitBans();
     }
@@ -56,18 +51,18 @@ internal class StrikeInfo
         banIndex = 0;
         StageBans = new List<StageBan>();
 
-        if (IsFreePickForced) return;
+        if (SetTracker.Instance.CurrentSet.IsFreePickForced) return;
         if (!SetTracker.Instance.IsTrackingSet) return;
         Set set = SetTracker.Instance.CurrentSet;
         
         if (set.IsGame1)
         {
-            ActiveRuleset.stagesCounterpick.ForEach(stage => StageBans.Add(new StageBan(stage, StageBan.BanReason.COUNTERPICK)));
+            SetTracker.Instance.CurrentSet.ActiveRuleset.stagesCounterpick.ForEach(stage => StageBans.Add(new StageBan(stage, StageBan.BanReason.COUNTERPICK)));
             StageStrikeTracker.Log.LogInfo("Counterpick bans applied: " + Plugin.PrintArray(StageBans.Map(ban => ban.stage).ToArray(), false));
             return;
         }
 
-        if (ActiveRuleset.dsrMode == Ruleset.DsrMode.OFF) return;
+        if (SetTracker.Instance.CurrentSet.ActiveRuleset.dsrMode == Ruleset.DsrMode.OFF) return;
 
         Match[] lastWins = new Match[4];
         set.CompletedMatches.ForEach(match => lastWins[match.Winner] = match);
@@ -78,7 +73,7 @@ internal class StrikeInfo
             Match lastWin = lastWins[winner];
 
             StageBan previousBan = StageBans.Find(ban => ban.stage == match.PlayedStage);
-            if (ActiveRuleset.dsrMode == Ruleset.DsrMode.LAST_WIN && match != lastWin) return;
+            if (SetTracker.Instance.CurrentSet.ActiveRuleset.dsrMode == Ruleset.DsrMode.LAST_WIN && match != lastWin) return;
 
             if (previousBan == null) StageBans.Add(new StageBan(match.PlayedStage, StageBan.BanReason.DSR, winner));
             else if (previousBan.banPlayer != winner) previousBan.banPlayer = -1;
@@ -116,8 +111,8 @@ internal class StrikeInfo
                 break;
                 
             case Ruleset.RandomMode.ANY_LEGAL:
-                randomStagePool.AddRange(ActiveRuleset.stagesNeutral);
-                randomStagePool.AddRange(ActiveRuleset.stagesCounterpick);
+                randomStagePool.AddRange(SetTracker.Instance.CurrentSet.ActiveRuleset.stagesNeutral);
+                randomStagePool.AddRange(SetTracker.Instance.CurrentSet.ActiveRuleset.stagesCounterpick);
                 break;
                 
             case Ruleset.RandomMode.OFF or Ruleset.RandomMode.BOTH:
@@ -158,7 +153,7 @@ internal class StrikeInfo
     private void UpdateInteractMode()
     {
         TotalBansRemaining = [0, 0, 0, 0];
-        if (SetTracker.Instance.CurrentSet.IsFreePickMode || IsFreePickForced)
+        if (SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced)
         {
             CurrentInteractMode = InteractMode.PICK;
             return;
@@ -166,8 +161,8 @@ internal class StrikeInfo
 
         ControllingPlayer = ControlStartPlayer;
         int matchCount = SetTracker.Instance.IsTrackingSet ? SetTracker.Instance.CurrentSet.CompletedMatches.Count : 0;
-        int banRulesCount = ActiveRuleset.banAmounts.Length;
-        int[] banAmounts = ActiveRuleset.banAmounts[matchCount < banRulesCount ? matchCount : banRulesCount - 1];
+        int banRulesCount = SetTracker.Instance.CurrentSet.ActiveRuleset.banAmounts.Length;
+        int[] banAmounts = SetTracker.Instance.CurrentSet.ActiveRuleset.banAmounts[matchCount < banRulesCount ? matchCount : banRulesCount - 1];
         foreach (int banAmount in banAmounts)
         {
             TotalBansRemaining[ControllingPlayer] += banAmount;
@@ -208,7 +203,7 @@ internal class StrikeInfo
 
     internal bool CheckPlayerInteraction(StageBan stageBan, int playerNumber)
     {
-        if (SetTracker.Instance.CurrentSet.IsFreePickMode || IsFreePickForced) return true;
+        if (SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced) return true;
         if (playerNumber != ControllingPlayer) return false;
         if (stageBan == null) return true;
         if (stageBan.reason != StageBan.BanReason.DSR) return false;
