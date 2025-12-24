@@ -23,9 +23,9 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
     private LLButton btOnline1v1;
 
     private LLButton btEndSet;
+    private LLButton btRulesets;
 
     private SetPreviewWindow pnSetPreview;
-    private RulesetPreviewWindow pnRulesetPreview;
 
     public string GetCustomTitle()
     {
@@ -56,7 +56,7 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         btLocal1v1.name = "btLocal1v1";
         btLocal1v1.onClick = (playerNr) =>
         {
-            SetTracker.Instance.SetTourneyMode(TourneyMode.LOCAL_1V1);
+            SetTracker.Instance.ActiveTourneyMode = TourneyMode.LOCAL_1V1;
             GameStates.Send(Msg.SEL_1V1, playerNr, -1);
         };
         btLocal1v1.SetText("local 1v1");
@@ -65,7 +65,7 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         btLocalDoubles.name = "btLocalDoubles";
         btLocalDoubles.onClick = (playerNr) =>
         {
-            SetTracker.Instance.SetTourneyMode(TourneyMode.LOCAL_DOUBLES);
+            SetTracker.Instance.ActiveTourneyMode = TourneyMode.LOCAL_DOUBLES;
             GameStates.Send(Msg.SEL_TEAMS, playerNr, -1);
         };
         btLocalDoubles.SetText("local doubles");
@@ -74,7 +74,7 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         btLocalCrew.name = "btLocalCrew";
         btLocalCrew.onClick = (playerNr) =>
         {
-            SetTracker.Instance.SetTourneyMode(TourneyMode.LOCAL_CREW);
+            SetTracker.Instance.ActiveTourneyMode = TourneyMode.LOCAL_CREW;
             GameStates.Send(Msg.SEL_1V1, playerNr, -1);
         };
         btLocalCrew.SetText("crew battle");
@@ -84,33 +84,41 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         btOnline1v1.name = "btOnline1v1";
         btOnline1v1.onClick = (playerNr) =>
         {
-            SetTracker.Instance.SetTourneyMode(TourneyMode.ONLINE_1V1);
+            SetTracker.Instance.ActiveTourneyMode = TourneyMode.ONLINE_1V1;
             GameStates.Send(Msg.SEL_RANKED, playerNr, -1);
         };
         btOnline1v1.SetText("online 1v1");
+        
+        btRulesets = Instantiate(btTeams, transform);
+        btRulesets.transform.localPosition += OFFSET_BUTTON_1DOWN * 2;
+        btRulesets.name = "btRulesets";
+        btRulesets.onClick = (playerNr) =>
+        {
+            
+        };
+        btRulesets.SetText("rulesets");
 
         btEndSet = Instantiate(btTeams, transform);
-        btEndSet.transform.localPosition += OFFSET_BUTTON_1DOWN * 2;
+        btEndSet.transform.localPosition += OFFSET_BUTTON_1DOWN * 2 + OFFSET_RIGHTCOL;
         btEndSet.name = "btEndSet";
         btEndSet.onClick = (playerNr) =>
         {
-            SetTracker.Instance.SetTourneyMode(TourneyMode.NONE);
+            SetTracker.Instance.ActiveTourneyMode = TourneyMode.NONE;
+            SetTracker.Instance.End();
+            pnSetPreview.UpdateText();
+            UpdateButtons();
         };
         btEndSet.SetText("end set");
         
-        btEndSet.SetActive(SetTracker.Instance.IsTrackingSet && SetTracker.Instance.ActiveTourneyMode != TourneyMode.NONE);
+        SetPreviewWindow.Create(ref pnSetPreview, transform, btEndSet.transform.localPosition + OFFSET_BUTTON_1DOWN);
+        
+        UpdateButtons();
         
         btRoyale.visible = false;
         bt1v1.visible = false;
         btTeams.visible = false;
         btVolley.visible = false;
         btStrikers.visible = false;
-        
-        //btLocalCrew.SetActive(false);
-        //btOnline1v1.SetActive(false);
-
-        SetPreviewWindow.Create(ref pnSetPreview, transform, btEndSet.transform.localPosition + OFFSET_RIGHTCOL + SETPREVIEW_OFFSET);
-        pnRulesetPreview = RulesetPreviewWindow.Create(transform, true);
     }
 
     public override void GetControls(ref List<LLClickable> list, bool vert, LLClickable curFocus, LLCursor cursor)
@@ -119,14 +127,20 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         list.Add(btLocalDoubles);
         list.Add(btLocalCrew);
         
-        list.Add(btEndSet);
+        list.Add(btRulesets);
         
         list.Add(btOnline1v1);
+        
+        list.Add(btEndSet);
     }
 
     public override LLClickable GetDefaultFocus(LLCursor cursor)
     {
-        return btLocal1v1;
+        if (btLocal1v1.isActive) return btLocal1v1;
+        if (btLocalDoubles.isActive) return btLocalDoubles;
+        if (btLocalCrew.isActive) return btLocalCrew;
+        if (btOnline1v1.isActive) return btOnline1v1;
+        return btRulesets;
     }
 
     public override bool DirectMove(Vector2 move, LLClickable curFocus, bool shouldMove)
@@ -137,17 +151,47 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
 
         if (vert) return false;
 
+        if (curFocus == btLocal1v1 || curFocus == btLocalDoubles || curFocus == btLocalCrew)
+        {
+            UIScreen.SetFocus(btOnline1v1);
+            AudioHandler.PlayMenuSfx(Sfx.MENU_SCROLL);
+            return true;
+        }
         if (curFocus == btOnline1v1)
         {
             UIScreen.SetFocus(btLocal1v1);
             AudioHandler.PlayMenuSfx(Sfx.MENU_SCROLL);
             return true;
         }
-        else
+        
+        if (curFocus == btRulesets)
         {
-            UIScreen.SetFocus(btOnline1v1);
+            UIScreen.SetFocus(btEndSet);
             AudioHandler.PlayMenuSfx(Sfx.MENU_SCROLL);
             return true;
         }
+        if (curFocus == btEndSet)
+        {
+            UIScreen.SetFocus(btRulesets);
+            AudioHandler.PlayMenuSfx(Sfx.MENU_SCROLL);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void UpdateButtons()
+    {
+        btLocal1v1.SetActive(SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_1V1 or TourneyMode.NONE);
+        btLocalDoubles.SetActive(SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_DOUBLES or TourneyMode.NONE);
+        btLocalCrew.SetActive(SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_CREW or TourneyMode.NONE);
+        btOnline1v1.SetActive(SetTracker.Instance.ActiveTourneyMode is TourneyMode.ONLINE_1V1 or TourneyMode.NONE);
+        btEndSet.SetActive(SetTracker.Instance.ActiveTourneyMode is not TourneyMode.NONE);
+        
+        UIScreen.SetFocus(GetDefaultFocus(UIInput.mainCursor));
+        if (!btEndSet.isActive) btEndSet.OnHoverOut(-1);
+        
+        //btLocalCrew.SetActive(false);
+        //btOnline1v1.SetActive(false);
     }
 }

@@ -19,13 +19,13 @@ internal class SetTracker
     internal Set CurrentSet { get; private set; }
     internal bool IsTrackingSet => CurrentSet != null;
     
-    private Ruleset defaultRuleset;
+    internal Ruleset DefaultRuleset { get; private set; }
     internal void FindDefaultRuleset()
     {
-        defaultRuleset = RulesetIO.GetRulesetById("all_stages");
+        DefaultRuleset = RulesetIO.GetRulesetById("all_stages");
     }
     
-    internal TourneyMode ActiveTourneyMode { get; private set; } = TourneyMode.NONE;
+    internal TourneyMode ActiveTourneyMode = TourneyMode.NONE;
     
     internal int NumPlayersInMatch
     {
@@ -47,7 +47,7 @@ internal class SetTracker
         if (forceDefault) Log.LogInfo("Tourney mode not active! Forcing default ruleset 'all_stages'");
         else if (Plugin.Instance.SelectedRuleset == null) Log.LogError("No valid ruleset selected! Forcing default ruleset 'all_stages'");
         else Log.LogInfo($"Using ruleset `{Plugin.Instance.SelectedRuleset.Id}`");
-        CurrentSet = new Set(Plugin.Instance.SelectedRuleset != null && !forceDefault ? Plugin.Instance.SelectedRuleset : defaultRuleset);
+        CurrentSet = new Set(Plugin.Instance.SelectedRuleset != null && !forceDefault ? Plugin.Instance.SelectedRuleset : DefaultRuleset);
     }
 
     internal void End()
@@ -66,15 +66,5 @@ internal class SetTracker
     {
         if (IsTrackingSet) End();
         Start();
-    }
-
-    internal void SetTourneyMode(TourneyMode tourneyMode)
-    {
-        if (ActiveTourneyMode == tourneyMode) return;
-
-        ActiveTourneyMode = tourneyMode;
-        
-        if (ActiveTourneyMode == TourneyMode.NONE) End();
-        else Reset();
     }
 }

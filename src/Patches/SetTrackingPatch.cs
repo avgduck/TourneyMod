@@ -25,19 +25,7 @@ internal static class SetTrackingPatch
 
         if (newState == GameState.MENU)
         {
-            switch (SetTracker.Instance.ActiveTourneyMode)
-            {
-                case TourneyMode.NONE:
-                    SetTracker.Instance.End();
-                    break;
-                
-                case TourneyMode.LOCAL_1V1 or TourneyMode.LOCAL_DOUBLES:
-                    SetTracker.Instance.SetTourneyMode(TourneyMode.NONE);
-                    break;
-                
-                default:
-                    break;
-            }
+            if (SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE) SetTracker.Instance.End();
         }
     }
     
