@@ -1,9 +1,7 @@
-using LLGUI;
 using LLHandlers;
 using LLScreen;
 using TMPro;
 using TourneyMod.SetTracking;
-using TourneyMod.StageStriking;
 using UnityEngine;
 
 namespace TourneyMod.UI;
@@ -12,14 +10,18 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
 {
     private static readonly Vector2 GAME_POSITION = new Vector2(0f, 250f);
     private const int GAME_FONT_SIZE = 28;
-    private static readonly Vector2 SETCOUNT_POSITION = new Vector2(0f, 204f);
-    private const int SETCOUNT_FONT_SIZE = 52;
+    private static readonly Vector2 SCORE_POSITION = new Vector2(0f, 204f);
+    private const int SCORE_FONT_SIZE = 52;
+    private static readonly Vector2 SCORE_OFFSET = new Vector2(50f, 0f);
     private static readonly Vector2 RESET_SCALE = new Vector2(220f, 26f);
     private static readonly Vector2 RESET_POSITION = new Vector2(0f, -346f);
     private const int RESET_FONT_SIZE = 18;
     
     private TextMeshProUGUI lbGame;
-    private TextMeshProUGUI lbSetCount;
+    private TextMeshProUGUI lbScoreRed;
+    private TextMeshProUGUI lbScoreDash;
+    private TextMeshProUGUI lbScoreBlue;
+    
     private VoteButton btResetSetCount;
     
     public void Init(ScreenPlayers screenPlayers)
@@ -70,13 +72,19 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     public override void OnOpen(ScreenType screenTypePrev)
     {
         base.OnOpen(screenTypePrev);
-        //Plugin.LogGlobal.LogInfo("Custom tourney lobby OnOpen");
         
         UIUtils.CreateText(ref lbGame, "lbGame", transform, GAME_POSITION);
         lbGame.fontSize = GAME_FONT_SIZE;
         
-        UIUtils.CreateText(ref lbSetCount, "lbSetCount", transform, SETCOUNT_POSITION);
-        lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
+        UIUtils.CreateText(ref lbScoreDash, "lbScoreDash", transform, SCORE_POSITION);
+        lbScoreDash.fontSize = SCORE_FONT_SIZE;
+        lbScoreDash.SetText("-");
+        UIUtils.CreateText(ref lbScoreRed, "lbScoreRed", transform, SCORE_POSITION - SCORE_OFFSET);
+        lbScoreRed.fontSize = SCORE_FONT_SIZE;
+        lbScoreRed.color = UIUtils.COLOR_PLAYER[0];
+        UIUtils.CreateText(ref lbScoreBlue, "lbScoreBlue", transform, SCORE_POSITION + SCORE_OFFSET);
+        lbScoreBlue.fontSize = SCORE_FONT_SIZE;
+        lbScoreBlue.color = UIUtils.COLOR_PLAYER[1];
 
         UIUtils.CreateVoteButton(ref btResetSetCount, "btResetSetCount", transform, RESET_POSITION, RESET_SCALE);
         VoteButton.ActiveVoteButtons.Add(btResetSetCount);
@@ -93,7 +101,6 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         VoteButton.ActiveVoteButtons.Remove(btResetSetCount);
         
         base.OnClose(screenTypeNext);
-        //Plugin.LogGlobal.LogInfo("Custom tourney lobby OnClose");
     }
 
     public override void DoUpdate()
@@ -106,8 +113,11 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     {
         int gameNumber = SetTracker.Instance.CurrentSet.GameNumber;
         int[] winCounts = SetTracker.Instance.CurrentSet.WinCounts;
-        TextHandler.SetText(lbGame, $"Game {gameNumber}");
-        TextHandler.SetText(lbSetCount, $"({winCounts[0]}-{winCounts[1]})");
+        
+        lbGame.SetText($"Game {gameNumber}");
+        
+        lbScoreRed.SetText(winCounts[0].ToString());
+        lbScoreBlue.SetText(winCounts[1].ToString());
     }
     
     private void OnVoteReset()

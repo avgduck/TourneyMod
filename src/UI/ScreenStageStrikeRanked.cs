@@ -45,14 +45,6 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
     private static readonly Vector2 OPPONENT_INFO_POSITION = new Vector2(580f, -250f);
     private static readonly Vector2 INFO_SCALE = Vector2.one * 0.65f;
     
-    private static readonly Color[] COLOR_PLAYER =
-    [
-        new Color(255/255f, 64/255f, 22/255f),
-        new Color(13/255f, 136/255f, 255/255f),
-        new Color(255/255f, 255/255f, 61/255f),
-        new Color(90/255f, 244/255f, 90/255f)
-    ];
-    
     private List<StageContainer> stageContainersNeutral;
     private List<StageContainer> stageContainersCounterpick;
     private List<StageContainer> stageContainers;
@@ -471,7 +463,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
             TextHandler.SetText(lbBansRemaining, $"Bans remaining: P1 {StageStrikeTracker.Instance.CurrentStrikeInfo.TotalBansRemaining[0]}, P2 {StageStrikeTracker.Instance.CurrentStrikeInfo.TotalBansRemaining[1]}");
 
             int controllingPlayer = StageStrikeTracker.Instance.CurrentStrikeInfo.ControllingPlayer;
-            lbBanStatus.color = COLOR_PLAYER[controllingPlayer];
+            lbBanStatus.color = UIUtils.COLOR_PLAYER[controllingPlayer];
             TextHandler.SetText(lbBanStatus, StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentInteractMode == StrikeInfo.InteractMode.BAN
                 ? $"P{controllingPlayer+1} banning {StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentBansRemaining}..."
                 : $"P{controllingPlayer+1} picking...");

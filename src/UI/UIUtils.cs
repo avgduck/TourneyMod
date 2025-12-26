@@ -13,6 +13,14 @@ internal static class UIUtils
     private static Sprite panelBG;
     private static Sprite buttonBG;
     internal static Sprite spriteStageSelected;
+    
+    internal static readonly Color[] COLOR_PLAYER =
+    [
+        new Color(255/255f, 64/255f, 22/255f),
+        new Color(13/255f, 136/255f, 255/255f),
+        new Color(255/255f, 255/255f, 61/255f),
+        new Color(90/255f, 244/255f, 90/255f)
+    ];
 
     internal static void Init()
     {

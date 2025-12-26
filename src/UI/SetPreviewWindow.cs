@@ -49,6 +49,6 @@ internal class SetPreviewWindow
     {
         lbActiveSet.SetText($"Active set: <color=\"{(SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE ? "red" : "green")}\">{Plugin.GetModeName(SetTracker.Instance.ActiveTourneyMode)}</color>");
         lbRuleset.SetText($"Ruleset: <color=\"yellow\">{(SetTracker.Instance.IsTrackingSet ? SetTracker.Instance.CurrentSet.ActiveRuleset.name : "")}</color>");
-        lbScore.SetText($"Score: <color=\"yellow\">{(SetTracker.Instance.IsTrackingSet ? $"Game {SetTracker.Instance.CurrentSet.GameNumber}, {SetTracker.Instance.CurrentSet.WinCounts[0]}-{SetTracker.Instance.CurrentSet.WinCounts[1]}" : "")}</color>");
+        lbScore.SetText($"Score: <color=\"yellow\">{(SetTracker.Instance.IsTrackingSet ? $"Game {SetTracker.Instance.CurrentSet.GameNumber}, <color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_PLAYER[0])}>{SetTracker.Instance.CurrentSet.WinCounts[0]}</color>-<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_PLAYER[1])}>{SetTracker.Instance.CurrentSet.WinCounts[1]}</color>" : "")}</color>");
     }
 }
