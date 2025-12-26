@@ -23,14 +23,5 @@ internal static class HarmonyPatches
         harmony.PatchAll(typeof(StageSizePatch));
         Plugin.LogGlobal.LogInfo("Stage size check patch applied");
         */
-        
-        if (!ModDependenciesUtils.IsModLoaded(Plugin.DEPENDENCY_MODMENU))
-        {
-            Plugin.LogGlobal.LogWarning("ModMenu is not loaded. Skipping preview patch...");
-            return;
-        }
-        
-        harmony.PatchAll(typeof(RulesetPreviewPatch));
-        Plugin.LogGlobal.LogInfo("Ruleset preview patch applied");
     }
 }
