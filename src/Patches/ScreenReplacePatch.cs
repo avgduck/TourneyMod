@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection.Emit;
 using HarmonyLib;
 using LLBML.Players;
+using LLBML.States;
 using LLScreen;
 using TourneyMod.SetTracking;
 using TourneyMod.UI;
@@ -26,6 +27,10 @@ internal static class ScreenReplacePatch
         else if (screenType == ScreenType.MENU_VERSUS && Plugin.Instance.TourneyMenuOpen)
         {
             ReplaceScreen<ScreenMenuVersus, ScreenMenuTourney>(ref __result);
+        }
+        else if (screenType == ScreenType.UNLOCKS_STAGES && Plugin.Instance.RulesetsMenuOpen)
+        {
+            ReplaceScreen<ScreenUnlocksStages, ScreenMenuRulesets>(ref __result);
         }
         else if (screenType == ScreenType.PLAYERS && SetTracker.Instance.IsTrackingSet)
         {
@@ -67,6 +72,16 @@ internal static class ScreenReplacePatch
     [HarmonyPatch(typeof(IOGKKINMEFB), nameof(IOGKKINMEFB.CJAOMBCFJJO))]
     [HarmonyPostfix]
     private static void GameStatesMenu_SetMenu_Postfix()
+    {
+        IMenuTitle menu = UIScreen.GetScreen(1) as IMenuTitle;
+        if (menu == null) return;
+        // ScreenMenu GameStatesMenu.screenMenu
+        IOGKKINMEFB.PPGAIOHGPAK.SetTitle(menu.GetCustomTitle());
+    }
+
+    [HarmonyPatch(typeof(OGKPCMDOMPF), nameof(OGKPCMDOMPF.CJAOMBCFJJO))]
+    [HarmonyPostfix]
+    private static void GameStatesUnlocks_SetMenu_Postfix()
     {
         IMenuTitle menu = UIScreen.GetScreen(1) as IMenuTitle;
         if (menu == null) return;
@@ -115,9 +130,27 @@ internal static class ScreenReplacePatch
                 if (menu == null) return;
                 UIScreen.SetFocus(menu.btTourney);
                 Plugin.Instance.TourneyMenuOpen = false;
+                Plugin.Instance.RulesetsMenuOpen = false;
             })
         );
         return cm.InstructionEnumeration();
+    }
+    
+    //void GameStatesUnlocks::ProcessMsg(GameState state, Message message)
+    [HarmonyPatch(typeof(OGKPCMDOMPF), nameof(OGKPCMDOMPF.ProcessMsg))]
+    [HarmonyPrefix]
+    private static bool GameStatesUnlocks_ProcessMsg_Prefix(JOFJHDJHJGI OHBPPCEFBHI, Message EIMJOIEPMNA)
+    {
+        Msg msg = EIMJOIEPMNA.msg;
+        if (!Plugin.Instance.RulesetsMenuOpen) return true;
+        if (msg != Msg.BACK) return true;
+        
+        OGKPCMDOMPF.screenMenu.SetActive(true);
+        OGKPCMDOMPF.screenMenu.btBack.OnHoverOut(-1);
+        // void GameStatesMenu::JumpTo(ScreenType screenType, ScreenTransition transition = ScreenTransition.NONE, bool backSound = false, ...)
+        GameStates.ClearMessages();
+        IOGKKINMEFB.CDAGGNOHLNK(ScreenType.MENU_VERSUS, ScreenTransition.MOVE_RIGHT, true);
+        return false;
     }
 
     /*

@@ -99,15 +99,15 @@ internal class Plugin : BaseUnityPlugin
         return s;
     }
 
-    internal static string GetModeName(TourneyMode tourneyMode)
+    internal static string GetModeName(TourneyMode tourneyMode, bool capitalized = false)
     {
         return tourneyMode switch
         {
-            TourneyMode.LOCAL_1V1 => "local 1v1",
-            TourneyMode.LOCAL_DOUBLES => "local doubles",
-            TourneyMode.LOCAL_CREW => "crew battle",
-            TourneyMode.ONLINE_1V1 => "online 1v1",
-            _ => "none"
+            TourneyMode.LOCAL_1V1 => capitalized ? "Local 1v1" : "local 1v1",
+            TourneyMode.LOCAL_DOUBLES => capitalized ? "Local Doubles" : "local doubles",
+            TourneyMode.LOCAL_CREW => capitalized ? "Crew Battle" : "crew battle",
+            TourneyMode.ONLINE_1V1 => capitalized ? "Online 1v1" : "online 1v1",
+            _ => capitalized ? "Vanilla" : "none"
         };
     }
 

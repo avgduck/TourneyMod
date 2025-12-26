@@ -16,16 +16,16 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
     
     private static readonly Vector3 SETPREVIEW_OFFSET = new Vector2(60f, 0f);
     
-    private LLButton btLocal1v1;
-    private LLButton btLocalDoubles;
-    private LLButton btLocalCrew;
+    internal LLButton btLocal1v1;
+    internal LLButton btLocalDoubles;
+    internal LLButton btLocalCrew;
 
-    private LLButton btOnline1v1;
+    internal LLButton btOnline1v1;
 
-    private LLButton btEndSet;
-    private LLButton btRulesets;
+    internal LLButton btEndSet;
+    internal LLButton btRulesets;
 
-    private SetPreviewWindow pnSetPreview;
+    internal SetPreviewWindow pnSetPreview;
 
     public string GetCustomTitle()
     {
@@ -56,45 +56,51 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         btLocal1v1.name = "btLocal1v1";
         btLocal1v1.onClick = (playerNr) =>
         {
+            Plugin.Instance.RulesetsMenuOpen = false;
             SetTracker.Instance.ActiveTourneyMode = TourneyMode.LOCAL_1V1;
             GameStates.Send(Msg.SEL_1V1, playerNr, -1);
         };
-        btLocal1v1.SetText("local 1v1");
+        btLocal1v1.SetText(Plugin.GetModeName(TourneyMode.LOCAL_1V1));
 
         btLocalDoubles = Instantiate(bt1v1, transform);
         btLocalDoubles.name = "btLocalDoubles";
         btLocalDoubles.onClick = (playerNr) =>
         {
+            Plugin.Instance.RulesetsMenuOpen = false;
             SetTracker.Instance.ActiveTourneyMode = TourneyMode.LOCAL_DOUBLES;
             GameStates.Send(Msg.SEL_TEAMS, playerNr, -1);
         };
-        btLocalDoubles.SetText("local doubles");
+        btLocalDoubles.SetText(Plugin.GetModeName(TourneyMode.LOCAL_DOUBLES));
         
         btLocalCrew = Instantiate(btTeams, transform);
         btLocalCrew.name = "btLocalCrew";
         btLocalCrew.onClick = (playerNr) =>
         {
+            Plugin.Instance.RulesetsMenuOpen = false;
             SetTracker.Instance.ActiveTourneyMode = TourneyMode.LOCAL_CREW;
             GameStates.Send(Msg.SEL_1V1, playerNr, -1);
         };
-        btLocalCrew.SetText("crew battle");
+        btLocalCrew.SetText(Plugin.GetModeName(TourneyMode.LOCAL_CREW));
         
         btOnline1v1 = Instantiate(btRoyale, transform);
         btOnline1v1.transform.localPosition += OFFSET_RIGHTCOL;
         btOnline1v1.name = "btOnline1v1";
         btOnline1v1.onClick = (playerNr) =>
         {
+            Plugin.Instance.RulesetsMenuOpen = false;
             SetTracker.Instance.ActiveTourneyMode = TourneyMode.ONLINE_1V1;
             GameStates.Send(Msg.SEL_RANKED, playerNr, -1);
         };
-        btOnline1v1.SetText("online 1v1");
+        btOnline1v1.SetText(Plugin.GetModeName(TourneyMode.ONLINE_1V1));
         
         btRulesets = Instantiate(btTeams, transform);
         btRulesets.transform.localPosition += OFFSET_BUTTON_1DOWN * 2;
         btRulesets.name = "btRulesets";
         btRulesets.onClick = (playerNr) =>
         {
-            
+            Plugin.Instance.RulesetsMenuOpen = true;
+            GameStates.Set(GameState.UNLOCKS);
+            GameStates.Send(Msg.SEL_STAGES, playerNr, -1);
         };
         btRulesets.SetText("rulesets");
 
@@ -103,6 +109,7 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         btEndSet.name = "btEndSet";
         btEndSet.onClick = (playerNr) =>
         {
+            Plugin.Instance.RulesetsMenuOpen = false;
             SetTracker.Instance.ActiveTourneyMode = TourneyMode.NONE;
             SetTracker.Instance.End();
             pnSetPreview.UpdateText();
@@ -136,6 +143,7 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
 
     public override LLClickable GetDefaultFocus(LLCursor cursor)
     {
+        if (Plugin.Instance.RulesetsMenuOpen) return btRulesets;
         if (btLocal1v1.isActive) return btLocal1v1;
         if (btLocalDoubles.isActive) return btLocalDoubles;
         if (btLocalCrew.isActive) return btLocalCrew;
@@ -192,6 +200,6 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         if (!btEndSet.isActive) btEndSet.OnHoverOut(-1);
         
         //btLocalCrew.SetActive(false);
-        //btOnline1v1.SetActive(false);
+        btOnline1v1.SetActive(false);
     }
 }
