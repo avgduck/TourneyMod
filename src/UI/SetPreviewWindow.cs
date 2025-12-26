@@ -6,26 +6,19 @@ namespace TourneyMod.UI;
 
 internal class SetPreviewWindow
 {
-    private static readonly Vector2 SETPREVIEW_SCALE = new Vector2(320f, 50f);
+    private static readonly Vector2 SETPREVIEW_SCALE = new Vector2(380f, 58f);
     private const int HEADER_FONTSIZE = 22;
     private const int MAIN_FONTSIZE = 16;
 
-    private const float TOP = 10f;
-    private static readonly Vector2 LEFTCOL = new Vector2(-320f, TOP);
-    private static readonly Vector2 RIGHTCOL = new Vector2(210f, TOP);
+    private static readonly Vector2 TOP = new Vector2(106f, -26f);
     private static readonly Vector2 HEADER_LINE_SPACING = new Vector2(0f, -HEADER_FONTSIZE);
     private static readonly Vector2 MAIN_LINE_SPACING = new Vector2(0f, -MAIN_FONTSIZE);
-    
-    private static readonly Vector2 ACTIVESET_POSITION_1 = new Vector2(-280f, TOP);
-    private static readonly Vector2 ACTIVESET_POSITION_2 = new Vector2(250f, TOP);
 
     private RectTransform rectTransform;
 
-    private TextMeshProUGUI lbActiveSet1;
-    private TextMeshProUGUI lbActiveSet2;
-
-    private TextMeshProUGUI lbScore1;
-    private TextMeshProUGUI lbScore2;
+    private TextMeshProUGUI lbActiveSet;
+    private TextMeshProUGUI lbRuleset;
+    private TextMeshProUGUI lbScore;
     
     internal static void Create(ref SetPreviewWindow pnSetPreview, Transform parent, Vector2 position)
     {
@@ -36,34 +29,26 @@ internal class SetPreviewWindow
 
     private void Init()
     {
-        UIUtils.CreateText(ref lbActiveSet1, "lbActiveSet1", rectTransform, ACTIVESET_POSITION_1);
-        lbActiveSet1.fontSize = HEADER_FONTSIZE;
-        lbActiveSet1.alignment = TextAlignmentOptions.Right;
-        lbActiveSet1.SetText("Active set:");
-        UIUtils.CreateText(ref lbActiveSet2, "lbActiveSet2", rectTransform, ACTIVESET_POSITION_2);
-        lbActiveSet2.fontSize = HEADER_FONTSIZE;
-        lbActiveSet2.alignment = TextAlignmentOptions.Left;
-        lbActiveSet2.color = Color.red;
-        lbActiveSet2.SetText("");
+        UIUtils.CreateText(ref lbActiveSet, "lbActiveSet", rectTransform, TOP);
+        lbActiveSet.fontSize = HEADER_FONTSIZE;
+        lbActiveSet.alignment = TextAlignmentOptions.TopLeft;
+        lbActiveSet.richText = true;
         
-        UIUtils.CreateText(ref lbScore1, "lbScore1", rectTransform, LEFTCOL + HEADER_LINE_SPACING + MAIN_LINE_SPACING*0);
-        lbScore1.fontSize = MAIN_FONTSIZE;
-        lbScore1.alignment = TextAlignmentOptions.Right;
-        lbScore1.SetText("Set count:");
-        UIUtils.CreateText(ref lbScore2, "lbScore2", rectTransform, RIGHTCOL + HEADER_LINE_SPACING + MAIN_LINE_SPACING*0);
-        lbScore2.fontSize = MAIN_FONTSIZE;
-        lbScore2.alignment = TextAlignmentOptions.Left;
-        lbScore2.color = Color.yellow;
-        lbScore2.SetText("");
+        UIUtils.CreateText(ref lbRuleset, "lbRuleset", rectTransform, TOP + HEADER_LINE_SPACING);
+        lbRuleset.fontSize = MAIN_FONTSIZE;
+        lbRuleset.alignment = TextAlignmentOptions.TopLeft;
+        
+        UIUtils.CreateText(ref lbScore, "lbScore", rectTransform, TOP + HEADER_LINE_SPACING + MAIN_LINE_SPACING);
+        lbScore.fontSize = MAIN_FONTSIZE;
+        lbScore.alignment = TextAlignmentOptions.TopLeft;
         
         UpdateText();
     }
 
     internal void UpdateText()
     {
-        lbActiveSet2.color = SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE ? Color.red : Color.green;
-        lbActiveSet2.SetText(Plugin.GetModeName(SetTracker.Instance.ActiveTourneyMode));
-        
-        lbScore2.SetText(SetTracker.Instance.IsTrackingSet ? $"Game {SetTracker.Instance.CurrentSet.GameNumber}, {SetTracker.Instance.CurrentSet.WinCounts[0]}-{SetTracker.Instance.CurrentSet.WinCounts[1]}" : "");
+        lbActiveSet.SetText($"Active set: <color=\"{(SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE ? "red" : "green")}\">{Plugin.GetModeName(SetTracker.Instance.ActiveTourneyMode)}</color>");
+        lbRuleset.SetText($"Ruleset: <color=\"yellow\">{(SetTracker.Instance.IsTrackingSet ? SetTracker.Instance.CurrentSet.ActiveRuleset.name : "")}</color>");
+        lbScore.SetText($"Score: <color=\"yellow\">{(SetTracker.Instance.IsTrackingSet ? $"Game {SetTracker.Instance.CurrentSet.GameNumber}, {SetTracker.Instance.CurrentSet.WinCounts[0]}-{SetTracker.Instance.CurrentSet.WinCounts[1]}" : "")}</color>");
     }
 }

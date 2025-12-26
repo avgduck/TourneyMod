@@ -14,8 +14,6 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
     private static readonly Vector3 OFFSET_BUTTON_1DOWN = new Vector2(-16.3f, -88.8f);
     private static readonly Vector3 OFFSET_RIGHTCOL = new Vector2(406.3f, 0f);
     
-    private static readonly Vector3 SETPREVIEW_OFFSET = new Vector2(60f, 0f);
-    
     internal LLButton btLocal1v1;
     internal LLButton btLocalDoubles;
     internal LLButton btLocalCrew;
