@@ -81,10 +81,10 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         lbScoreDash.SetText("-");
         UIUtils.CreateText(ref lbScoreRed, "lbScoreRed", transform, SCORE_POSITION - SCORE_OFFSET);
         lbScoreRed.fontSize = SCORE_FONT_SIZE;
-        lbScoreRed.color = UIUtils.COLOR_PLAYER[0];
+        lbScoreRed.color = UIUtils.COLOR_TEAM[0];
         UIUtils.CreateText(ref lbScoreBlue, "lbScoreBlue", transform, SCORE_POSITION + SCORE_OFFSET);
         lbScoreBlue.fontSize = SCORE_FONT_SIZE;
-        lbScoreBlue.color = UIUtils.COLOR_PLAYER[1];
+        lbScoreBlue.color = UIUtils.COLOR_TEAM[1];
 
         UIUtils.CreateVoteButton(ref btResetSetCount, "btResetSetCount", transform, RESET_POSITION, RESET_SCALE);
         VoteButton.ActiveVoteButtons.Add(btResetSetCount);

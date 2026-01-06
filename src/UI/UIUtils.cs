@@ -14,7 +14,7 @@ internal static class UIUtils
     private static Sprite buttonBG;
     internal static Sprite spriteStageSelected;
     
-    internal static readonly Color[] COLOR_PLAYER =
+    internal static readonly Color[] COLOR_TEAM =
     [
         new Color(255/255f, 64/255f, 22/255f),
         new Color(13/255f, 136/255f, 255/255f),
@@ -222,7 +222,7 @@ internal static class UIUtils
         cursorImagesInactive[player.nr] = cursorInactive;
     }
 
-    internal static void UpdateCursorColors(int controllingPlayer)
+    internal static void UpdateCursorColors(Team controllingTeam)
     {
         if (!StageStrikeTracker.Instance.IsTrackingStrikeInfo || SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced)
         {
@@ -230,14 +230,14 @@ internal static class UIUtils
             return;
         }
         
-        Player.ForAll(player =>
+        Player.ForAll((Player player) =>
         {
-            player.cursor.image.color = player.nr == controllingPlayer ? COLOR_CURSOR_ACTIVE : COLOR_CURSOR_INACTIVE;
+            player.cursor.image.color = player.Team == controllingTeam ? COLOR_CURSOR_ACTIVE : COLOR_CURSOR_INACTIVE;
             
             if (player.cursor.state != CursorState.POINTER_HW) return;
             Texture2D activeCursor = cursorImagesActive[player.nr];
             Texture2D inactiveCursor = cursorImagesInactive[player.nr];
-            Cursor.SetCursor(player.nr == controllingPlayer ? activeCursor : inactiveCursor, new Vector2(0f, 0f), CursorMode.ForceSoftware);
+            Cursor.SetCursor(player.Team == controllingTeam ? activeCursor : inactiveCursor, new Vector2(0f, 0f), CursorMode.ForceSoftware);
         });
     }
 

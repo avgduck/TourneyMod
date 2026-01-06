@@ -66,6 +66,6 @@ internal static class CursorPatch
                 return;
             }
             
-            UIUtils.UpdateCursorColors(StageStrikeTracker.Instance.CurrentStrikeInfo.ControllingPlayer);
+            UIUtils.UpdateCursorColors(StageStrikeTracker.Instance.CurrentStrikeInfo.ControllingTeam);
         }
     }

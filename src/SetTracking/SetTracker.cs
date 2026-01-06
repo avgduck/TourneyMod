@@ -20,6 +20,17 @@ internal class SetTracker
     internal bool IsTrackingSet => CurrentSet != null;
     
     internal TourneyMode ActiveTourneyMode = TourneyMode.NONE;
+
+    internal bool IsMode1v1 => ActiveTourneyMode switch
+    {
+        TourneyMode.LOCAL_1V1 or TourneyMode.LOCAL_CREW => true,
+        _ => false
+    };
+    internal bool IsModeDoubles => ActiveTourneyMode switch
+    {
+        TourneyMode.LOCAL_DOUBLES => true,
+        _ => false
+    };
     
     internal int NumPlayersInMatch
     {
@@ -56,5 +67,23 @@ internal class SetTracker
     {
         if (IsTrackingSet) End();
         Start();
+    }
+
+    internal Team GetPlayerTeam(int playerNumber)
+    {
+        if (IsMode1v1) return playerNumber switch
+        {
+            0 => Team.RED,
+            1 => Team.BLUE,
+            _ => Team.NONE
+        };
+        if (IsModeDoubles) return playerNumber switch
+        {
+            0 or 1 => Team.RED,
+            2 or 3 => Team.BLUE,
+            _ => Team.NONE
+        };
+
+        return Team.NONE;
     }
 }

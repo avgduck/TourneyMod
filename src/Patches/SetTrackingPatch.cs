@@ -38,7 +38,6 @@ internal static class SetTrackingPatch
 
         if (!SetTracker.Instance.IsTrackingSet) return;
         
-        
         if (newState == GameState.GAME_INTRO)
         {
             Stage stage = HPNLMFHPHFD.ELPLKHOLJID.OOEPDFABFIP; // GameStatesLobby.curSettings.stage
@@ -53,13 +52,14 @@ internal static class SetTrackingPatch
         }
         else if (newState == GameState.GAME_RESULT)
         {
-            int[] scores = [-1, -1, -1, -1];
-            Player.ForAllInMatch(player =>
+            PlayerScore[] scores = [new(), new(), new(), new()];
+            Player.ForAllInMatch((Player player) =>
             {
                 if (GameSettings.current.UsePoints) return;
                     
                 PlayerData data = player.playerEntity.playerData;
-                scores[player.nr] = data.stocks;
+                scores[player.nr].Stocks = data.stocks;
+                scores[player.nr].Team = data.team;
             });
             SetTracker.Instance.CurrentSet.EndMatch(scores);
         }

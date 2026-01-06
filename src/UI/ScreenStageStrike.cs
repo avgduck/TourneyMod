@@ -126,12 +126,8 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         
         UIUtils.CreateText(ref lbSetCount, "lbSetCount", transform, SETCOUNT_POSITION);
         lbSetCount.fontSize = SETCOUNT_FONT_SIZE;
+        lbSetCount.richText = true;
         TextHandler.SetText(lbSetCount, "");
-        if (SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE)
-        {
-            //Plugin.LogGlobal.LogInfo("Tourney mode not active! Hiding stage select set count");
-            lbSetCount.gameObject.SetActive(false);
-        }
         
         UIUtils.CreateText(ref lbBansRemaining, "lbBansRemaining", transform, BANSREMAINING_POSITION);
         lbBansRemaining.fontSize = BANSREMAINING_FONT_SIZE;
@@ -385,7 +381,7 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
             winCounts = SetTracker.Instance.CurrentSet.WinCounts;
         }
         
-        TextHandler.SetText(lbSetCount, $"Game {gameNumber} ({winCounts[0]}-{winCounts[1]})");
+        TextHandler.SetText(lbSetCount, SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE ? "" : $"Game {SetTracker.Instance.CurrentSet.GameNumber} (<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[0])}>{SetTracker.Instance.CurrentSet.WinCounts[0]}</color>-<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[1])}>{SetTracker.Instance.CurrentSet.WinCounts[1]}</color>)");
 
         if (SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced)
         {
@@ -396,13 +392,13 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         }
         else
         {
-            TextHandler.SetText(lbBansRemaining, $"Bans remaining: P1 {StageStrikeTracker.Instance.CurrentStrikeInfo.TotalBansRemaining[0]}, P2 {StageStrikeTracker.Instance.CurrentStrikeInfo.TotalBansRemaining[1]}");
+            TextHandler.SetText(lbBansRemaining, $"Bans remaining: RED {StageStrikeTracker.Instance.CurrentStrikeInfo.TotalBansRemaining[0]}, BLUE {StageStrikeTracker.Instance.CurrentStrikeInfo.TotalBansRemaining[1]}");
 
-            int controllingPlayer = StageStrikeTracker.Instance.CurrentStrikeInfo.ControllingPlayer;
-            lbBanStatus.color = UIUtils.COLOR_PLAYER[controllingPlayer];
+            Team controllingTeam = StageStrikeTracker.Instance.CurrentStrikeInfo.ControllingTeam;
+            lbBanStatus.color = UIUtils.COLOR_TEAM[(int)controllingTeam];
             TextHandler.SetText(lbBanStatus, StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentInteractMode == StrikeInfo.InteractMode.BAN
-                ? $"P{controllingPlayer+1} banning {StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentBansRemaining}..."
-                : $"P{controllingPlayer+1} picking...");
+                ? $"{controllingTeam} banning {StageStrikeTracker.Instance.CurrentStrikeInfo.CurrentBansRemaining}..."
+                : $"{controllingTeam} picking...");
         }
     }
 

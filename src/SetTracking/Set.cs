@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using LLBML.Players;
 using LLHandlers;
 using TourneyMod.Rulesets;
 
@@ -20,11 +21,16 @@ internal class Set
         get
         {
             int[] winCounts = [0, 0, 0, 0];
-            CompletedMatches.ForEach(match => winCounts[match.Winner]++);
+            CompletedMatches.ForEach(match =>
+            {
+                Team winner = match.Winner;
+                if (winner == Team.NONE) return;
+                winCounts[(int)match.Winner]++;
+            });
             return winCounts;
         }
     }
-    internal int LastWinner => IsGame1 ? -1 : CompletedMatches.Last().Winner;
+    internal Team LastWinner => IsGame1 ? Team.NONE : CompletedMatches.Last().Winner;
 
     internal Set(Ruleset ruleset)
     {
@@ -38,13 +44,13 @@ internal class Set
         CurrentMatch.Start(stage, selectedCharacters, playedCharacters);
     }
 
-    internal void EndMatch(int[] scores)
+    internal void EndMatch(PlayerScore[] scores)
     {
         CurrentMatch.End(scores);
-        int winner = CurrentMatch.Winner;
+        Team winner = CurrentMatch.Winner;
         
-        SetTracker.Log.LogInfo($"Ending match with stocks {Plugin.PrintArray(scores, true)}. winner: {(winner != -1 ? $"P{winner+1}" : "none")}");
-        if (winner == -1) return;
+        SetTracker.Log.LogInfo($"Ending match with scores {Plugin.PrintArray(scores, true)}. winning team: {winner}");
+        if (winner == Team.NONE) return;
         
         CompletedMatches.Add(CurrentMatch);
         CurrentMatch = null;

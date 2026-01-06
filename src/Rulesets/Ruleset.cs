@@ -1,6 +1,7 @@
 using System.Collections.Generic;
-using System.Linq;
+using LLBML.Players;
 using LLHandlers;
+using TourneyMod.SetTracking;
 
 namespace TourneyMod.Rulesets;
 
@@ -9,8 +10,8 @@ public class Ruleset(
     List<Stage> stagesNeutral,
     List<Stage> stagesCounterpick,
     int[][] banAmounts,
-    int game1FirstPlayer,
-    Ruleset.FirstPlayer laterGamesFirstPlayer,
+    PlayerTeam game1FirstTeam,
+    Ruleset.FirstTeam laterGamesFirstTeam,
     Ruleset.DsrMode dsrMode,
     Ruleset.RandomMode randomMode)
 {
@@ -20,12 +21,12 @@ public class Ruleset(
     public readonly List<Stage> stagesCounterpick = stagesCounterpick;
 
     public readonly int[][] banAmounts = banAmounts;
-    public readonly int game1FirstPlayer = game1FirstPlayer;
-    public readonly FirstPlayer laterGamesFirstPlayer = laterGamesFirstPlayer;
+    public readonly PlayerTeam game1FirstTeam = game1FirstTeam;
+    public readonly FirstTeam laterGamesFirstTeam = laterGamesFirstTeam;
     public readonly DsrMode dsrMode = dsrMode;
     public readonly RandomMode randomMode = randomMode;
 
-    public enum FirstPlayer
+    public enum FirstTeam
     {
         WINNER,
         LOSER
@@ -54,6 +55,17 @@ public class Ruleset(
         else Id = id;
     }
 
+    internal static Team ConvertPlayerTeam(PlayerTeam team)
+    {
+        return team switch
+        {
+            PlayerTeam.RED => Team.RED,
+            PlayerTeam.BLUE => Team.BLUE,
+            PlayerTeam.YELLOW => Team.YELLOW,
+            PlayerTeam.GREEN => Team.GREEN,
+            _ => Team.NONE
+        };
+    }
     public static readonly List<Stage> STAGES_3D = [Stage.OUTSKIRTS, Stage.SEWERS, Stage.JUNKTOWN, Stage.CONSTRUCTION, Stage.FACTORY, Stage.SUBWAY, Stage.STADIUM, Stage.STREETS, Stage.POOL, Stage.ROOM21];
     public static readonly List<Stage> STAGES_2D = [Stage.OUTSKIRTS_2D, Stage.SEWERS_2D, Stage.ROOM21_2D, Stage.STREETS_2D, Stage.SUBWAY_2D, Stage.FACTORY_2D];
 }

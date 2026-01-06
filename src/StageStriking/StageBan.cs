@@ -1,3 +1,4 @@
+using LLBML.Players;
 using LLHandlers;
 
 namespace TourneyMod.StageStriking;
@@ -6,13 +7,13 @@ internal class StageBan
 {
     internal Stage stage;
     internal BanReason reason;
-    internal int banPlayer;
+    internal Team banTeam;
 
-    internal StageBan(Stage stage, BanReason reason, int banPlayer = -1)
+    internal StageBan(Stage stage, BanReason reason, Team banTeam)
     {
         this.stage = stage;
         this.reason = reason;
-        this.banPlayer = banPlayer;
+        this.banTeam = banTeam;
     }
 
     internal enum BanReason

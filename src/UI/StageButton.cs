@@ -1,6 +1,8 @@
+using LLBML.Players;
 using LLGUI;
 using LLHandlers;
 using TMPro;
+using TourneyMod.SetTracking;
 using TourneyMod.StageStriking;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,14 +17,14 @@ internal class StageButton : LLButton
 
     private static readonly Color COLOR_LOCK = Color.white;
     
-    private static readonly Color[] COLOR_LOCK_PLAYER =
+    private static readonly Color[] COLOR_LOCK_TEAM =
     [
         new Color(255/255f, 64/255f, 22/255f),
         new Color(13/255f, 136/255f, 255/255f),
         new Color(255/255f, 255/255f, 61/255f),
         new Color(90/255f, 244/255f, 90/255f)
     ];
-    private static readonly Color[] COLOR_SOFTLOCK_PLAYER =
+    private static readonly Color[] COLOR_SOFTLOCK_TEAM =
     [
         new Color(255/255f, 64/255f, 22/255f, 0.3f),
         new Color(13/255f, 136/255f, 255/255f, 0.3f),
@@ -75,7 +77,16 @@ internal class StageButton : LLButton
     public void SetBan(StageBan ban)
     {
         stageBan = ban;
-        OnHoverOut(stageBan != null ? stageBan.banPlayer : -1);
+
+        if (stageBan.banTeam == Team.NONE) OnHoverOut(-1);
+        else
+        {
+            for (int playerNumber = 0; playerNumber < 4; playerNumber++)
+            {
+                if (SetTracker.Instance.GetPlayerTeam(playerNumber) == stageBan.banTeam) OnHoverOut(playerNumber);
+            }
+        }
+        
         UpdateDisplay();
     }
 
@@ -127,7 +138,7 @@ internal class StageButton : LLButton
         }
         else if (stageBan != null)
         {
-            if (stageBan.reason == StageBan.BanReason.DSR && stageBan.banPlayer != -1)
+            if (stageBan.reason == StageBan.BanReason.DSR && stageBan.banTeam != Team.NONE)
             {
                 stageImage.color = COLOR_UNFOCUSED;
             }
@@ -155,14 +166,14 @@ internal class StageButton : LLButton
                 TextHandler.SetText(lbBanReason, "Counterpick");
                 break;
             case StageBan.BanReason.BAN:
-                lockedImage.color = COLOR_LOCK_PLAYER[stageBan.banPlayer];
-                lbBanReason.color = COLOR_LOCK_PLAYER[stageBan.banPlayer];
-                TextHandler.SetText(lbBanReason, $"P{stageBan.banPlayer+1} Ban");
+                lockedImage.color = COLOR_LOCK_TEAM[(int)stageBan.banTeam];
+                lbBanReason.color = COLOR_LOCK_TEAM[(int)stageBan.banTeam];
+                TextHandler.SetText(lbBanReason, $"{stageBan.banTeam} Ban");
                 break;
             case StageBan.BanReason.DSR:
-                lockedImage.color = (stageBan.banPlayer == -1) ? COLOR_LOCK : COLOR_SOFTLOCK_PLAYER[stageBan.banPlayer];
-                lbBanReason.color = (stageBan.banPlayer == -1) ? COLOR_LOCK : COLOR_SOFTLOCK_PLAYER[stageBan.banPlayer];
-                TextHandler.SetText(lbBanReason, (stageBan.banPlayer == -1) ? "Both DSR" : $"P{stageBan.banPlayer+1} DSR");
+                lockedImage.color = (stageBan.banTeam == Team.NONE) ? COLOR_LOCK : COLOR_SOFTLOCK_TEAM[(int)stageBan.banTeam];
+                lbBanReason.color = (stageBan.banTeam == Team.NONE) ? COLOR_LOCK : COLOR_SOFTLOCK_TEAM[(int)stageBan.banTeam];
+                TextHandler.SetText(lbBanReason, (stageBan.banTeam == Team.NONE) ? "Both DSR" : $"{stageBan.banTeam} DSR");
                 break;
         }
     }

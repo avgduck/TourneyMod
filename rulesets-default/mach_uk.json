@@ -17,8 +17,8 @@
     [1, 2, 1],
     [2]
   ],
-  "game1FirstPlayer": 1,
-  "laterGamesFirstPlayer": "WINNER",
+  "game1FirstTeam": "BLUE",
+  "laterGamesFirstTeam": "WINNER",
   "dsrMode": "FULL_SET",
   "randomMode": "OFF"
 }

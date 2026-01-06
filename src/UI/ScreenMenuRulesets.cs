@@ -167,7 +167,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         }
         else
         {
-            s += $"<size={FONTSIZE_HEADER}pt>(Player {ruleset.game1FirstPlayer+1} starts for Game 1)</size>\n";
+            s += $"<size={FONTSIZE_HEADER}pt>({ruleset.game1FirstTeam} starts for Game 1)</size>\n";
             int gameIndex = 0;
             foreach (int[] banNums in ruleset.banAmounts)
             {
@@ -176,14 +176,14 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
                 {
                     if (banNums[i] == 0)
                     {
-                        s += $"{(ruleset.laterGamesFirstPlayer == Ruleset.FirstPlayer.WINNER ? "W" : "L")} picks";
+                        s += $"{(ruleset.laterGamesFirstTeam == Ruleset.FirstTeam.WINNER ? "W" : "L")} picks";
                         break;
                     }
 
                     if (i != 0) s += "-";
                     for (int j = 0; j < banNums[i]; j++)
                     {
-                        s += (i % 2 == 0) ? (ruleset.laterGamesFirstPlayer == Ruleset.FirstPlayer.WINNER ? "W" : "L") : (ruleset.laterGamesFirstPlayer == Ruleset.FirstPlayer.WINNER ? "L" : "W");
+                        s += (i % 2 == 0) ? (ruleset.laterGamesFirstTeam == Ruleset.FirstTeam.WINNER ? "W" : "L") : (ruleset.laterGamesFirstTeam == Ruleset.FirstTeam.WINNER ? "L" : "W");
                     }
                 }
 
