@@ -1,4 +1,4 @@
-namespace TourneyMod.UI;
+namespace TourneyMod.UI.Menu;
 
 internal interface IMenuTitle
 {

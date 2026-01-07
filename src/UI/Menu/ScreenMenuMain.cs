@@ -6,7 +6,7 @@ using LLScreen;
 using TourneyMod.SetTracking;
 using UnityEngine;
 
-namespace TourneyMod.UI;
+namespace TourneyMod.UI.Menu;
 
 internal class ScreenMenuMain : LLScreen.ScreenMenuMain, ICustomScreen<LLScreen.ScreenMenuMain>
 {

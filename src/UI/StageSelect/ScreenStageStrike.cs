@@ -10,7 +10,7 @@ using TourneyMod.SetTracking;
 using TourneyMod.StageStriking;
 using UnityEngine;
 
-namespace TourneyMod.UI;
+namespace TourneyMod.UI.StageSelect;
 
 internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlayersStage>, IStageSelect
 {

@@ -1,10 +1,9 @@
 using LLBML.Utils;
-using LLGUI;
 using LLHandlers;
 using TMPro;
 using UnityEngine;
 
-namespace TourneyMod.UI;
+namespace TourneyMod.UI.StageSelect;
 
 internal class StageContainer
 {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TourneyMod.UI;
+namespace TourneyMod.UI.StageSelect;
 
 internal struct StageLayout
 {

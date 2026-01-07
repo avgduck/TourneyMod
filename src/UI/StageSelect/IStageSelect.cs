@@ -1,6 +1,6 @@
 using LLHandlers;
 
-namespace TourneyMod.UI;
+namespace TourneyMod.UI.StageSelect;
 
 internal interface IStageSelect
 {

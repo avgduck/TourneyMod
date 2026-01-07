@@ -2,7 +2,7 @@ using TMPro;
 using TourneyMod.SetTracking;
 using UnityEngine;
 
-namespace TourneyMod.UI;
+namespace TourneyMod.UI.Menu;
 
 internal class SetPreviewWindow
 {

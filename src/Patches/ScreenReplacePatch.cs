@@ -7,6 +7,8 @@ using LLBML.States;
 using LLScreen;
 using TourneyMod.SetTracking;
 using TourneyMod.UI;
+using TourneyMod.UI.Menu;
+using TourneyMod.UI.StageSelect;
 using UnityEngine;
 using ScreenMenuMain = LLScreen.ScreenMenuMain;
 
@@ -22,7 +24,7 @@ internal static class ScreenReplacePatch
         ScreenType screenType = FLMBCGMOCKC;
         if (screenType == ScreenType.MENU_MAIN)
         {
-            ReplaceScreen<LLScreen.ScreenMenuMain, UI.ScreenMenuMain>(ref __result);
+            ReplaceScreen<LLScreen.ScreenMenuMain, UI.Menu.ScreenMenuMain>(ref __result);
         }
         else if (screenType == ScreenType.MENU_VERSUS && Plugin.Instance.TourneyMenuOpen)
         {
@@ -102,7 +104,7 @@ internal static class ScreenReplacePatch
     [HarmonyPrefix]
     private static bool ScreenMenuMain_Awake_Prefix(LLScreen.ScreenMenuMain __instance)
     {
-        UI.ScreenMenuMain menu = __instance as UI.ScreenMenuMain;
+        UI.Menu.ScreenMenuMain menu = __instance as UI.Menu.ScreenMenuMain;
         if (menu == null) return true;
         return false;
     }
@@ -126,7 +128,7 @@ internal static class ScreenReplacePatch
             Transpilers.EmitDelegate<Action<LLScreen.ScreenMenuMain>>(screenMenuMain =>
             {
                 if (!Plugin.Instance.TourneyMenuOpen) return;
-                UI.ScreenMenuMain menu = screenMenuMain as UI.ScreenMenuMain;
+                UI.Menu.ScreenMenuMain menu = screenMenuMain as UI.Menu.ScreenMenuMain;
                 if (menu == null) return;
                 UIScreen.SetFocus(menu.btTourney);
                 Plugin.Instance.TourneyMenuOpen = false;

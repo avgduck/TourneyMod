@@ -8,7 +8,7 @@ using TMPro;
 using TourneyMod.Rulesets;
 using UnityEngine;
 
-namespace TourneyMod.UI;
+namespace TourneyMod.UI.Menu;
 
 internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnlocksStages>, IMenuTitle
 {

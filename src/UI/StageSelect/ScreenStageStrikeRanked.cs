@@ -12,7 +12,7 @@ using TourneyMod.StageStriking;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TourneyMod.UI;
+namespace TourneyMod.UI.StageSelect;
 
 internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<ScreenPlayersStageComp>, IStageSelect
 {
