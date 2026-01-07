@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using LLBML.Players;
 using LLGUI;
 using TMPro;
@@ -14,6 +16,7 @@ internal static class UIUtils
     private static Sprite panelBG;
     private static Sprite buttonBG;
     internal static Sprite spriteStageSelected;
+    internal static Sprite spriteCustomRandom;
     
     internal static readonly Color[] COLOR_TEAM =
     [
@@ -28,6 +31,10 @@ internal static class UIUtils
         panelBG = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
         buttonBG = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
         spriteStageSelected = Sprite.Create(CreateBorderTexture(Color.yellow, 8, 500, 250), new Rect(0, 0, 500, 250), new Vector2(0.5f, 0.5f));
+
+        Dictionary<string, FileInfo> assetFiles = Plugin.Instance.AssetsDirectory.GetFiles().ToDictionary(file => file.Name);
+        Texture2D texRandom = LoadImageFile(assetFiles["random.png"]);
+        spriteCustomRandom = Sprite.Create(texRandom, new Rect(0, 0, texRandom.width, texRandom.height), new Vector2(0.5f, 0.5f));
     }
 
     internal static Texture2D CreateBorderTexture(Color color, int thickness, int width, int height)

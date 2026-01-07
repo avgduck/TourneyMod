@@ -16,12 +16,12 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
 
     private const int FONTSIZE_RULESET = 32;
     private static readonly Vector2 SPACING_RULESET = new Vector2(0f, -FONTSIZE_RULESET);
-    private const int FONTSIZE_HEADER = 24;
+    private const int FONTSIZE_HEADER = 22;
     private static readonly Vector2 SPACING_HEADER = new Vector2(0f, -FONTSIZE_HEADER);
-    private const int FONTSIZE_MAIN = 16;
+    private const int FONTSIZE_MAIN = 14;
     private static readonly Vector2 SPACING_MAIN = new Vector2(0f, -FONTSIZE_MAIN);
 
-    private static readonly Vector2 TOP = new Vector2(322f - 50f, 210f);
+    private static readonly Vector2 TOP = new Vector2(322f - 50f, 220f);
     private static readonly Vector2 LEFTCOL = new Vector2(TOP.x - 160f, TOP.y);
     private static readonly Vector2 RIGHTCOL = new Vector2(TOP.x + 160f, TOP.y);
 
@@ -33,7 +33,8 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
     private TextMeshProUGUI lbBanOrder;
 
     private TextMeshProUGUI lbDsrMode;
-    private TextMeshProUGUI lbRandomMode;
+    private TextMeshProUGUI lbRandomStageMode;
+    private TextMeshProUGUI lbRandomCharacterMode;
 
     public string GetCustomTitle()
     {
@@ -129,19 +130,23 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         lbStagesCounterpick.alignment = TextAlignmentOptions.Top;
         lbStagesCounterpick.richText = true;
         
-        UIUtils.CreateText(ref lbBanOrder, "lbBanOrder", transform, TOP + SPACING_RULESET + SPACING_HEADER * 4);
+        UIUtils.CreateText(ref lbBanOrder, "lbBanOrder", transform, TOP + SPACING_RULESET + SPACING_HEADER * 3.5f);
         lbBanOrder.fontSize = FONTSIZE_HEADER;
         lbBanOrder.alignment = TextAlignmentOptions.Top;
         lbBanOrder.richText = true;
         
-        UIUtils.CreateText(ref lbDsrMode, "lbDsrMode", transform, TOP + SPACING_RULESET + SPACING_HEADER * 6);
+        UIUtils.CreateText(ref lbDsrMode, "lbDsrMode", transform, TOP + SPACING_RULESET + SPACING_HEADER * 5f);
         lbDsrMode.fontSize = FONTSIZE_HEADER;
         lbDsrMode.alignment = TextAlignmentOptions.Top;
         lbDsrMode.richText = true;
-        UIUtils.CreateText(ref lbRandomMode, "lbRandomMode", transform, TOP + SPACING_RULESET + SPACING_HEADER * 8);
-        lbRandomMode.fontSize = FONTSIZE_HEADER;
-        lbRandomMode.alignment = TextAlignmentOptions.Top;
-        lbRandomMode.richText = true;
+        UIUtils.CreateText(ref lbRandomStageMode, "lbRandomStageMode", transform, TOP + SPACING_RULESET + SPACING_HEADER * 6.5f);
+        lbRandomStageMode.fontSize = FONTSIZE_HEADER;
+        lbRandomStageMode.alignment = TextAlignmentOptions.Top;
+        lbRandomStageMode.richText = true;
+        UIUtils.CreateText(ref lbRandomCharacterMode, "lbRandomCharacterMode", transform, TOP + SPACING_RULESET + SPACING_HEADER * 8f);
+        lbRandomCharacterMode.fontSize = FONTSIZE_HEADER;
+        lbRandomCharacterMode.alignment = TextAlignmentOptions.Top;
+        lbRandomCharacterMode.richText = true;
         
         btFirstButton.OnHover(-1);
         ((LLSelectionButton)btFirstButton).SetSelected(-1);
@@ -237,11 +242,11 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         lbStagesCounterpick.SetText($"Counterpick stages:\n<color=\"yellow\"><size={FONTSIZE_MAIN}pt>{sCounterpick}</size></color>");
         int linesStages = Mathf.Max(linesNeutral, linesCounterpick);
 
-        lbBanOrder.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 4 + SPACING_MAIN * linesStages;
+        lbBanOrder.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 3.5f + SPACING_MAIN * linesStages;
         lbBanOrder.SetText($"Ban order: <color=\"yellow\"><size={FONTSIZE_MAIN}pt>{GetBanOrder(ruleset)}</size></color>");
         int linesBans = ruleset.banAmounts.Length;
 
-        lbDsrMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 6 + SPACING_MAIN * linesStages + SPACING_MAIN * linesBans;
+        lbDsrMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 5f + SPACING_MAIN * linesStages + SPACING_MAIN * linesBans;
         lbDsrMode.SetText($"DSR: <color=\"yellow\">{ruleset.dsrMode switch {
             Ruleset.DsrMode.FULL_SET => $"ON\n<size={FONTSIZE_MAIN}pt>(includes all wins)</size>",
             Ruleset.DsrMode.LAST_WIN => $"ON\n<size={FONTSIZE_MAIN}pt>(only last win)</size>",
@@ -249,14 +254,21 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         }}</color>");
         int linesDsr = ruleset.dsrMode == Ruleset.DsrMode.OFF ? 0 : 1;
 
-        lbRandomMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 8 + SPACING_MAIN * linesStages + SPACING_MAIN * linesBans + SPACING_MAIN * linesDsr;
-        lbRandomMode.SetText($"Random: <color=\"yellow\">{ruleset.randomMode switch {
-            Ruleset.RandomMode.ANY_3D => $"ON\n<size={FONTSIZE_MAIN}pt>(any 3D stage)</size>",
-            Ruleset.RandomMode.ANY_2D => $"ON\n<size={FONTSIZE_MAIN}pt>(any 2D stage)</size>",
-            Ruleset.RandomMode.BOTH => $"ON\n<size={FONTSIZE_MAIN}pt>(both any 3D/any 2D stage options)</size>",
-            Ruleset.RandomMode.ANY => $"ON\n<size={FONTSIZE_MAIN}pt>(any stage)</size>",
-            Ruleset.RandomMode.ANY_LEGAL => $"ON\n<size={FONTSIZE_MAIN}pt>(any legal stage)</size>",
+        lbRandomStageMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 6.5f + SPACING_MAIN * linesStages + SPACING_MAIN * linesBans + SPACING_MAIN * linesDsr;
+        lbRandomStageMode.SetText($"Random stage select: <color=\"yellow\">{ruleset.randomStageMode switch {
+            Ruleset.RandomStageMode.ANY_3D => $"ON\n<size={FONTSIZE_MAIN}pt>(any 3D stage)</size>",
+            Ruleset.RandomStageMode.ANY_2D => $"ON\n<size={FONTSIZE_MAIN}pt>(any 2D stage)</size>",
+            Ruleset.RandomStageMode.BOTH => $"ON\n<size={FONTSIZE_MAIN}pt>(both any 3D/any 2D stage options)</size>",
+            Ruleset.RandomStageMode.ANY => $"ON\n<size={FONTSIZE_MAIN}pt>(any stage)</size>",
+            Ruleset.RandomStageMode.ANY_LEGAL => $"ON\n<size={FONTSIZE_MAIN}pt>(any legal stage)</size>",
             _ => "OFF"
+        }}</color>");
+        int linesRandomStage = ruleset.randomStageMode == Ruleset.RandomStageMode.OFF ? 0 : 1;
+        
+        lbRandomCharacterMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 8f + SPACING_MAIN * linesStages + SPACING_MAIN * linesBans + SPACING_MAIN * linesDsr + SPACING_MAIN * linesRandomStage;
+        lbRandomCharacterMode.SetText($"Random character mode: <color=\"yellow\">{ruleset.randomCharacterMode switch {
+            Ruleset.RandomCharacterMode.COMPETITIVE => $"COMPETITIVE\n<size={FONTSIZE_MAIN}pt>(revealed on character select screen)</size>",
+            _ => "VANILLA"
         }}</color>");
     }
 }

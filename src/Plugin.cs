@@ -37,6 +37,9 @@ internal class Plugin : BaseUnityPlugin
     internal bool RulesetsMenuOpen = false;
     internal bool RecolorCursors = false;
 
+    internal DirectoryInfo AssetsDirectory { get; private set; }
+    internal DirectoryInfo CursorDirectory { get; private set; }
+
     private void Awake()
     {
         Instance = this;
@@ -47,15 +50,17 @@ internal class Plugin : BaseUnityPlugin
         
         SetTracker.Init();
         StageStrikeTracker.Init();
+        
+        string pathAssets = Path.Combine(Path.GetDirectoryName(Info.Location), "assets");
+        AssetsDirectory = new DirectoryInfo(pathAssets);
         UIUtils.Init();
+        
+        string pathCursors = Path.Combine(pathAssets, "cursors");
+        CursorDirectory = new DirectoryInfo(pathCursors);
+        Cursors.LoadCursorImages();
         
         HarmonyPatches.PatchAll();
         RulesetIO.Init();
-
-        string pathAssets = Path.Combine(Path.GetDirectoryName(Info.Location), "assets");
-        string pathCursors = Path.Combine(pathAssets, "cursors");
-        DirectoryInfo cursorDirectory = new DirectoryInfo(pathCursors);
-        Cursors.LoadCursorImages(cursorDirectory);
 
         VoteButton.ActiveVoteButtons = new List<VoteButton>();
 

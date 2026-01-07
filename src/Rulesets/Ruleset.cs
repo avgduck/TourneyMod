@@ -13,7 +13,8 @@ public class Ruleset(
     PlayerTeam game1FirstTeam,
     Ruleset.FirstTeam laterGamesFirstTeam,
     Ruleset.DsrMode dsrMode,
-    Ruleset.RandomMode randomMode)
+    Ruleset.RandomStageMode randomStageMode,
+    Ruleset.RandomCharacterMode randomCharacterMode)
 {
     public string Id { get; private set; }
     public readonly string name = name;
@@ -24,7 +25,8 @@ public class Ruleset(
     public readonly PlayerTeam game1FirstTeam = game1FirstTeam;
     public readonly FirstTeam laterGamesFirstTeam = laterGamesFirstTeam;
     public readonly DsrMode dsrMode = dsrMode;
-    public readonly RandomMode randomMode = randomMode;
+    public readonly RandomStageMode randomStageMode = randomStageMode;
+    public readonly RandomCharacterMode randomCharacterMode = randomCharacterMode;
 
     public enum FirstTeam
     {
@@ -39,7 +41,7 @@ public class Ruleset(
         LAST_WIN
     }
 
-    public enum RandomMode
+    public enum RandomStageMode
     {
         OFF,
         ANY_3D,
@@ -47,6 +49,12 @@ public class Ruleset(
         BOTH,
         ANY,
         ANY_LEGAL
+    }
+
+    public enum RandomCharacterMode
+    {
+        VANILLA,
+        COMPETITIVE
     }
 
     internal void InitId(string id)

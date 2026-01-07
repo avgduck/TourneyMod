@@ -68,6 +68,11 @@
         <Copy SourceFiles="@(_RuleFiles)" DestinationFolder="C:\Users\Owner\AppData\Roaming\r2modmanPlus-local\LethalLeagueBlaze\profiles\Dev\BepInEx\plugins\TourneyMod\rulesets-default" />
         
         <ItemGroup>
+            <_AssetFiles Include="assets\*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(_AssetFiles)" DestinationFolder="C:\Users\Owner\AppData\Roaming\r2modmanPlus-local\LethalLeagueBlaze\profiles\Dev\BepInEx\plugins\TourneyMod\assets" />
+        
+        <ItemGroup>
             <_CursorFiles Include="assets\cursors\*.png" />
         </ItemGroup>
         <Copy SourceFiles="@(_CursorFiles)" DestinationFolder="C:\Users\Owner\AppData\Roaming\r2modmanPlus-local\LethalLeagueBlaze\profiles\Dev\BepInEx\plugins\TourneyMod\assets\cursors" />
@@ -75,6 +80,7 @@
         <Copy SourceFiles="@(_BuildFiles)" DestinationFolder="release" />
         <Copy SourceFiles="@(_ReleaseFiles)" DestinationFolder="release" />
         <Copy SourceFiles="@(_RuleFiles)" DestinationFolder="release/BepInEx/plugins/rulesets-default" />
+        <Copy SourceFiles="@(_AssetFiles)" DestinationFolder="release/BepInEx/plugins/assets" />
         <Copy SourceFiles="@(_CursorFiles)" DestinationFolder="release/BepInEx/plugins/assets/cursors" />
     </Target>
 </Project>

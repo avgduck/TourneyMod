@@ -59,7 +59,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
     private VoteButton btRandomBoth2D;
 
     private Stage selectedStage = Stage.NONE;
-    private Ruleset.RandomMode selectedRandom = Ruleset.RandomMode.OFF;
+    private Ruleset.RandomStageMode _selectedRandomStage = Ruleset.RandomStageMode.OFF;
     
     public void Init(ScreenPlayersStageComp screenPlayersStageComp)
     {
@@ -152,37 +152,37 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         btFreePick.onVote = OnVoteFreePick;
         if (SetTracker.Instance.CurrentSet.IsFreePickForced) btFreePick.gameObject.SetActive(false);
 
-        Ruleset.RandomMode randomMode = SetTracker.Instance.CurrentSet.ActiveRuleset.randomMode;
+        Ruleset.RandomStageMode randomStageMode = SetTracker.Instance.CurrentSet.ActiveRuleset.randomStageMode;
         
         UIUtils.CreateVoteButton(ref btRandomMain, "btRandomMain", transform, RANDOM_POSITION, RANDOM_SCALE);
         VoteButton.ActiveVoteButtons.Add(btRandomMain);
-        btRandomMain.label = $"Random {randomMode switch {
-            Ruleset.RandomMode.ANY => "(any 3D/2D)",
-            Ruleset.RandomMode.ANY_3D => "(any 3D)",
-            Ruleset.RandomMode.ANY_2D => "(any 2D)",
-            Ruleset.RandomMode.ANY_LEGAL => "(any legal)",
+        btRandomMain.label = $"Random {randomStageMode switch {
+            Ruleset.RandomStageMode.ANY => "(any 3D/2D)",
+            Ruleset.RandomStageMode.ANY_3D => "(any 3D)",
+            Ruleset.RandomStageMode.ANY_2D => "(any 2D)",
+            Ruleset.RandomStageMode.ANY_LEGAL => "(any legal)",
             _ => ""
         }}";
         btRandomMain.textMesh.fontSize = RANDOM_FONT_SIZE;
-        btRandomMain.onVote = () => OnVoteRandom(randomMode);
+        btRandomMain.onVote = () => OnVoteRandom(randomStageMode);
         btRandomMain.enableVoting = !(SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced);
-        if (randomMode == Ruleset.RandomMode.OFF || randomMode == Ruleset.RandomMode.BOTH) btRandomMain.gameObject.SetActive(false);
+        if (randomStageMode == Ruleset.RandomStageMode.OFF || randomStageMode == Ruleset.RandomStageMode.BOTH) btRandomMain.gameObject.SetActive(false);
         
         UIUtils.CreateVoteButton(ref btRandomBoth3D, "btRandomBoth3D", transform, RANDOM_POSITION - RANDOM_BOTH_OFFSET, RANDOM_BOTH_SCALE);
         VoteButton.ActiveVoteButtons.Add(btRandomBoth3D);
         btRandomBoth3D.label = $"Random\n(3D)";
         btRandomBoth3D.textMesh.fontSize = RANDOM_BOTH_FONT_SIZE;
-        btRandomBoth3D.onVote = () => OnVoteRandom(Ruleset.RandomMode.ANY_3D);
+        btRandomBoth3D.onVote = () => OnVoteRandom(Ruleset.RandomStageMode.ANY_3D);
         btRandomBoth3D.enableVoting = !(SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced);
-        if (randomMode != Ruleset.RandomMode.BOTH) btRandomBoth3D.gameObject.SetActive(false);
+        if (randomStageMode != Ruleset.RandomStageMode.BOTH) btRandomBoth3D.gameObject.SetActive(false);
         
         UIUtils.CreateVoteButton(ref btRandomBoth2D, "btRandomBoth2D", transform, RANDOM_POSITION + RANDOM_BOTH_OFFSET, RANDOM_BOTH_SCALE);
         VoteButton.ActiveVoteButtons.Add(btRandomBoth2D);
         btRandomBoth2D.label = $"Random\n(2D)";
         btRandomBoth2D.textMesh.fontSize = RANDOM_BOTH_FONT_SIZE;
-        btRandomBoth2D.onVote = () => OnVoteRandom(Ruleset.RandomMode.ANY_2D);
+        btRandomBoth2D.onVote = () => OnVoteRandom(Ruleset.RandomStageMode.ANY_2D);
         btRandomBoth2D.enableVoting = !(SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced);
-        if (randomMode != Ruleset.RandomMode.BOTH) btRandomBoth2D.gameObject.SetActive(false);
+        if (randomStageMode != Ruleset.RandomStageMode.BOTH) btRandomBoth2D.gameObject.SetActive(false);
 
         CreateStageContainers();
         UpdateStageBans();
@@ -328,10 +328,10 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
 
     public override LLClickable GetDefaultFocus(LLCursor cursor)
     {
-        return SetTracker.Instance.CurrentSet.ActiveRuleset.randomMode switch
+        return SetTracker.Instance.CurrentSet.ActiveRuleset.randomStageMode switch
         {
-            Ruleset.RandomMode.OFF => null,
-            Ruleset.RandomMode.BOTH => btRandomBoth3D,
+            Ruleset.RandomStageMode.OFF => null,
+            Ruleset.RandomStageMode.BOTH => btRandomBoth3D,
             _ => btRandomMain
         };
     }
@@ -340,11 +340,11 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
     {
         list.AddRange(btStages);
         list.Add(btBack);
-        switch (SetTracker.Instance.CurrentSet.ActiveRuleset.randomMode)
+        switch (SetTracker.Instance.CurrentSet.ActiveRuleset.randomStageMode)
         {
-            case Ruleset.RandomMode.OFF:
+            case Ruleset.RandomStageMode.OFF:
                 break;
-            case Ruleset.RandomMode.BOTH:
+            case Ruleset.RandomStageMode.BOTH:
                 list.Add(btRandomBoth3D);
                 list.Add(btRandomBoth2D);
                 break;
@@ -503,7 +503,7 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         btRandomBoth2D.SetActive(false);
         btFreePick.SetActive(false);
 
-        if (selectedRandom == Ruleset.RandomMode.OFF || selectedRandom == Ruleset.RandomMode.BOTH)
+        if (_selectedRandomStage == Ruleset.RandomStageMode.OFF || _selectedRandomStage == Ruleset.RandomStageMode.BOTH)
         {
             StageContainer container = stageContainers.Find(container => container.StoredStage == selectedStage);
             Plugin.LogGlobal.LogInfo(container);
@@ -513,16 +513,16 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         }
         else
         {
-            Ruleset.RandomMode randomMode = SetTracker.Instance.CurrentSet.ActiveRuleset.randomMode;
-            if (randomMode == Ruleset.RandomMode.BOTH)
+            Ruleset.RandomStageMode randomStageMode = SetTracker.Instance.CurrentSet.ActiveRuleset.randomStageMode;
+            if (randomStageMode == Ruleset.RandomStageMode.BOTH)
             {
-                if (selectedRandom == Ruleset.RandomMode.ANY_3D)
+                if (_selectedRandomStage == Ruleset.RandomStageMode.ANY_3D)
                 {
                     btRandomBoth3D.imgBorder.color = Color.white;
                     btRandomBoth3D.colDisabled = btRandomBoth3D.colHover;
                     btRandomBoth3D.UpdateColor();
                 }
-                else if (selectedRandom == Ruleset.RandomMode.ANY_2D)
+                else if (_selectedRandomStage == Ruleset.RandomStageMode.ANY_2D)
                 {
                     btRandomBoth2D.imgBorder.color = Color.white;
                     btRandomBoth2D.colDisabled = btRandomBoth2D.colHover;
@@ -550,12 +550,12 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
         UpdateSetInfo();
     }
 
-    private void OnVoteRandom(Ruleset.RandomMode randomMode)
+    private void OnVoteRandom(Ruleset.RandomStageMode randomStageMode)
     {
-        if (randomMode == Ruleset.RandomMode.OFF || randomMode == Ruleset.RandomMode.BOTH) return;
+        if (randomStageMode == Ruleset.RandomStageMode.OFF || randomStageMode == Ruleset.RandomStageMode.BOTH) return;
         UIScreen.blockGlobalInput = false;
         AudioHandler.PlaySfx(Sfx.LOBBY_START_GAME);
-        selectedStage = StageStrikeTracker.Instance.CurrentStrikeInfo.PickRandomStage(randomMode);
-        selectedRandom = randomMode;
+        selectedStage = StageStrikeTracker.Instance.CurrentStrikeInfo.PickRandomStage(randomStageMode);
+        _selectedRandomStage = randomStageMode;
     }
 }

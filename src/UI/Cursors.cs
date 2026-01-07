@@ -15,9 +15,9 @@ internal static class Cursors
     private static readonly Color COLOR_CURSOR_INACTIVE = Color.white * 0.6f;
     private static readonly PlayerCursor[] playerCursors = [new(), new(), new(), new()];
 
-    internal static void LoadCursorImages(DirectoryInfo directory)
+    internal static void LoadCursorImages()
     {
-        foreach (FileInfo file in directory.GetFiles().OrderBy(f => f.Name))
+        foreach (FileInfo file in Plugin.Instance.CursorDirectory.GetFiles().OrderBy(f => f.Name))
         {
             if (!file.Name.Contains("cursor")) continue;
             string[] id = file.Name.Replace("cursor", "").Replace(".png", "").Split('_');

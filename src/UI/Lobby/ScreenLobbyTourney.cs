@@ -1,10 +1,9 @@
-using LLHandlers;
 using LLScreen;
 using TMPro;
 using TourneyMod.SetTracking;
 using UnityEngine;
 
-namespace TourneyMod.UI;
+namespace TourneyMod.UI.Lobby;
 
 internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
 {

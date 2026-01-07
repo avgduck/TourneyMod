@@ -90,37 +90,37 @@ internal class StrikeInfo
         return stage;
     }
 
-    internal Stage PickRandomStage(Ruleset.RandomMode randomMode)
+    internal Stage PickRandomStage(Ruleset.RandomStageMode randomStageMode)
     {
         List<Stage> randomStagePool = new List<Stage>();
-        switch (randomMode)
+        switch (randomStageMode)
         {
-            case Ruleset.RandomMode.ANY:
+            case Ruleset.RandomStageMode.ANY:
                 randomStagePool.AddRange(Ruleset.STAGES_3D);
                 randomStagePool.AddRange(Ruleset.STAGES_2D);
                 break;
                 
-            case Ruleset.RandomMode.ANY_3D:
+            case Ruleset.RandomStageMode.ANY_3D:
                 randomStagePool.AddRange(Ruleset.STAGES_3D);
                 break;
                 
-            case Ruleset.RandomMode.ANY_2D:
+            case Ruleset.RandomStageMode.ANY_2D:
                 randomStagePool.AddRange(Ruleset.STAGES_2D);
                 break;
                 
-            case Ruleset.RandomMode.ANY_LEGAL:
+            case Ruleset.RandomStageMode.ANY_LEGAL:
                 randomStagePool.AddRange(SetTracker.Instance.CurrentSet.ActiveRuleset.stagesNeutral);
                 randomStagePool.AddRange(SetTracker.Instance.CurrentSet.ActiveRuleset.stagesCounterpick);
                 break;
                 
-            case Ruleset.RandomMode.OFF or Ruleset.RandomMode.BOTH:
+            case Ruleset.RandomStageMode.OFF or Ruleset.RandomStageMode.BOTH:
                 break;
         }
         
         if (randomStagePool.Count == 0) return Stage.NONE;
         Stage stage = randomStagePool[Random.RandomRangeInt(0, randomStagePool.Count)];
         GameStates.Send(Msg.SEL_STAGE, -1, (int)stage);
-        StageStrikeTracker.Log.LogInfo($"Players voted random {randomMode}: picked {stage}");
+        StageStrikeTracker.Log.LogInfo($"Players voted random {randomStageMode}: picked {stage}");
         return stage;
     }
 
