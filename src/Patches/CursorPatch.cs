@@ -46,15 +46,6 @@ internal static class CursorPatch
             }
         }
 
-        [HarmonyPatch(typeof(LLCursor), nameof(LLCursor.ResizeHWCursor))]
-        [HarmonyPostfix]
-        private static void HWCursor_Postfix(LLCursor __instance)
-        {
-            if (__instance.state != CursorState.POINTER_HW) return;
-            if (__instance.player == null) return;
-            UIUtils.GenerateCursorImages(__instance);
-        }
-
         [HarmonyPatch(typeof(UIInput), nameof(UIInput.HandleCursors))]
         [HarmonyPostfix]
         private static void HandleCursors_Postfix()
@@ -62,10 +53,10 @@ internal static class CursorPatch
             if (UIInput.uiControl != UIControl.PLAYER_POINTERS) return;
             if (!Plugin.Instance.RecolorCursors)
             {
-                UIUtils.ResetCursorColors();
+                Cursors.ResetCursorColors();
                 return;
             }
             
-            UIUtils.UpdateCursorColors(StageStrikeTracker.Instance.CurrentStrikeInfo.ControllingTeam);
+            Cursors.UpdateCursorColors(StageStrikeTracker.Instance.CurrentStrikeInfo.ControllingTeam);
         }
     }

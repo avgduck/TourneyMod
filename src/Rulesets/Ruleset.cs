@@ -66,6 +66,16 @@ public class Ruleset(
             _ => Team.NONE
         };
     }
+
+    internal static PlayerTeam ConvertTeam(Team team)
+    {
+        if (team == Team.RED) return PlayerTeam.RED;
+        if (team == Team.BLUE) return PlayerTeam.BLUE;
+        if (team == Team.YELLOW) return PlayerTeam.YELLOW;
+        if (team == Team.GREEN) return PlayerTeam.GREEN;
+        return PlayerTeam.NONE;
+    }
+    
     public static readonly List<Stage> STAGES_3D = [Stage.OUTSKIRTS, Stage.SEWERS, Stage.JUNKTOWN, Stage.CONSTRUCTION, Stage.FACTORY, Stage.SUBWAY, Stage.STADIUM, Stage.STREETS, Stage.POOL, Stage.ROOM21];
     public static readonly List<Stage> STAGES_2D = [Stage.OUTSKIRTS_2D, Stage.SEWERS_2D, Stage.ROOM21_2D, Stage.STREETS_2D, Stage.SUBWAY_2D, Stage.FACTORY_2D];
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BepInEx;
 using BepInEx.Logging;
@@ -50,6 +51,11 @@ internal class Plugin : BaseUnityPlugin
         
         HarmonyPatches.PatchAll();
         RulesetIO.Init();
+
+        string pathAssets = Path.Combine(Path.GetDirectoryName(Info.Location), "assets");
+        string pathCursors = Path.Combine(pathAssets, "cursors");
+        DirectoryInfo cursorDirectory = new DirectoryInfo(pathCursors);
+        Cursors.LoadCursorImages(cursorDirectory);
 
         VoteButton.ActiveVoteButtons = new List<VoteButton>();
 

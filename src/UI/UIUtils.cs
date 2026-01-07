@@ -1,3 +1,4 @@
+using System.IO;
 using LLBML.Players;
 using LLGUI;
 using TMPro;
@@ -176,12 +177,30 @@ internal static class UIUtils
         if (img == null) return;
         img.gameObject.SetActive(visible);
     }
+
+    private static void CopyStream(Stream input, Stream output)
+    {
+        byte[] buffer = new byte[8 * 1024];
+        int len;
+        while ((len = input.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            output.Write(buffer, 0, len);
+        }
+    }
     
-    private static readonly Color COLOR_CURSOR_ACTIVE = Color.white;
-    private static readonly Color COLOR_CURSOR_INACTIVE = Color.white * 0.6f;
+    internal static Texture2D LoadImageFile(FileInfo file)
+    {
+        using FileStream fileStream = file.OpenRead();
+        using MemoryStream memoryStream = new MemoryStream();
+        
+        CopyStream(fileStream, memoryStream);
+        Texture2D tex = new Texture2D(1, 1);
+        tex.LoadImage(memoryStream.ToArray());
+        return tex;
+    }
     
     // texture editing code from ColorSwap
-    private static void SetTextureCopy(ref Texture2D destination, Texture2D source)
+    internal static void SetTextureCopy(ref Texture2D destination, Texture2D source)
     {
         RenderTexture temp = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
         
@@ -195,7 +214,7 @@ internal static class UIUtils
         RenderTexture.active = prev;
         RenderTexture.ReleaseTemporary(temp);
     }
-    private static void SetTextureColor(ref Texture2D texture, Color color)
+    internal static void SetTextureColor(ref Texture2D texture, Color color)
     {
         Color[] pixels = texture.GetPixels();
         for (int pixelIndex = 0; pixelIndex < pixels.Length; pixelIndex++)
@@ -207,49 +226,8 @@ internal static class UIUtils
         texture.Apply();
     }
 
-    private static readonly Texture2D[] cursorImagesActive = new Texture2D[4];
-    private static readonly Texture2D[] cursorImagesInactive = new Texture2D[4];
-    internal static void GenerateCursorImages(LLCursor cursor)
+    internal static Sprite ToSprite(Texture2D tex)
     {
-        Texture2D source = cursor.texCursor;
-        Texture2D cursorActive = new Texture2D(0, 0);
-        Texture2D cursorInactive = new Texture2D(0, 0);
-        SetTextureCopy(ref cursorActive, source);
-        SetTextureCopy(ref cursorInactive, source);
-        SetTextureColor(ref cursorInactive, COLOR_CURSOR_INACTIVE);
-        Player player = cursor.player;
-        cursorImagesActive[player.nr] = cursorActive;
-        cursorImagesInactive[player.nr] = cursorInactive;
-    }
-
-    internal static void UpdateCursorColors(Team controllingTeam)
-    {
-        if (!StageStrikeTracker.Instance.IsTrackingStrikeInfo || SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced)
-        {
-            ResetCursorColors();
-            return;
-        }
-        
-        Player.ForAll((Player player) =>
-        {
-            player.cursor.image.color = player.Team == controllingTeam ? COLOR_CURSOR_ACTIVE : COLOR_CURSOR_INACTIVE;
-            
-            if (player.cursor.state != CursorState.POINTER_HW) return;
-            Texture2D activeCursor = cursorImagesActive[player.nr];
-            Texture2D inactiveCursor = cursorImagesInactive[player.nr];
-            Cursor.SetCursor(player.Team == controllingTeam ? activeCursor : inactiveCursor, new Vector2(0f, 0f), CursorMode.ForceSoftware);
-        });
-    }
-
-    internal static void ResetCursorColors()
-    {
-        Player.ForAll(player =>
-        {
-            player.cursor.image.color = COLOR_CURSOR_ACTIVE;
-            
-            if (player.cursor.state != CursorState.POINTER_HW) return;
-            Texture2D activeCursor = cursorImagesActive[player.nr];
-            Cursor.SetCursor(activeCursor, new Vector2(0f, 0f), CursorMode.ForceSoftware);
-        });
+        return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
     }
 }
