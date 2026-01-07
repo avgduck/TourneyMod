@@ -3,6 +3,7 @@ using LLBML.States;
 using LLGUI;
 using LLHandlers;
 using LLScreen;
+using TourneyMod.SetTracking;
 using UnityEngine;
 
 namespace TourneyMod.UI;
@@ -45,6 +46,11 @@ internal class ScreenMenuMain : LLScreen.ScreenMenuMain, ICustomScreen<LLScreen.
             GameStates.Send(Msg.SEL_VERSUS, playerNr, -1);
         };
         btTourney.SetText("tournament");
+
+        bool active = SetTracker.Instance.ActiveTourneyMode is TourneyMode.NONE;
+        btOnline.SetActive(active);
+        btVersus.SetActive(active);
+        btSingle.SetActive(active);
     }
 
     public override void GetControls(ref List<LLClickable> list, bool vert, LLClickable curFocus, LLCursor cursor)
@@ -63,7 +69,8 @@ internal class ScreenMenuMain : LLScreen.ScreenMenuMain, ICustomScreen<LLScreen.
 
         if (curFocus == btTourney)
         {
-            UIScreen.SetFocus(btOnline.visible ? btOnline : btVersus);
+            if (SetTracker.Instance.ActiveTourneyMode is not TourneyMode.NONE) UIScreen.SetFocus(btUnlocks);
+            else UIScreen.SetFocus(btOnline.visible ? btOnline : btVersus);
             AudioHandler.PlayMenuSfx(Sfx.MENU_SCROLL);
             return true;
         }
