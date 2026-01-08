@@ -16,6 +16,7 @@ namespace TourneyMod;
 [BepInDependency(DEPENDENCY_LLBML, BepInDependency.DependencyFlags.HardDependency)]
 [BepInDependency(DEPENDENCY_MODMENU, BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency(DEPENDENCY_CURSORSPEED, BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency(DEPENDENCY_CHARACTERREROLL, BepInDependency.DependencyFlags.SoftDependency)]
 [BepInIncompatibility(INCOMPATIBILITY_STAGESELECT)]
 [BepInProcess("LLBlaze.exe")]
 public class Plugin : BaseUnityPlugin
@@ -24,6 +25,7 @@ public class Plugin : BaseUnityPlugin
     internal const string DEPENDENCY_LLBML = "fr.glomzubuk.plugins.llb.llbml";
     internal const string DEPENDENCY_MODMENU = "no.mrgentle.plugins.llb.modmenu";
     internal const string DEPENDENCY_CURSORSPEED = "com.github.daioutzu.cursorspeed";
+    internal const string DEPENDENCY_CHARACTERREROLL = "avgduck.plugins.llb.characterreroll";
     internal const string INCOMPATIBILITY_STAGESELECT = "com.github.daioutzu.stageselect";
     
     internal static Plugin Instance { get; private set; }

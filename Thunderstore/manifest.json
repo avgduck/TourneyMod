@@ -5,6 +5,7 @@
   "description": "Adds features to enhance the tournament experience",
   "dependencies": [
     "Glomzubuk-LLBModdingLib-0.10.4",
-    "Daioutzu-CursorSpeed-1.0.0"
+    "Daioutzu-CursorSpeed-1.0.0",
+    "avg_duck-CharacterReroll-1.0.0"
   ]
 }
