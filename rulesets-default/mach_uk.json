@@ -20,5 +20,14 @@
   "game1FirstTeam": "BLUE",
   "laterGamesFirstTeam": "WINNER",
   "dsrMode": "FULL_SET",
-  "randomStageMode": "OFF"
+  "randomStageMode": "OFF",
+  "gameOptions": {
+    "stocks": 5,
+    "time": 300,
+    "energy": 4,
+    "hpFactor": "HP_100",
+    "minBallSpeed": 8,
+    "ballType": "REGULAR",
+    "powerupSelection": "OFF"
+  }
 }

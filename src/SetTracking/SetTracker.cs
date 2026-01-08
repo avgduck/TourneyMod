@@ -86,4 +86,17 @@ internal class SetTracker
 
         return Team.NONE;
     }
+    
+    internal void ApplyGameOptions(GameSettings settings, GameOptions gameOptions)
+    {
+        settings.stocks = gameOptions.stocks;
+        settings.time = gameOptions.time;
+        settings.energy = gameOptions.energy;
+        settings.useHP = gameOptions.hpFactor;
+        settings.MinSpeed = gameOptions.minBallSpeed;
+        settings.mMinSpeed = gameOptions.minBallSpeed;
+        settings.ballType = gameOptions.ballType;
+        settings.PowerupSelection = gameOptions.powerupSelection;
+        settings.havePowerups = gameOptions.powerupSelection;
+    }
 }

@@ -13,7 +13,8 @@ public class Ruleset(
     PlayerTeam game1FirstTeam,
     Ruleset.FirstTeam laterGamesFirstTeam,
     Ruleset.DsrMode dsrMode,
-    Ruleset.RandomStageMode randomStageMode)
+    Ruleset.RandomStageMode randomStageMode,
+    GameOptions gameOptions)
 {
     public string Id { get; private set; }
     public readonly string name = name;
@@ -25,6 +26,9 @@ public class Ruleset(
     public readonly FirstTeam laterGamesFirstTeam = laterGamesFirstTeam;
     public readonly DsrMode dsrMode = dsrMode;
     public readonly RandomStageMode randomStageMode = randomStageMode;
+    
+    public readonly GameOptions GameOptions;
+    public bool HasGameOptions => GameOptions is not null;
 
     public enum FirstTeam
     {

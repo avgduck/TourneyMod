@@ -16,16 +16,15 @@ internal static class SetTrackingPatch
     private static void GameStates_Set_Prefix(JOFJHDJHJGI CFDCLPJMFDP)
     {
         GameState newState = CFDCLPJMFDP;
-
-        if (!SetTracker.Instance.IsTrackingSet)
+        
+        if (newState == GameState.LOBBY_LOCAL || newState == GameState.LOBBY_ONLINE || newState == GameState.LOBBY_TRAINING)
         {
-            if (newState == GameState.LOBBY_LOCAL || newState == GameState.LOBBY_ONLINE || newState == GameState.LOBBY_TRAINING) SetTracker.Instance.Start();
-            return;
+            if (!SetTracker.Instance.IsTrackingSet) SetTracker.Instance.Start();
         }
 
         if (newState == GameState.MENU)
         {
-            if (SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE) SetTracker.Instance.End();
+            if (SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE && SetTracker.Instance.IsTrackingSet) SetTracker.Instance.End();
         }
     }
     
@@ -63,5 +62,17 @@ internal static class SetTrackingPatch
             });
             SetTracker.Instance.CurrentSet.EndMatch(scores);
         }
+    }
+
+    // void GameSettings::ResetGameModeSettings()
+    [HarmonyPatch(typeof(JOMBNFKIHIC), nameof(JOMBNFKIHIC.ADDBHIFLMEI))]
+    [HarmonyPostfix]
+    private static void GameSettings_ResetGameModeSettings_Postfix(JOMBNFKIHIC __instance)
+    {
+        GameSettings settings = __instance;
+
+        if (!SetTracker.Instance.IsTrackingSet) return;
+        if (!SetTracker.Instance.CurrentSet.ActiveRuleset.HasGameOptions) return;
+        SetTracker.Instance.ApplyGameOptions(settings, SetTracker.Instance.CurrentSet.ActiveRuleset.GameOptions);
     }
 }

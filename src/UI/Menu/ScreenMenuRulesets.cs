@@ -6,6 +6,7 @@ using LLHandlers;
 using LLScreen;
 using TMPro;
 using TourneyMod.Rulesets;
+using TourneyMod.SetTracking;
 using UnityEngine;
 
 namespace TourneyMod.UI.Menu;
@@ -34,6 +35,15 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
 
     private TextMeshProUGUI lbDsrMode;
     private TextMeshProUGUI lbRandomStageMode;
+
+    private TextMeshProUGUI lbGameOptionsHeader;
+    private TextMeshProUGUI lbGameOptionsStocks;
+    private TextMeshProUGUI lbGameOptionsTime;
+    private TextMeshProUGUI lbGameOptionsEnergy;
+    private TextMeshProUGUI lbGameOptionsHpFactor;
+    private TextMeshProUGUI lbGameOptionsMinBallSpeed;
+    private TextMeshProUGUI lbGameOptionsBallType;
+    private TextMeshProUGUI lbGameOptionsPowerupSelection;
 
     public string GetCustomTitle()
     {
@@ -142,6 +152,11 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         lbRandomStageMode.fontSize = FONTSIZE_HEADER;
         lbRandomStageMode.alignment = TextAlignmentOptions.Top;
         lbRandomStageMode.richText = true;
+        
+        UIUtils.CreateText(ref lbGameOptionsHeader, "lbGameOptionsHeader", transform, TOP + SPACING_RULESET + SPACING_HEADER * 8f);
+        lbGameOptionsHeader.fontSize = FONTSIZE_HEADER;
+        lbGameOptionsHeader.alignment = TextAlignmentOptions.Top;
+        lbGameOptionsHeader.richText = true;
         
         btFirstButton.OnHover(-1);
         ((LLSelectionButton)btFirstButton).SetSelected(-1);
@@ -259,5 +274,38 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
             _ => "OFF"
         }}</color>");
         int linesRandomStage = ruleset.randomStageMode == Ruleset.RandomStageMode.OFF ? 0 : 1;
+
+        lbGameOptionsHeader.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 8f + SPACING_MAIN * linesStages + SPACING_MAIN * linesBans + SPACING_MAIN * linesDsr + SPACING_MAIN * linesRandomStage;
+
+        if (ruleset.HasGameOptions)
+        {
+            string stockHeader;
+            string stocks;
+            string time;
+            string tag;
+            string speed;
+            string ballType;
+            string energy;
+            string hpFactor;
+            string powerupSelection;
+            SetTracker.Instance.ApplyGameOptions(ScreenPlayersSettings.curGameSettings, ruleset.GameOptions);
+            ScreenPlayersSettings.GetSettingTexts(out stockHeader, out stocks, out time, out tag, out speed, out ballType, out energy, out hpFactor, out powerupSelection);
+
+
+            lbGameOptionsHeader.SetText(
+                $"Game options:<size={FONTSIZE_MAIN}pt>"
+                  + $"\n{stockHeader} <color=\"yellow\">{stocks}</color>"
+                  + $"\nTime: <color=\"yellow\">{time}</color>"
+                  + $"\nEnergy: <color=\"yellow\">{energy}</color>"
+                  + $"\nHP: <color=\"yellow\">{hpFactor}</color>"
+                  + $"\nMin ball speed: <color=\"yellow\">{speed}</color>"
+                  + $"\nBall type: <color=\"yellow\">{ballType}</color>"
+                  + $"\nPowerups: <color=\"yellow\">{powerupSelection}</color></size>"
+            );
+        }
+        else
+        {
+            lbGameOptionsHeader.SetText("");
+        }
     }
 }

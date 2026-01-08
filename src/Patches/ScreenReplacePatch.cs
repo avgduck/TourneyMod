@@ -256,4 +256,12 @@ internal static class ScreenReplacePatch
         
         return false;
     }
+
+    [HarmonyPatch(typeof(ScreenPlayers), nameof(ScreenPlayers.ShowOptionsButton))]
+    [HarmonyPrefix]
+    private static void ScreenPlayers_ShowOptionsButton_Prefix(ref bool enabled)
+    {
+        if (!SetTracker.Instance.IsTrackingSet) return;
+        if (SetTracker.Instance.CurrentSet.ActiveRuleset.HasGameOptions) enabled = false;
+    }
 }
