@@ -20,6 +20,5 @@
   "game1FirstTeam": "BLUE",
   "laterGamesFirstTeam": "WINNER",
   "dsrMode": "FULL_SET",
-  "randomStageMode": "OFF",
-  "randomCharacterMode": "COMPETITIVE"
+  "randomStageMode": "OFF"
 }

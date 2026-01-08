@@ -34,7 +34,6 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
 
     private TextMeshProUGUI lbDsrMode;
     private TextMeshProUGUI lbRandomStageMode;
-    private TextMeshProUGUI lbRandomCharacterMode;
 
     public string GetCustomTitle()
     {
@@ -143,10 +142,6 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         lbRandomStageMode.fontSize = FONTSIZE_HEADER;
         lbRandomStageMode.alignment = TextAlignmentOptions.Top;
         lbRandomStageMode.richText = true;
-        UIUtils.CreateText(ref lbRandomCharacterMode, "lbRandomCharacterMode", transform, TOP + SPACING_RULESET + SPACING_HEADER * 8f);
-        lbRandomCharacterMode.fontSize = FONTSIZE_HEADER;
-        lbRandomCharacterMode.alignment = TextAlignmentOptions.Top;
-        lbRandomCharacterMode.richText = true;
         
         btFirstButton.OnHover(-1);
         ((LLSelectionButton)btFirstButton).SetSelected(-1);
@@ -264,11 +259,5 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
             _ => "OFF"
         }}</color>");
         int linesRandomStage = ruleset.randomStageMode == Ruleset.RandomStageMode.OFF ? 0 : 1;
-        
-        lbRandomCharacterMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 8f + SPACING_MAIN * linesStages + SPACING_MAIN * linesBans + SPACING_MAIN * linesDsr + SPACING_MAIN * linesRandomStage;
-        lbRandomCharacterMode.SetText($"Random character mode: <color=\"yellow\">{ruleset.randomCharacterMode switch {
-            Ruleset.RandomCharacterMode.COMPETITIVE => $"COMPETITIVE\n<size={FONTSIZE_MAIN}pt>(revealed on character select screen)</size>",
-            _ => "VANILLA"
-        }}</color>");
     }
 }

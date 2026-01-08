@@ -256,20 +256,4 @@ internal static class ScreenReplacePatch
         
         return false;
     }
-
-    [HarmonyPatch(typeof(PlayersCharacterButton), nameof(PlayersCharacterButton.Init))]
-    [HarmonyPostfix]
-    private static void PlayersCharacterButton_Init_Postfix(PlayersCharacterButton __instance)
-    {
-        if (SetTracker.Instance.ActiveTourneyMode is TourneyMode.NONE) return;
-        if (SetTracker.Instance.CurrentSet.ActiveRuleset.randomCharacterMode is not Ruleset.RandomCharacterMode.COMPETITIVE) return;
-        if (__instance.character is not Character.RANDOM) return;
-
-        __instance.imCharacter.sprite = UIUtils.spriteCustomRandom;
-        __instance.btCharacter.onClick = (playerNr) =>
-        {
-            List<Character> unlockedCharacters = CharacterApi.GetPlayableCharacters().Filter(c => ProgressApi.IsUnlocked(c)).ToList();
-            GameStates.Send(Msg.SEL_CHAR, playerNr, (int)unlockedCharacters[UnityEngine.Random.RandomRangeInt(0, unlockedCharacters.Count)]);
-        };
-    }
 }

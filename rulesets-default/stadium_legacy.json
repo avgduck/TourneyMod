@@ -19,6 +19,5 @@
   "game1FirstTeam": "RED",
   "laterGamesFirstTeam": "WINNER",
   "dsrMode": "OFF",
-  "randomStageMode": "OFF",
-  "randomCharacterMode": "VANILLA"
+  "randomStageMode": "OFF"
 }

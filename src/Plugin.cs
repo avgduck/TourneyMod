@@ -18,7 +18,7 @@ namespace TourneyMod;
 [BepInDependency(DEPENDENCY_CURSORSPEED, BepInDependency.DependencyFlags.SoftDependency)]
 [BepInIncompatibility(INCOMPATIBILITY_STAGESELECT)]
 [BepInProcess("LLBlaze.exe")]
-internal class Plugin : BaseUnityPlugin
+public class Plugin : BaseUnityPlugin
 {
     public const string GUID = "avgduck.plugins.llb.tourneymod";
     internal const string DEPENDENCY_LLBML = "fr.glomzubuk.plugins.llb.llbml";
