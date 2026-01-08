@@ -78,15 +78,18 @@ internal class StageButton : LLButton
     {
         stageBan = ban;
 
-        if (stageBan.banTeam == Team.NONE) OnHoverOut(-1);
-        else
+        if (stageBan != null)
         {
-            for (int playerNumber = 0; playerNumber < 4; playerNumber++)
+            if (stageBan.banTeam == Team.NONE) OnHoverOut(-1);
+            else
             {
-                if (SetTracker.Instance.GetPlayerTeam(playerNumber) == stageBan.banTeam) OnHoverOut(playerNumber);
+                for (int playerNumber = 0; playerNumber < 4; playerNumber++)
+                {
+                    if (SetTracker.Instance.GetPlayerTeam(playerNumber) == stageBan.banTeam) OnHoverOut(playerNumber);
+                }
             }
         }
-        
+
         UpdateDisplay();
     }
 
