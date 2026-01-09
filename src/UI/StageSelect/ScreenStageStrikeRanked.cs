@@ -536,8 +536,6 @@ internal class ScreenStageStrikeRanked : ScreenPlayersStageComp, ICustomScreen<S
                 btRandomMain.UpdateColor();
             }
         }
-        
-        Plugin.LogGlobal.LogWarning("OnStageSelected");
     }
 
     private void OnVoteFreePick()
