@@ -1,4 +1,6 @@
+using System.Linq;
 using LLBML.Players;
+using LLBML.Settings;
 using LLScreen;
 using TMPro;
 using TourneyMod.SetTracking;
@@ -21,6 +23,8 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     private static readonly Vector2 LOCK_SCALE = new Vector2(128f, 128f);
     private static readonly Vector2 LOCK_POSITION = new Vector2(0f, 60f);
     private static readonly Color LOCK_COLOR = Color.white * 0.95f;
+
+    private static readonly Vector2 STOCKDISPLAY_POSITION = new Vector2(0f, 290f);
     
     private TextMeshProUGUI lbGame;
     private TextMeshProUGUI lbScoreRed;
@@ -29,6 +33,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     
     private VoteButton btResetSetCount;
 
+    private StockDisplay[] stockDisplays;
     private Image[] imgsCharacterLock;
     
     public void Init(ScreenPlayers screenPlayers)
@@ -100,9 +105,13 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         btResetSetCount.label = "Reset set count";
         btResetSetCount.onVote = OnVoteReset;
 
+        stockDisplays = new StockDisplay[4];
         imgsCharacterLock = new Image[4];
         for (int playerNr = 0; playerNr < 4; playerNr++)
         {
+            StockDisplay.Create(ref stockDisplays[playerNr], GameSettings.current.stocks, "stockDisplay" + playerNr, transform, Vector2.zero, Vector2.one);
+            stockDisplays[playerNr].rectTransform.gameObject.SetActive(false);
+            
             UIUtils.CreateImage(ref imgsCharacterLock[playerNr], UIUtils.spriteLock, "imgLock", transform, Vector2.zero, LOCK_SCALE);
             imgsCharacterLock[playerNr].color = LOCK_COLOR;
             imgsCharacterLock[playerNr].gameObject.SetActive(false);
@@ -123,6 +132,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         base.DoUpdate();
         ShowCpuButtons(false);
         UpdateLockIcons();
+        UpdateStockDisplays();
     }
     
     private void UpdateSetCount()
@@ -134,6 +144,36 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         
         lbScoreRed.SetText(winCounts[0].ToString());
         lbScoreBlue.SetText(winCounts[1].ToString());
+    }
+
+    private void UpdateStockDisplays()
+    {
+        Player.ForAll((Player player) =>
+        {
+            StockDisplay display = stockDisplays[player.nr];
+
+            if (!player.IsInMatch || SetTracker.Instance.ActiveTourneyMode is not TourneyMode.LOCAL_CREW)
+            {
+                display.rectTransform.gameObject.SetActive(false);
+                return;
+            }
+            
+            display.rectTransform.anchoredPosition = playerSelections[player.nr].transform.localPosition + (Vector3)STOCKDISPLAY_POSITION;
+
+            int maxStocks = GameSettings.current.stocks;
+            display.SetMaxStocks(maxStocks);
+
+            if (SetTracker.Instance.CurrentSet.IsGame1)
+            {
+                display.SetStocks(maxStocks);
+            }
+            else
+            {
+                int stocksRemaining = SetTracker.Instance.CurrentSet.CompletedMatches.Last().FinalScores[player.nr].Stocks;
+                display.SetStocks(stocksRemaining > 0 ? stocksRemaining : maxStocks);
+            }
+            display.rectTransform.gameObject.SetActive(true);
+        });
     }
 
     private void UpdateLockIcons()

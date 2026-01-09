@@ -1,3 +1,4 @@
+using System.Linq;
 using GameplayEntities;
 using HarmonyLib;
 using LLBML.Players;
@@ -5,6 +6,7 @@ using LLBML.Settings;
 using LLBML.States;
 using LLHandlers;
 using TourneyMod.SetTracking;
+using UnityEngine;
 
 namespace TourneyMod.Patches;
 
@@ -72,5 +74,19 @@ internal static class SetTrackingPatch
         if (!SetTracker.Instance.IsTrackingSet) return;
         if (!SetTracker.Instance.CurrentSet.ActiveRuleset.HasGameOptions) return;
         SetTracker.Instance.ApplyGameOptions(settings, SetTracker.Instance.CurrentSet.ActiveRuleset.GameOptions);
+    }
+
+    [HarmonyPatch(typeof(PlayerEntity), nameof(PlayerEntity.Init))]
+    [HarmonyPostfix]
+    private static void PlayerEntity_Init_Postfix(PlayerEntity __instance)
+    {
+        if (SetTracker.Instance.ActiveTourneyMode is not TourneyMode.LOCAL_CREW) return;
+        if (SetTracker.Instance.CurrentSet.IsGame1) return;
+
+        Player p = __instance.player;
+        int stocksRemaining = SetTracker.Instance.CurrentSet.CompletedMatches.Last().FinalScores[p.nr].Stocks;
+        if (stocksRemaining < 1) return;
+
+        __instance.playerData.stocks = Mathf.Clamp(stocksRemaining, 1, GameSettings.current.stocks);
     }
 }
