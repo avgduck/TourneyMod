@@ -35,6 +35,10 @@ internal static class ScreenReplacePatch
         {
             ReplaceScreen<ScreenMenuVersus, ScreenMenuTourney>(ref __result);
         }
+        else if (screenType == ScreenType.MENU_UNLOCKS && Plugin.Instance.RulesetsMenuOpen)
+        {
+            GameObject.Destroy(__result);
+        }
         else if (screenType == ScreenType.UNLOCKS_STAGES && Plugin.Instance.RulesetsMenuOpen)
         {
             ReplaceScreen<ScreenUnlocksStages, ScreenMenuRulesets>(ref __result);

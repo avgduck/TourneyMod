@@ -84,7 +84,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         btBuy.visible = false;
         btStageButtons = [];
         TextHandler.SetText(lbDescription, "");
-        lbCurrency.gameObject.SetActive(false);
+        pnBuy.gameObject.SetActive(false);
 
         btRulesets = new List<LLButton>();
         int index = 0;
