@@ -10,6 +10,7 @@ internal static class UIUtils
     private static Sprite panelBG;
     private static Sprite buttonBG;
     internal static Sprite spriteStageSelected;
+    internal static Sprite spriteLock;
     
     internal static readonly Color[] COLOR_TEAM =
     [
@@ -24,6 +25,7 @@ internal static class UIUtils
         panelBG = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
         buttonBG = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
         spriteStageSelected = Sprite.Create(CreateBorderTexture(Color.yellow, 8, 500, 250), new Rect(0, 0, 500, 250), new Vector2(0.5f, 0.5f));
+        spriteLock = ToSprite(Assets.LoadTexture("lock.png"));
     }
 
     internal static Texture2D CreateBorderTexture(Color color, int thickness, int width, int height)
@@ -39,6 +41,18 @@ internal static class UIUtils
         }
         tex.Apply();
         return tex;
+    }
+
+    internal static void CreateImage(ref Image image, Sprite sprite, string name, Transform parent, Vector2 position, Vector2 scale)
+    {
+        image = LLControl.CreateImage(parent, sprite);
+        image.rectTransform.name = name;
+        image.rectTransform.anchorMin = new Vector2(0f, 0f);
+        image.rectTransform.anchorMax = new Vector2(1f, 1f);
+        image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scale.x);
+        image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scale.y);
+
+        image.rectTransform.anchoredPosition = position;
     }
 
     internal static void CreatePanel(ref RectTransform panel, string name, Transform parent, Vector2 position, Vector2 scale)

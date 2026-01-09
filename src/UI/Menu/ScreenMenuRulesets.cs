@@ -35,15 +35,9 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
 
     private TextMeshProUGUI lbDsrMode;
     private TextMeshProUGUI lbRandomStageMode;
+    private TextMeshProUGUI lbWinnerCharacterLock;
 
-    private TextMeshProUGUI lbGameOptionsHeader;
-    private TextMeshProUGUI lbGameOptionsStocks;
-    private TextMeshProUGUI lbGameOptionsTime;
-    private TextMeshProUGUI lbGameOptionsEnergy;
-    private TextMeshProUGUI lbGameOptionsHpFactor;
-    private TextMeshProUGUI lbGameOptionsMinBallSpeed;
-    private TextMeshProUGUI lbGameOptionsBallType;
-    private TextMeshProUGUI lbGameOptionsPowerupSelection;
+    private TextMeshProUGUI lbGameOptions;
 
     public string GetCustomTitle()
     {
@@ -153,10 +147,15 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         lbRandomStageMode.alignment = TextAlignmentOptions.Top;
         lbRandomStageMode.richText = true;
         
-        UIUtils.CreateText(ref lbGameOptionsHeader, "lbGameOptionsHeader", transform, TOP + SPACING_RULESET + SPACING_HEADER * 8f);
-        lbGameOptionsHeader.fontSize = FONTSIZE_HEADER;
-        lbGameOptionsHeader.alignment = TextAlignmentOptions.Top;
-        lbGameOptionsHeader.richText = true;
+        UIUtils.CreateText(ref lbWinnerCharacterLock, "lbWinnerCharacterLock", transform, TOP + SPACING_RULESET + SPACING_HEADER * 8f);
+        lbWinnerCharacterLock.fontSize = FONTSIZE_HEADER;
+        lbWinnerCharacterLock.alignment = TextAlignmentOptions.Top;
+        lbWinnerCharacterLock.richText = true;
+        
+        UIUtils.CreateText(ref lbGameOptions, "lbGameOptions", transform, TOP + SPACING_RULESET + SPACING_HEADER * 9.5f);
+        lbGameOptions.fontSize = FONTSIZE_HEADER;
+        lbGameOptions.alignment = TextAlignmentOptions.Top;
+        lbGameOptions.richText = true;
         
         btFirstButton.OnHover(-1);
         ((LLSelectionButton)btFirstButton).SetSelected(-1);
@@ -252,11 +251,11 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         lbStagesCounterpick.SetText($"Counterpick stages:\n<color=\"yellow\"><size={FONTSIZE_MAIN}pt>{sCounterpick}</size></color>");
         int linesStages = Mathf.Max(linesNeutral, linesCounterpick);
 
-        lbBanOrder.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 3.5f + SPACING_MAIN * linesStages;
+        lbBanOrder.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 3.5f + SPACING_MAIN * (linesStages);
         lbBanOrder.SetText($"Ban order: <color=\"yellow\"><size={FONTSIZE_MAIN}pt>{GetBanOrder(ruleset)}</size></color>");
         int linesBans = ruleset.banAmounts.Length;
 
-        lbDsrMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 5f + SPACING_MAIN * linesStages + SPACING_MAIN * linesBans;
+        lbDsrMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 5f + SPACING_MAIN * (linesStages + linesBans);
         lbDsrMode.SetText($"DSR: <color=\"yellow\">{ruleset.dsrMode switch {
             Ruleset.DsrMode.FULL_SET => $"ON\n<size={FONTSIZE_MAIN}pt>(includes all wins)</size>",
             Ruleset.DsrMode.LAST_WIN => $"ON\n<size={FONTSIZE_MAIN}pt>(only last win)</size>",
@@ -264,7 +263,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         }}</color>");
         int linesDsr = ruleset.dsrMode == Ruleset.DsrMode.OFF ? 0 : 1;
 
-        lbRandomStageMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 6.5f + SPACING_MAIN * linesStages + SPACING_MAIN * linesBans + SPACING_MAIN * linesDsr;
+        lbRandomStageMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 6.5f + SPACING_MAIN * (linesStages + linesBans + linesDsr);
         lbRandomStageMode.SetText($"Random stage select: <color=\"yellow\">{ruleset.randomStageMode switch {
             Ruleset.RandomStageMode.ANY_3D => $"ON\n<size={FONTSIZE_MAIN}pt>(any 3D stage)</size>",
             Ruleset.RandomStageMode.ANY_2D => $"ON\n<size={FONTSIZE_MAIN}pt>(any 2D stage)</size>",
@@ -275,7 +274,11 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         }}</color>");
         int linesRandomStage = ruleset.randomStageMode == Ruleset.RandomStageMode.OFF ? 0 : 1;
 
-        lbGameOptionsHeader.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 8f + SPACING_MAIN * linesStages + SPACING_MAIN * linesBans + SPACING_MAIN * linesDsr + SPACING_MAIN * linesRandomStage;
+        lbWinnerCharacterLock.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 8f + SPACING_MAIN * (linesStages + linesBans + linesDsr + linesRandomStage);
+        lbWinnerCharacterLock.SetText($"Winner character lock: <color=\"yellow\">{(ruleset.winnerCharacterLock ? "ON" : "OFF")}{(tourneyMode is TourneyMode.LOCAL_CREW ? $"\n<size={FONTSIZE_MAIN}pt>(forced on for crew battles)</size>" : "")}</color>");
+        int linesCharacterLock = tourneyMode is TourneyMode.LOCAL_CREW ? 1 : 0;
+
+        lbGameOptions.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 9.5f + SPACING_MAIN * (linesStages + linesBans + linesDsr + linesRandomStage + linesCharacterLock);
 
         if (ruleset.HasGameOptions)
         {
@@ -292,7 +295,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
             ScreenPlayersSettings.GetSettingTexts(out stockHeader, out stocks, out time, out tag, out speed, out ballType, out energy, out hpFactor, out powerupSelection);
 
 
-            lbGameOptionsHeader.SetText(
+            lbGameOptions.SetText(
                 $"Game options:<size={FONTSIZE_MAIN}pt>"
                   + $"\n{stockHeader} <color=\"yellow\">{stocks}</color>"
                   + $"\nTime: <color=\"yellow\">{time}</color>"
@@ -305,7 +308,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         }
         else
         {
-            lbGameOptionsHeader.SetText("");
+            lbGameOptions.SetText("");
         }
     }
 }

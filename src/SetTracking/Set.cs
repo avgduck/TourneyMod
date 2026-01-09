@@ -11,6 +11,7 @@ internal class Set
     internal List<Match> CompletedMatches { get; private set; } = new List<Match>();
     internal Match CurrentMatch { get; private set; }
     internal Ruleset ActiveRuleset { get; private set; }
+    internal PlayerCharacter[] PlayerCharacterLock = [PlayerCharacter.EMPTY, PlayerCharacter.EMPTY, PlayerCharacter.EMPTY, PlayerCharacter.EMPTY];
 
     internal bool IsFreePickMode = false;
     internal bool IsFreePickForced => ActiveRuleset.banAmounts.Length == 0;
@@ -37,11 +38,11 @@ internal class Set
         ActiveRuleset = ruleset;
     }
 
-    internal void StartMatch(Stage stage, Character[] selectedCharacters)
+    internal void StartMatch(Stage stage, PlayerCharacter[] playerCharacters)
     {
-        SetTracker.Log.LogInfo($"Starting new match: stage {stage}, characters selected {Plugin.PrintArray(selectedCharacters, true)}");
+        SetTracker.Log.LogInfo($"Starting new match: stage {stage}, characters selected {Plugin.PrintArray(playerCharacters, true)}");
         CurrentMatch = new Match();
-        CurrentMatch.Start(stage, selectedCharacters);
+        CurrentMatch.Start(stage, playerCharacters);
     }
 
     internal void EndMatch(PlayerScore[] scores)
@@ -51,6 +52,14 @@ internal class Set
         
         SetTracker.Log.LogInfo($"Ending match with scores {Plugin.PrintArray(scores, true)}. winning team: {winner}");
         if (winner == Team.NONE) return;
+
+        if (ActiveRuleset.winnerCharacterLock || SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_CREW)
+        {
+            Player.ForAll((Player player) =>
+            {
+                PlayerCharacterLock[player.nr] = player.Team == winner ? new PlayerCharacter(player.CharacterSelected, player.CharacterVariant) : PlayerCharacter.EMPTY;
+            });
+        }
         
         CompletedMatches.Add(CurrentMatch);
         CurrentMatch = null;

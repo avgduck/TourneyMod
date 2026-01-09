@@ -14,6 +14,7 @@ public class Ruleset(
     Ruleset.FirstTeam laterGamesFirstTeam,
     Ruleset.DsrMode dsrMode,
     Ruleset.RandomStageMode randomStageMode,
+    bool winnerCharacterLock,
     GameOptions gameOptions)
 {
     public string Id { get; private set; }
@@ -26,8 +27,9 @@ public class Ruleset(
     public readonly FirstTeam laterGamesFirstTeam = laterGamesFirstTeam;
     public readonly DsrMode dsrMode = dsrMode;
     public readonly RandomStageMode randomStageMode = randomStageMode;
+    public readonly bool winnerCharacterLock = winnerCharacterLock;
     
-    public readonly GameOptions GameOptions;
+    public readonly GameOptions GameOptions = gameOptions;
     public bool HasGameOptions => GameOptions is not null;
 
     public enum FirstTeam

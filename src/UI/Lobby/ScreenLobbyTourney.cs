@@ -1,7 +1,9 @@
+using LLBML.Players;
 using LLScreen;
 using TMPro;
 using TourneyMod.SetTracking;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TourneyMod.UI.Lobby;
 
@@ -15,6 +17,10 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     private static readonly Vector2 RESET_SCALE = new Vector2(220f, 26f);
     private static readonly Vector2 RESET_POSITION = new Vector2(0f, -346f);
     private const int RESET_FONT_SIZE = 18;
+
+    private static readonly Vector2 LOCK_SCALE = new Vector2(128f, 128f);
+    private static readonly Vector2 LOCK_POSITION = new Vector2(0f, 60f);
+    private static readonly Color LOCK_COLOR = Color.white * 0.95f;
     
     private TextMeshProUGUI lbGame;
     private TextMeshProUGUI lbScoreRed;
@@ -22,6 +28,8 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     private TextMeshProUGUI lbScoreBlue;
     
     private VoteButton btResetSetCount;
+
+    private Image[] imgsCharacterLock;
     
     public void Init(ScreenPlayers screenPlayers)
     {
@@ -91,6 +99,14 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         btResetSetCount.textMesh.fontSize = RESET_FONT_SIZE;
         btResetSetCount.label = "Reset set count";
         btResetSetCount.onVote = OnVoteReset;
+
+        imgsCharacterLock = new Image[4];
+        for (int playerNr = 0; playerNr < 4; playerNr++)
+        {
+            UIUtils.CreateImage(ref imgsCharacterLock[playerNr], UIUtils.spriteLock, "imgLock", transform, Vector2.zero, LOCK_SCALE);
+            imgsCharacterLock[playerNr].color = LOCK_COLOR;
+            imgsCharacterLock[playerNr].gameObject.SetActive(false);
+        }
         
         UpdateSetCount();
     }
@@ -106,6 +122,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     {
         base.DoUpdate();
         ShowCpuButtons(false);
+        UpdateLockIcons();
     }
     
     private void UpdateSetCount()
@@ -117,6 +134,23 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         
         lbScoreRed.SetText(winCounts[0].ToString());
         lbScoreBlue.SetText(winCounts[1].ToString());
+    }
+
+    private void UpdateLockIcons()
+    {
+        Player.ForAll((Player player) =>
+        {
+            Image img = imgsCharacterLock[player.nr];
+
+            if (!player.IsInMatch)
+            {
+                img.gameObject.SetActive(false);
+                return;
+            }
+            
+            img.rectTransform.anchoredPosition = playerSelections[player.nr].transform.localPosition + (Vector3)LOCK_POSITION;
+            img.gameObject.SetActive(!SetTracker.Instance.CurrentSet.PlayerCharacterLock[player.nr].IsEmpty);
+        });
     }
     
     private void OnVoteReset()

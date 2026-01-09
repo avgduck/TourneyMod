@@ -19,6 +19,7 @@
   "laterGamesFirstTeam": "WINNER",
   "dsrMode": "OFF",
   "randomStageMode": "OFF",
+  "winnerCharacterLock": true,
   "gameOptions": {
     "stocks": 5,
     "time": 300,

@@ -1,5 +1,6 @@
 using HarmonyLib;
 using LLBML.Players;
+using LLGUI;
 using LLScreen;
 using TourneyMod.SetTracking;
 using TourneyMod.UI.Lobby;
@@ -69,5 +70,49 @@ internal static class LobbyPatch
     {
         if (!SetTracker.Instance.IsTrackingSet) return;
         if (SetTracker.Instance.CurrentSet.ActiveRuleset.HasGameOptions) enabled = false;
+    }
+
+    // void GameStatesLobby::AddPlayer(Player p)
+    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.GNCDBOBHOHN))]
+    [HarmonyPrefix]
+    private static void GameStatesLobby_AddPlayer_Prefix(ref ALDOKEMAOMB LGACHGEPNNH)
+    {
+        if (SetTracker.Instance.ActiveTourneyMode is TourneyMode.NONE) return;
+
+        Player p = LGACHGEPNNH;
+        PlayerCharacter characterLock = SetTracker.Instance.CurrentSet.PlayerCharacterLock[p.nr];
+        if (characterLock.IsEmpty) return;
+        
+        p.variant = characterLock.variant;
+    }
+    
+    // void GameStatesLobby::UpdatePlayer(Player p, bool play_selection_anim)
+    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.BDMIDGAHNLA))]
+    [HarmonyPrefix]
+    private static void GameStatesLobby_UpdatePlayer_Prefix(ref ALDOKEMAOMB LGACHGEPNNH)
+    {
+        if (SetTracker.Instance.ActiveTourneyMode is TourneyMode.NONE) return;
+        
+        Player p = LGACHGEPNNH;
+        PlayerCharacter characterLock = SetTracker.Instance.CurrentSet.PlayerCharacterLock[p.nr];
+        if (characterLock.IsEmpty) return;
+        
+        p.CharacterSelected = characterLock.character;
+        p.selected = true;
+    }
+
+    [HarmonyPatch(typeof(ScreenPlayers), nameof(ScreenPlayers.AddCharacters))]
+    [HarmonyPostfix]
+    private static void ScreenPlayers_AddCharacters_Postfix(ScreenPlayers __instance)
+    {
+        foreach (PlayersCharacterButton characterButton in __instance.characterButtons)
+        {
+            LLClickable.ControlDelegate onClick = characterButton.btCharacter.onClick;
+            characterButton.btCharacter.onClick = (playerNr) =>
+            {
+                if (SetTracker.Instance.ActiveTourneyMode is not TourneyMode.NONE && playerNr != -1 && !SetTracker.Instance.CurrentSet.PlayerCharacterLock[playerNr].IsEmpty) return;
+                onClick(playerNr);
+            };
+        }
     }
 }
