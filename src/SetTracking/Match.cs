@@ -7,15 +7,13 @@ internal class Match
 {
     internal Stage PlayedStage { get; private set; }
     internal Character[] SelectedCharacters { get; private set; }
-    internal Character[] PlayedCharacters { get; private set; }
     internal PlayerScore[] FinalScores { get; private set; }
     internal Team Winner { get; private set; }
 
-    internal void Start(Stage stage, Character[] selectedCharacters, Character[] playedCharacters)
+    internal void Start(Stage stage, Character[] selectedCharacters)
     {
         PlayedStage = stage;
         SelectedCharacters = selectedCharacters;
-        PlayedCharacters = playedCharacters;
     }
 
     internal void End(PlayerScore[] scores)

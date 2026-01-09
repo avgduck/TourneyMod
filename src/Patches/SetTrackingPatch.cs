@@ -41,13 +41,11 @@ internal static class SetTrackingPatch
         {
             Stage stage = HPNLMFHPHFD.ELPLKHOLJID.OOEPDFABFIP; // GameStatesLobby.curSettings.stage
             Character[] selectedCharacters = [Character.NONE, Character.NONE, Character.NONE, Character.NONE];
-            Character[] playedCharacters = [Character.NONE, Character.NONE, Character.NONE, Character.NONE];
             Player.ForAllInMatch(player =>
             {
                 selectedCharacters[player.nr] = player.CharacterSelected;
-                playedCharacters[player.nr] = player.Character;
             });
-            SetTracker.Instance.CurrentSet.StartMatch(stage, selectedCharacters, playedCharacters);
+            SetTracker.Instance.CurrentSet.StartMatch(stage, selectedCharacters);
         }
         else if (newState == GameState.GAME_RESULT)
         {

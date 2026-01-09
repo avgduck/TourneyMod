@@ -37,11 +37,11 @@ internal class Set
         ActiveRuleset = ruleset;
     }
 
-    internal void StartMatch(Stage stage, Character[] selectedCharacters, Character[] playedCharacters)
+    internal void StartMatch(Stage stage, Character[] selectedCharacters)
     {
-        SetTracker.Log.LogInfo($"Starting new match: stage {stage}, characters selected {Plugin.PrintArray(selectedCharacters, true)} played {Plugin.PrintArray(playedCharacters, true)}");
+        SetTracker.Log.LogInfo($"Starting new match: stage {stage}, characters selected {Plugin.PrintArray(selectedCharacters, true)}");
         CurrentMatch = new Match();
-        CurrentMatch.Start(stage, selectedCharacters, playedCharacters);
+        CurrentMatch.Start(stage, selectedCharacters);
     }
 
     internal void EndMatch(PlayerScore[] scores)
