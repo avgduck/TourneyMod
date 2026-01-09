@@ -13,55 +13,30 @@ internal static class Cursors
 {
     private static readonly Color COLOR_CURSOR_ACTIVE = Color.white;
     private static readonly Color COLOR_CURSOR_INACTIVE = Color.white * 0.6f;
-    private static readonly PlayerCursor[] playerCursors = [new(), new(), new(), new()];
+    private static PlayerCursor[] playerCursors;
 
     internal static void LoadCursorImages()
     {
-        foreach (FileInfo file in Plugin.Instance.CursorDirectory.GetFiles().OrderBy(f => f.Name))
-        {
-            if (!file.Name.Contains("cursor")) continue;
-            string[] id = file.Name.Replace("cursor", "").Replace(".png", "").Split('_');
-            int playerNumber = int.Parse(id[0]);
-            PlayerTeam team = (PlayerTeam)Enum.Parse(typeof(PlayerTeam), id[1]);
-            Texture2D texActive = UIUtils.LoadImageFile(file);
-            
-            Texture2D texInactive = new Texture2D(0, 0);
-            UIUtils.SetTextureCopy(ref texInactive, texActive);
-            UIUtils.SetTextureColor(ref texInactive, COLOR_CURSOR_INACTIVE);
+        playerCursors = new PlayerCursor[4];
 
-            switch (team)
+        for (int playerNr = 0; playerNr < 4; playerNr++)
+        {
+            PlayerCursor cursor = new PlayerCursor();
+
+            for (int team = 0; team < 5; team++)
             {
-                case PlayerTeam.RED:
-                    playerCursors[playerNumber].texRedActive = texActive;
-                    playerCursors[playerNumber].texRedInactive = texInactive;
-                    playerCursors[playerNumber].spriteRedActive = UIUtils.ToSprite(texActive);
-                    playerCursors[playerNumber].spriteRedInactive = UIUtils.ToSprite(texInactive);
-                    break;
-                case PlayerTeam.BLUE:
-                    playerCursors[playerNumber].texBlueActive = texActive;
-                    playerCursors[playerNumber].texBlueInactive = texInactive;
-                    playerCursors[playerNumber].spriteBlueActive = UIUtils.ToSprite(texActive);
-                    playerCursors[playerNumber].spriteBlueInactive = UIUtils.ToSprite(texInactive);
-                    break;
-                case PlayerTeam.YELLOW:
-                    playerCursors[playerNumber].texYellowActive = texActive;
-                    playerCursors[playerNumber].texYellowInactive = texInactive;
-                    playerCursors[playerNumber].spriteYellowActive = UIUtils.ToSprite(texActive);
-                    playerCursors[playerNumber].spriteYellowInactive = UIUtils.ToSprite(texInactive);
-                    break;
-                case PlayerTeam.GREEN:
-                    playerCursors[playerNumber].texGreenActive = texActive;
-                    playerCursors[playerNumber].texGreenInactive = texInactive;
-                    playerCursors[playerNumber].spriteGreenActive = UIUtils.ToSprite(texActive);
-                    playerCursors[playerNumber].spriteGreenInactive = UIUtils.ToSprite(texInactive);
-                    break;
-                default:
-                    playerCursors[playerNumber].texNoneActive = texActive;
-                    playerCursors[playerNumber].texNoneInactive = texInactive;
-                    playerCursors[playerNumber].spriteNoneActive = UIUtils.ToSprite(texActive);
-                    playerCursors[playerNumber].spriteNoneInactive = UIUtils.ToSprite(texInactive);
-                    break;
+                Texture2D texActive = Assets.LoadTexture($"cursors/cursor{playerNr}_{(Team)team}.png");
+                Texture2D texInactive = new Texture2D(1, 1);
+                UIUtils.SetTextureCopy(ref texInactive, texActive);
+                UIUtils.SetTextureColor(ref texInactive, COLOR_CURSOR_INACTIVE);
+                
+                cursor.textures[team, 0] = texActive;
+                cursor.textures[team, 1] = texInactive;
+                cursor.sprites[team, 0] = UIUtils.ToSprite(texActive);
+                cursor.sprites[team, 1] = UIUtils.ToSprite(texInactive);
             }
+            
+            playerCursors[playerNr] = cursor;
         }
     }
 

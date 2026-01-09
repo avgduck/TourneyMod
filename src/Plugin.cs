@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using BepInEx;
 using BepInEx.Logging;
@@ -39,13 +38,12 @@ public class Plugin : BaseUnityPlugin
     internal bool RulesetsMenuOpen = false;
     internal bool RecolorCursors = false;
 
-    internal DirectoryInfo AssetsDirectory { get; private set; }
-    internal DirectoryInfo CursorDirectory { get; private set; }
-
     private void Awake()
     {
         Instance = this;
         LogGlobal = this.Logger;
+        
+        Assets.Init();
 
         SelectedRulesetIds = new Dictionary<TourneyMode, string>();
         SelectedRulesets = new Dictionary<TourneyMode, Ruleset>();
@@ -53,12 +51,7 @@ public class Plugin : BaseUnityPlugin
         SetTracker.Init();
         StageStrikeTracker.Init();
         
-        string pathAssets = Path.Combine(Path.GetDirectoryName(Info.Location), "assets");
-        AssetsDirectory = new DirectoryInfo(pathAssets);
         UIUtils.Init();
-        
-        string pathCursors = Path.Combine(pathAssets, "cursors");
-        CursorDirectory = new DirectoryInfo(pathCursors);
         Cursors.LoadCursorImages();
         
         HarmonyPatches.PatchAll();

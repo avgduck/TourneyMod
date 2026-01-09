@@ -1,11 +1,5 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using LLBML.Players;
 using LLGUI;
 using TMPro;
-using TourneyMod.SetTracking;
-using TourneyMod.StageStriking;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,8 +24,6 @@ internal static class UIUtils
         panelBG = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
         buttonBG = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
         spriteStageSelected = Sprite.Create(CreateBorderTexture(Color.yellow, 8, 500, 250), new Rect(0, 0, 500, 250), new Vector2(0.5f, 0.5f));
-
-        Dictionary<string, FileInfo> assetFiles = Plugin.Instance.AssetsDirectory.GetFiles().ToDictionary(file => file.Name);
     }
 
     internal static Texture2D CreateBorderTexture(Color color, int thickness, int width, int height)
@@ -180,27 +172,6 @@ internal static class UIUtils
         Transform img = button.transform.Find("Image");
         if (img == null) return;
         img.gameObject.SetActive(visible);
-    }
-
-    private static void CopyStream(Stream input, Stream output)
-    {
-        byte[] buffer = new byte[8 * 1024];
-        int len;
-        while ((len = input.Read(buffer, 0, buffer.Length)) > 0)
-        {
-            output.Write(buffer, 0, len);
-        }
-    }
-    
-    internal static Texture2D LoadImageFile(FileInfo file)
-    {
-        using FileStream fileStream = file.OpenRead();
-        using MemoryStream memoryStream = new MemoryStream();
-        
-        CopyStream(fileStream, memoryStream);
-        Texture2D tex = new Texture2D(1, 1);
-        tex.LoadImage(memoryStream.ToArray());
-        return tex;
     }
     
     // texture editing code from ColorSwap

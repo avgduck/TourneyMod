@@ -44,6 +44,8 @@ internal static class CursorPatch
                 CursorState[] playerStates = __state.playerStates;
                 Player.ForAll(player => player.cursor.SetState(playerStates[player.nr]));
             }
+            
+            Cursors.ResetCursorColors();
         }
 
         [HarmonyPatch(typeof(UIInput), nameof(UIInput.HandleCursors))]
