@@ -14,14 +14,14 @@ internal static class HarmonyPatches
         
         harmony.PatchAll(typeof(ScreenReplacePatch));
         Plugin.LogGlobal.LogInfo("Screen replacement patch applied");
+        harmony.PatchAll(typeof(StageSelectPatch));
+        Plugin.LogGlobal.LogInfo("Stage select patch applied");
+        harmony.PatchAll(typeof(LobbyPatch));
+        Plugin.LogGlobal.LogInfo("Lobby patch applied");
+        
         harmony.PatchAll(typeof(CursorPatch));
         Plugin.LogGlobal.LogInfo("Cursor patch applied");
         harmony.PatchAll(typeof(ScreenResultsPatch));
         Plugin.LogGlobal.LogInfo("Results screen patch applied");
-        
-        /*
-        harmony.PatchAll(typeof(StageSizePatch));
-        Plugin.LogGlobal.LogInfo("Stage size check patch applied");
-        */
     }
 }

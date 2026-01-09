@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection.Emit;
 using HarmonyLib;
-using LLBML;
 using LLBML.Players;
 using LLBML.States;
-using LLBML.Utils;
 using LLScreen;
-using TourneyMod.Rulesets;
 using TourneyMod.SetTracking;
 using TourneyMod.UI;
 using TourneyMod.UI.Lobby;
@@ -170,102 +166,5 @@ internal static class ScreenReplacePatch
     private static void GameStatesMenu_JumpTo_Prefix(ref ScreenType FJOFNHPCBPD)
     {
         if (FJOFNHPCBPD == ScreenType.MENU_ONLINE && Plugin.Instance.TourneyMenuOpen) FJOFNHPCBPD = ScreenType.MENU_VERSUS;
-    }
-
-    [HarmonyPatch(typeof(ScreenPlayersStage), nameof(ScreenPlayersStage.SelectionDone))]
-    [HarmonyPrefix]
-    private static bool ScreenPlayersStage_SelectionDone_Prefix(ScreenPlayersStage __instance)
-    {
-        IStageSelect stageSelect = __instance as IStageSelect;
-        if (stageSelect == null) return true;
-        stageSelect.OnStageSelected();
-        return false;
-    }
-    
-    /*
-    // THIS CODE PREVENTS STAGE SELECTIONS FROM GOING THROUGH AND ALLOWS "VOTING" IN LOCAL - TESTING ONLY
-    // void GameStatsLobby::ProcessMsgStageSelect(Message message)
-    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.LKBFKGGCFHE))]
-    [HarmonyPrefix]
-    private static bool GameStatesLobby_ProcessMsgStageSelect_Prefix(HPNLMFHPHFD __instance, Message EIMJOIEPMNA)
-    {
-        if (EIMJOIEPMNA.msg == Msg.SEL_STAGE)
-        {
-            __instance.CFKCIJCEILI.SelectionDone();
-            return false;
-        }
-        return true;
-    }
-    
-    // void GameStatsLobbyOnline::StageSelected(int playerNr, int stageIndex)
-    [HarmonyPatch(typeof(HDLIJDBFGKN), nameof(HDLIJDBFGKN.MNLFJDLDHEN))]
-    [HarmonyPrefix]
-    private static bool GameStatesLobbyOnline_StageSelected_Prefix()
-    {
-        return false;
-    }
-    */
-
-    [HarmonyPatch(typeof(ScreenPlayers), nameof(ScreenPlayers.ShowCpuButtons))]
-    [HarmonyPrefix]
-    private static void ScreenPlayers_ShowCpuButtons_Prefix(ScreenPlayers __instance, ref bool visible)
-    {
-        ScreenLobbyTourney screenLobbyTourney = __instance as ScreenLobbyTourney;
-        if (screenLobbyTourney == null) return;
-        visible = false;
-    }
-    
-    [HarmonyPatch(typeof(ScreenPlayers), nameof(ScreenPlayers.UpdateTeamButtons))]
-    [HarmonyPrefix]
-    private static bool ScreenPlayers_UpdateTeamButtons_Prefix(ScreenPlayers __instance)
-    {
-        ScreenLobbyTourney screenLobbyTourney = __instance as ScreenLobbyTourney;
-        if (screenLobbyTourney == null) return true;
-
-        foreach (PlayersSelection playerSelection in __instance.playerSelections)
-        {
-            playerSelection.btTeam.SetActive(false);
-        }
-
-        return false;
-    }
-
-    // void Player::ResetTeam(GameMode gameMode, bool changeAnyway)
-    [HarmonyPatch(typeof(ALDOKEMAOMB), nameof(ALDOKEMAOMB.MLFHMGNCMNA))]
-    [HarmonyPrefix]
-    private static bool Player_ResetTeam_Prefix(ALDOKEMAOMB __instance)
-    {
-        if (SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE) return true;
-
-        Player player = __instance;
-        if (SetTracker.Instance.IsMode1v1) player.Team = player.nr == 0 ? Team.RED : Team.BLUE;
-        else if (SetTracker.Instance.IsModeDoubles) player.Team = player.nr <= 1 ? Team.RED : Team.BLUE;
-        
-        return false;
-    }
-    
-    // bool GameStatesLobby::IsStartEnabled()
-    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.DJHHLDPLFMD))]
-    [HarmonyPrefix]
-    private static bool GameStatesLobby_IsStartEnabled_Prefix(ref bool __result)
-    {
-        if (!SetTracker.Instance.IsModeDoubles) return true;
-
-        int nReady = 0;
-        Player.ForAllInMatch(player =>
-        {
-            if (player.selected) nReady++;
-        });
-        __result = nReady == 4;
-        
-        return false;
-    }
-
-    [HarmonyPatch(typeof(ScreenPlayers), nameof(ScreenPlayers.ShowOptionsButton))]
-    [HarmonyPrefix]
-    private static void ScreenPlayers_ShowOptionsButton_Prefix(ref bool enabled)
-    {
-        if (!SetTracker.Instance.IsTrackingSet) return;
-        if (SetTracker.Instance.CurrentSet.ActiveRuleset.HasGameOptions) enabled = false;
     }
 }
