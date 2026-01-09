@@ -114,7 +114,7 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         };
         btEndSet.SetText("end set");
         
-        SetPreviewWindow.Create(ref pnSetPreview, transform, btEndSet.transform.localPosition + OFFSET_BUTTON_1DOWN);
+        SetPreviewWindow.Create(ref pnSetPreview, transform, btEndSet.transform.localPosition - OFFSET_BUTTON_1DOWN * 2f);
         
         UpdateButtons();
         
@@ -196,7 +196,6 @@ internal class ScreenMenuTourney : ScreenMenuVersus, ICustomScreen<ScreenMenuVer
         UIScreen.SetFocus(GetDefaultFocus(UIInput.mainCursor));
         if (!btEndSet.isActive) btEndSet.OnHoverOut(-1);
         
-        //btLocalCrew.SetActive(false);
         btOnline1v1.SetActive(false);
     }
 }
