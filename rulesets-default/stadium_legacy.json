@@ -23,6 +23,7 @@
   "winnerCharacterLock": true,
   "gameOptions": {
     "stocks": 5,
+    "timeInfinite": false,
     "time": 300,
     "energy": 4,
     "hpFactor": "HP_100",

@@ -2,6 +2,7 @@ namespace TourneyMod.Rulesets;
 
 public class GameOptions(
     int stocks,
+    bool timeInfinite,
     int time,
     int energy,
     HpFactor hpFactor,
@@ -10,6 +11,7 @@ public class GameOptions(
     PowerupSelection powerupSelection)
 {
     public readonly int stocks = stocks;
+    public readonly bool timeInfinite = timeInfinite;
     public readonly int time = time;
     public readonly int energy = energy;
     public readonly HpFactor hpFactor = hpFactor;

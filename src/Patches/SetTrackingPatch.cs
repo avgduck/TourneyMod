@@ -38,8 +38,8 @@ internal static class SetTrackingPatch
         GameSettings settings = __instance;
 
         if (!SetTracker.Instance.IsTrackingSet) return;
-        if (!SetTracker.Instance.CurrentSet.ActiveRuleset.HasGameOptions) return;
-        SetTracker.Instance.ApplyGameOptions(settings, SetTracker.Instance.CurrentSet.ActiveRuleset.GameOptions);
+        if (SetTracker.Instance.CurrentSet.ActiveRuleset.HasGameOptions) SetTracker.Instance.ApplyGameOptions(settings, SetTracker.Instance.CurrentSet.ActiveRuleset.GameOptions);
+        if (SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_CREW) SetTracker.Instance.ApplyInfiniteTimer(settings);
     }
 
     [HarmonyPatch(typeof(PlayerEntity), nameof(PlayerEntity.Init))]

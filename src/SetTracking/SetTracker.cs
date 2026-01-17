@@ -90,6 +90,7 @@ internal class SetTracker
     internal void ApplyGameOptions(GameSettings settings, GameOptions gameOptions)
     {
         settings.stocks = gameOptions.stocks;
+        settings.timeInfinite = gameOptions.timeInfinite;
         settings.time = gameOptions.time;
         settings.energy = gameOptions.energy;
         settings.useHP = gameOptions.hpFactor;
@@ -98,5 +99,10 @@ internal class SetTracker
         settings.ballType = gameOptions.ballType;
         settings.PowerupSelection = gameOptions.powerupSelection;
         settings.havePowerups = gameOptions.powerupSelection;
+    }
+
+    internal void ApplyInfiniteTimer(GameSettings settings)
+    {
+        settings.timeInfinite = true;
     }
 }

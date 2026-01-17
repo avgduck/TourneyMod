@@ -298,7 +298,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
             lbGameOptions.SetText(
                 $"Game options:<size={FONTSIZE_MAIN}pt>"
                   + $"\n{stockHeader} <color=\"yellow\">{stocks}</color>"
-                  + $"\nTime: <color=\"yellow\">{time}</color>"
+                  + $"\nTime: <color=\"yellow\">{time}" + (tourneyMode is TourneyMode.LOCAL_CREW ? "\n(forced infinite for crew battles)" : "") + "</color>"
                   + $"\nEnergy: <color=\"yellow\">{energy}</color>"
                   + $"\nHP: <color=\"yellow\">{hpFactor}</color>"
                   + $"\nMin ball speed: <color=\"yellow\">{speed}</color>"
