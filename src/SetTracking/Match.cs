@@ -8,7 +8,7 @@ internal class Match
     internal Stage PlayedStage { get; private set; }
     internal PlayerCharacter[] PlayerCharacters { get; private set; }
     internal PlayerScore[] FinalScores { get; private set; }
-    internal Team Winner { get; private set; }
+    internal Team Winner;
 
     internal void Start(Stage stage, PlayerCharacter[] playerCharacters)
     {

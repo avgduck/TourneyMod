@@ -179,6 +179,13 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         CreateStageContainers();
         UpdateStageBans();
         UpdateSetInfo();
+
+        if (SetTracker.Instance.ActiveTourneyMode is not TourneyMode.NONE && SetTracker.Instance.CurrentSet.StageLock != Stage.NONE)
+        {
+            UIScreen.blockGlobalInput = false;
+            AudioHandler.PlaySfx(Sfx.LOBBY_START_GAME);
+            selectedStage = StageStrikeTracker.Instance.CurrentStrikeInfo.PickStage(SetTracker.Instance.CurrentSet.StageLock, -1);
+        }
     }
 
     public override void OnClose(ScreenType screenTypeNext)

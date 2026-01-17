@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using LLBML.Math;
 using LLBML.Players;
 using LLHandlers;
 using TourneyMod.Rulesets;
@@ -12,6 +13,8 @@ internal class Set
     internal Match CurrentMatch { get; private set; }
     internal Ruleset ActiveRuleset { get; private set; }
     internal PlayerCharacter[] PlayerCharacterLock = [PlayerCharacter.EMPTY, PlayerCharacter.EMPTY, PlayerCharacter.EMPTY, PlayerCharacter.EMPTY];
+    internal int[] PlayerStockLock = [0, 0, 0, 0];
+    internal Stage StageLock = Stage.NONE;
 
     internal bool IsFreePickMode = false;
     internal bool IsFreePickForced => ActiveRuleset.banAmounts.Length == 0;
@@ -45,6 +48,7 @@ internal class Set
     internal int[] WinCountOverride { get; private set; }
     internal int TotalOverrideWins => WinCountOverride.Sum();
     internal Team LastWinnerOverride { get; private set; }
+    internal bool IsTiebreaker { get; private set; }
 
     internal Set(Ruleset ruleset)
     {
@@ -60,23 +64,116 @@ internal class Set
         CurrentMatch.Start(stage, playerCharacters);
     }
 
-    internal void EndMatch(PlayerScore[] scores)
+    internal void EndMatch(PlayerScore[] scores, bool isTimeout)
     {
         CurrentMatch.End(scores);
         Team winner = CurrentMatch.Winner;
         
-        SetTracker.Log.LogInfo($"Ending match with scores {Plugin.PrintArray(scores, true)}. winning team: {winner}");
-        if (winner == Team.NONE) return;
+        if (isTimeout)
+        {
+            int maxStocks = 0;
+            Team stockWinner = Team.NONE;
+            for (int playerNr = 0; playerNr < 4; playerNr++)
+            {
+                int score = scores[playerNr].Stocks;
+                if (score == 0) continue;
+                if (score > maxStocks)
+                {
+                    maxStocks = score;
+                    stockWinner = SetTracker.Instance.GetPlayerTeam(playerNr);
+                }
+                else if (score == maxStocks)
+                {
+                    stockWinner = Team.NONE;
+                }
+            }
+            
+            SetTracker.Log.LogInfo($"Match ended in timeout! Checking stocks {Plugin.PrintArray(scores, true)}: winner {stockWinner}");
+            
+            if (stockWinner != Team.NONE)
+            {
+                winner = stockWinner;
+            }
+            else
+            {
+                Floatf maxHp = Floatf.zero;
+                Team hpWinner = Team.NONE;
+                for (int playerNr = 0; playerNr < 4; playerNr++)
+                {
+                    int score = scores[playerNr].Stocks;
+                    if (score < maxStocks) continue;
+                    
+                    Floatf hp = scores[playerNr].Hp;
+                    if (Floatf.Equals(hp, Floatf.zero)) continue;
+                    if (Floatf.GreaterThan(hp, maxHp))
+                    {
+                        maxHp = hp;
+                        hpWinner = SetTracker.Instance.GetPlayerTeam(playerNr);
+                    }
+                    else if (Floatf.Equals(hp, maxHp))
+                    {
+                        hpWinner = Team.NONE;
+                    }
+                }
+                
+                SetTracker.Log.LogInfo($"Tie on stocks! Checking hp {Plugin.PrintArray(scores.Select(s => $"({s.Team}, {Floatf.ToFloat(s.Hp)})").ToArray(), true)}: winner {hpWinner}");
 
-        LastWinnerOverride = Team.NONE;
-        if (ActiveRuleset.winnerCharacterLock || SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_CREW)
+                if (hpWinner != Team.NONE)
+                {
+                    winner = hpWinner;
+                }
+                else
+                {
+                    winner = Team.NONE;
+                }
+            }
+        }
+        else
+        {
+            SetTracker.Log.LogInfo($"Ending match with scores {Plugin.PrintArray(scores, true)}");
+        }
+        
+        SetTracker.Log.LogInfo($"Determined match winner: {winner}");
+        CurrentMatch.Winner = winner;
+        if (CurrentMatch.Winner == Team.NONE)
+        {
+            if (isTimeout)
+            {
+                SetTracker.Log.LogInfo("Timeout tiebreaker needed!");
+                Player.ForAll((Player player) =>
+                {
+                    PlayerCharacterLock[player.nr] = new PlayerCharacter(player.CharacterSelected, player.CharacterVariant);
+                    PlayerStockLock[player.nr] = 1;
+                });
+                StageLock = CurrentMatch.PlayedStage;
+                IsTiebreaker = true;
+            }
+            else
+            {
+                return;
+            }
+        }
+        else
         {
             Player.ForAll((Player player) =>
             {
-                PlayerCharacterLock[player.nr] = player.Team == winner ? new PlayerCharacter(player.CharacterSelected, player.CharacterVariant) : PlayerCharacter.EMPTY;
+                PlayerCharacterLock[player.nr] = PlayerCharacter.EMPTY;
+                PlayerStockLock[player.nr] = 0;
             });
+            StageLock = Stage.NONE;
+            IsTiebreaker = false;
+            
+            if (ActiveRuleset.winnerCharacterLock || SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_CREW)
+            {
+                Player.ForAll((Player player) =>
+                {
+                    PlayerCharacterLock[player.nr] = player.Team == winner ? new PlayerCharacter(player.CharacterSelected, player.CharacterVariant) : PlayerCharacter.EMPTY;
+                    PlayerStockLock[player.nr] = SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_CREW ? scores[player.nr].Stocks : 0;
+                });
+            }
         }
-        
+
+        LastWinnerOverride = Team.NONE;
         CompletedMatches.Add(CurrentMatch);
         CurrentMatch = null;
     }

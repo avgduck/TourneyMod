@@ -1,7 +1,8 @@
-using System.Linq;
 using LLBML.Players;
 using LLBML.Settings;
 using LLBML.States;
+using LLBML.Utils;
+using LLHandlers;
 using LLScreen;
 using TMPro;
 using TourneyMod.SetTracking;
@@ -26,6 +27,9 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     private static readonly Color LOCK_COLOR = Color.white * 0.95f;
 
     private static readonly Vector2 STOCKDISPLAY_POSITION = new Vector2(0f, 290f);
+
+    private static readonly Vector2 TIEBREAKER_POSITION = new Vector2(0f, 140f);
+    private const int TIEBREAKER_FONT_SIZE = 28;
     
     private TextMeshProUGUI lbGame;
     private TextMeshProUGUI lbScoreRed;
@@ -36,6 +40,8 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
 
     private StockDisplay[] stockDisplays;
     private Image[] imgsCharacterLock;
+
+    private TextMeshProUGUI lbTiebreaker;
     
     public void Init(ScreenPlayers screenPlayers)
     {
@@ -118,6 +124,11 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
             imgsCharacterLock[playerNr].gameObject.SetActive(false);
         }
         
+        UIUtils.CreateText(ref lbTiebreaker, "lbTiebreaker", transform, TIEBREAKER_POSITION);
+        lbTiebreaker.fontSize = TIEBREAKER_FONT_SIZE;
+        lbTiebreaker.richText = true;
+        lbTiebreaker.alignment = TextAlignmentOptions.Top;
+        
         UpdateSetCount();
     }
 
@@ -145,6 +156,8 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         
         lbScoreRed.SetText(winCounts[0].ToString());
         lbScoreBlue.SetText(winCounts[1].ToString());
+        
+        lbTiebreaker.SetText(SetTracker.Instance.CurrentSet.IsTiebreaker ? "Tiebreaker!" + (SetTracker.Instance.CurrentSet.StageLock != Stage.NONE ? $"\n<color=\"yellow\">{StringUtils.GetStageReadableName(SetTracker.Instance.CurrentSet.StageLock)}</color>" : "") : "");
     }
 
     private void UpdateStockDisplays()
@@ -153,27 +166,29 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         {
             StockDisplay display = stockDisplays[player.nr];
 
-            if (!player.IsInMatch || SetTracker.Instance.ActiveTourneyMode is not TourneyMode.LOCAL_CREW)
+            if (!player.IsInMatch)
             {
                 display.rectTransform.gameObject.SetActive(false);
                 return;
             }
             
             display.rectTransform.anchoredPosition = playerSelections[player.nr].transform.localPosition + (Vector3)STOCKDISPLAY_POSITION;
+            display.rectTransform.gameObject.SetActive(true);
 
             int maxStocks = GameSettings.current.stocks;
             display.SetMaxStocks(maxStocks);
 
-            if (SetTracker.Instance.CurrentSet.IsGame1)
+            if (SetTracker.Instance.CurrentSet.IsGame1 && !SetTracker.Instance.CurrentSet.IsTiebreaker)
             {
-                display.SetStocks(maxStocks);
+                if (SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_CREW) display.SetStocks(maxStocks);
+                else display.rectTransform.gameObject.SetActive(false);
             }
             else
             {
-                int stocksRemaining = SetTracker.Instance.CurrentSet.CompletedMatches.Last().FinalScores[player.nr].Stocks;
+                int stocksRemaining = SetTracker.Instance.CurrentSet.PlayerStockLock[player.nr];
+                if (SetTracker.Instance.ActiveTourneyMode is not TourneyMode.LOCAL_CREW && stocksRemaining < 1) display.rectTransform.gameObject.SetActive(false);
                 display.SetStocks(stocksRemaining > 0 ? stocksRemaining : maxStocks);
             }
-            display.rectTransform.gameObject.SetActive(true);
         });
     }
 
