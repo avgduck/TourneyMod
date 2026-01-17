@@ -155,8 +155,8 @@ internal class ScreenMenuSetPreview : ScreenUnlocksStages, ICustomScreen<ScreenU
             Set set = SetTracker.Instance.CurrentSet;
             lbName.SetText("Set Overview");
 
-            string[] characterLock = Player.EPlayers().Where(p => !set.PlayerCharacterLock[((Player)p).nr].IsEmpty).Select(p => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)((Player)p).Team])}>{StringUtils.GetCharacterSafeName(set.PlayerCharacterLock[((Player)p).nr].character)}</color>").ToArray();
-            string[] stockLock = Player.EPlayers().Where(p => set.PlayerStockLock[((Player)p).nr] != 0).Select(p => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)((Player)p).Team])}>{set.PlayerStockLock[((Player)p).nr]}</color>").ToArray();
+            string[] characterLock = Player.EPlayers().Where(p => !set.PlayerCharacterLock[((Player)p).nr].IsEmpty).Select(p => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)SetTracker.Instance.GetPlayerTeam(((Player)p).nr)])}>{StringUtils.GetCharacterSafeName(set.PlayerCharacterLock[((Player)p).nr].character)}</color>").ToArray();
+            string[] stockLock = Player.EPlayers().Where(p => set.PlayerStockLock[((Player)p).nr] != 0).Select(p => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)SetTracker.Instance.GetPlayerTeam(((Player)p).nr)])}>{set.PlayerStockLock[((Player)p).nr]}</color>").ToArray();
             Stage stageLock = SetTracker.Instance.CurrentSet.StageLock;
             
             lbInfo.SetText(
