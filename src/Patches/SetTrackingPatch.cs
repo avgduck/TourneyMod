@@ -48,6 +48,7 @@ internal static class SetTrackingPatch
     {
         if (SetTracker.Instance.ActiveTourneyMode is TourneyMode.NONE) return;
         if (SetTracker.Instance.CurrentSet.IsGame1 && !SetTracker.Instance.CurrentSet.IsTiebreaker) return;
+        if (SetTracker.Instance.CurrentSet.LastWinnerOverride != Team.NONE) return;
 
         Player p = __instance.player;
         int stocksRemaining = SetTracker.Instance.CurrentSet.PlayerStockLock[p.nr];

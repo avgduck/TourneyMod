@@ -180,7 +180,7 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         UpdateStageBans();
         UpdateSetInfo();
 
-        if (SetTracker.Instance.ActiveTourneyMode is not TourneyMode.NONE && SetTracker.Instance.CurrentSet.StageLock != Stage.NONE)
+        if (SetTracker.Instance.ActiveTourneyMode is not TourneyMode.NONE && SetTracker.Instance.CurrentSet.StageLock != Stage.NONE && SetTracker.Instance.CurrentSet.LastWinnerOverride == Team.NONE)
         {
             UIScreen.blockGlobalInput = false;
             AudioHandler.PlaySfx(Sfx.LOBBY_START_GAME);

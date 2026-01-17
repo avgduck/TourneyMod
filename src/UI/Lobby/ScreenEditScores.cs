@@ -205,6 +205,7 @@ internal class ScreenEditScores : ScreenPlayersSettings, ICustomScreen<ScreenPla
     {
         screenLobbyTourney.UpdateSetCount();
         screenLobbyTourney.UpdateLockIcons();
+        screenLobbyTourney.UpdateStockDisplays();
         
         lbScoreOverrideRed.SetText(SetTracker.Instance.CurrentSet.WinCountOverride[0].ToString());
         lbScoreOverrideBlue.SetText(SetTracker.Instance.CurrentSet.WinCountOverride[1].ToString());

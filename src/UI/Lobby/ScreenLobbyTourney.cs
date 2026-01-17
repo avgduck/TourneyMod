@@ -157,10 +157,10 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         lbScoreRed.SetText(winCounts[0].ToString());
         lbScoreBlue.SetText(winCounts[1].ToString());
         
-        lbTiebreaker.SetText(SetTracker.Instance.CurrentSet.IsTiebreaker ? "Tiebreaker!" + (SetTracker.Instance.CurrentSet.StageLock != Stage.NONE ? $"\n<color=\"yellow\">{StringUtils.GetStageReadableName(SetTracker.Instance.CurrentSet.StageLock)}</color>" : "") : "");
+        lbTiebreaker.SetText(SetTracker.Instance.CurrentSet.IsTiebreaker && SetTracker.Instance.CurrentSet.LastWinnerOverride == Team.NONE ? "Tiebreaker!" + (SetTracker.Instance.CurrentSet.StageLock != Stage.NONE ? $"\n<color=\"yellow\">{StringUtils.GetStageReadableName(SetTracker.Instance.CurrentSet.StageLock)}</color>" : "") : "");
     }
 
-    private void UpdateStockDisplays()
+    internal void UpdateStockDisplays()
     {
         Player.ForAll((Player player) =>
         {
@@ -178,7 +178,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
             int maxStocks = GameSettings.current.stocks;
             display.SetMaxStocks(maxStocks);
 
-            if (SetTracker.Instance.CurrentSet.IsGame1 && !SetTracker.Instance.CurrentSet.IsTiebreaker)
+            if (SetTracker.Instance.CurrentSet.IsGame1 && !SetTracker.Instance.CurrentSet.IsTiebreaker || SetTracker.Instance.CurrentSet.LastWinnerOverride != Team.NONE)
             {
                 if (SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_CREW) display.SetStocks(maxStocks);
                 else display.rectTransform.gameObject.SetActive(false);
