@@ -16,7 +16,6 @@ internal class StockDisplay
 
     internal static void Create(ref StockDisplay stockDisplay, int maxStocks, string name, Transform parent, Vector2 position, Vector2 scale)
     {
-        Plugin.LogGlobal.LogInfo(maxStocks);
         stockDisplay = new StockDisplay();
         stockDisplay.rectTransform = LLControl.CreatePanel(parent, name);
         // Assets.GetGameSprite(...)
