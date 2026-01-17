@@ -36,6 +36,7 @@ public class Plugin : BaseUnityPlugin
     
     internal bool TourneyMenuOpen = false;
     internal bool RulesetsMenuOpen = false;
+    internal bool SetPreviewMenuOpen = false;
     internal bool ScoreEditMenuOpen = false;
     internal bool RecolorCursors = false;
 

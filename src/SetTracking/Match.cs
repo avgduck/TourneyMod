@@ -9,6 +9,9 @@ internal class Match
     internal PlayerCharacter[] PlayerCharacters { get; private set; }
     internal PlayerScore[] FinalScores { get; private set; }
     internal Team Winner;
+    internal int GameNumber { get; private set; }
+    internal bool IsTimeout { get; private set; }
+    internal bool IsTiebreaker { get; private set; }
 
     internal void Start(Stage stage, PlayerCharacter[] playerCharacters)
     {
@@ -16,10 +19,13 @@ internal class Match
         PlayerCharacters = playerCharacters;
     }
 
-    internal void End(PlayerScore[] scores)
+    internal void End(PlayerScore[] scores, int gameNumber, bool isTimeout, bool isTiebreaker)
     {
         FinalScores = scores;
         Winner = GetWinner();
+        GameNumber = gameNumber;
+        IsTimeout = isTimeout;
+        IsTiebreaker = isTiebreaker;
     }
 
     private Team GetWinner()

@@ -90,7 +90,7 @@ internal static class SetTrackingPatch
         PlayerCharacter[] playerCharacters = [PlayerCharacter.EMPTY, PlayerCharacter.EMPTY, PlayerCharacter.EMPTY, PlayerCharacter.EMPTY];
         Player.ForAllInMatch((Player player) =>
         {
-            playerCharacters[player.nr] = new PlayerCharacter(player.CharacterSelected, player.CharacterVariant);
+            playerCharacters[player.nr] = new PlayerCharacter(player.CharacterSelected, player.CharacterVariant, player.Team);
         });
         SetTracker.Instance.CurrentSet.StartMatch(stage, playerCharacters);
     }

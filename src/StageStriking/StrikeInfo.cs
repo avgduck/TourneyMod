@@ -65,10 +65,15 @@ internal class StrikeInfo
         if (SetTracker.Instance.CurrentSet.ActiveRuleset.dsrMode == Ruleset.DsrMode.OFF) return;
 
         Match[] lastWins = new Match[4];
-        set.CompletedMatches.ForEach(match => lastWins[(int)match.Winner] = match);
+        set.CompletedMatches.ForEach(match =>
+        {
+            if (match.Winner == Team.NONE) return;
+            lastWins[(int)match.Winner] = match;
+        });
         
         set.CompletedMatches.ForEach(match =>
         {
+            if (match.Winner == Team.NONE) return;
             Match lastWin = lastWins[(int)match.Winner];
 
             StageBan previousBan = StageBans.Find(ban => ban.stage == match.PlayedStage);

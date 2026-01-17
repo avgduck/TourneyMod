@@ -66,7 +66,7 @@ internal class Set
 
     internal void EndMatch(PlayerScore[] scores, bool isTimeout)
     {
-        CurrentMatch.End(scores);
+        CurrentMatch.End(scores, GameNumber, isTimeout, IsTiebreaker);
         Team winner = CurrentMatch.Winner;
         
         if (isTimeout)
@@ -135,14 +135,19 @@ internal class Set
         
         SetTracker.Log.LogInfo($"Determined match winner: {winner}");
         CurrentMatch.Winner = winner;
+        Player.ForAll((Player player) =>
+        {
+            PlayerCharacterLock[player.nr] = PlayerCharacter.EMPTY;
+            PlayerStockLock[player.nr] = 0;
+        });
         if (CurrentMatch.Winner == Team.NONE)
         {
             if (isTimeout)
             {
                 SetTracker.Log.LogInfo("Timeout tiebreaker needed!");
-                Player.ForAll((Player player) =>
+                Player.ForAllInMatch((Player player) =>
                 {
-                    PlayerCharacterLock[player.nr] = new PlayerCharacter(player.CharacterSelected, player.CharacterVariant);
+                    PlayerCharacterLock[player.nr] = new PlayerCharacter(player.CharacterSelected, player.CharacterVariant, player.Team);
                     PlayerStockLock[player.nr] = 1;
                 });
                 StageLock = CurrentMatch.PlayedStage;
@@ -155,19 +160,14 @@ internal class Set
         }
         else
         {
-            Player.ForAll((Player player) =>
-            {
-                PlayerCharacterLock[player.nr] = PlayerCharacter.EMPTY;
-                PlayerStockLock[player.nr] = 0;
-            });
             StageLock = Stage.NONE;
             IsTiebreaker = false;
             
             if (ActiveRuleset.winnerCharacterLock || SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_CREW)
             {
-                Player.ForAll((Player player) =>
+                Player.ForAllInMatch((Player player) =>
                 {
-                    PlayerCharacterLock[player.nr] = player.Team == winner ? new PlayerCharacter(player.CharacterSelected, player.CharacterVariant) : PlayerCharacter.EMPTY;
+                    PlayerCharacterLock[player.nr] = player.Team == winner ? new PlayerCharacter(player.CharacterSelected, player.CharacterVariant, player.Team) : PlayerCharacter.EMPTY;
                     PlayerStockLock[player.nr] = SetTracker.Instance.ActiveTourneyMode is TourneyMode.LOCAL_CREW ? scores[player.nr].Stocks : 0;
                 });
             }

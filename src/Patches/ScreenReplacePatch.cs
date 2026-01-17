@@ -31,13 +31,17 @@ internal static class ScreenReplacePatch
         {
             ReplaceScreen<ScreenMenuVersus, ScreenMenuTourney>(ref __result);
         }
-        else if (screenType == ScreenType.MENU_UNLOCKS && Plugin.Instance.RulesetsMenuOpen)
+        else if (screenType == ScreenType.MENU_UNLOCKS && (Plugin.Instance.RulesetsMenuOpen || Plugin.Instance.SetPreviewMenuOpen))
         {
             GameObject.Destroy(__result);
         }
         else if (screenType == ScreenType.UNLOCKS_STAGES && Plugin.Instance.RulesetsMenuOpen)
         {
             ReplaceScreen<ScreenUnlocksStages, ScreenMenuRulesets>(ref __result);
+        }
+        else if (screenType == ScreenType.UNLOCKS_STAGES && Plugin.Instance.SetPreviewMenuOpen)
+        {
+            ReplaceScreen<ScreenUnlocksStages, ScreenMenuSetPreview>(ref __result);
         }
         else if (screenType == ScreenType.PLAYERS && SetTracker.Instance.IsTrackingSet)
         {
@@ -153,7 +157,7 @@ internal static class ScreenReplacePatch
     private static bool GameStatesUnlocks_ProcessMsg_Prefix(JOFJHDJHJGI OHBPPCEFBHI, Message EIMJOIEPMNA)
     {
         Msg msg = EIMJOIEPMNA.msg;
-        if (!Plugin.Instance.RulesetsMenuOpen) return true;
+        if (!Plugin.Instance.RulesetsMenuOpen && !Plugin.Instance.SetPreviewMenuOpen) return true;
         if (msg != Msg.BACK) return true;
         
         OGKPCMDOMPF.screenMenu.SetActive(true);
