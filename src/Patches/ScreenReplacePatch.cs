@@ -50,6 +50,10 @@ internal static class ScreenReplacePatch
                 ReplaceScreen<ScreenPlayers, ScreenLobbyTourney>(ref __result);
             }
         }
+        else if (screenType == ScreenType.PLAYERS_SETTINGS && Plugin.Instance.ScoreEditMenuOpen)
+        {
+            ReplaceScreen<ScreenPlayersSettings, ScreenEditScores>(ref __result);
+        }
         else if (screenType == ScreenType.PLAYERS_STAGE && SetTracker.Instance.IsTrackingSet)
         {
             ReplaceScreen<ScreenPlayersStage, ScreenStageStrike>(ref __result);

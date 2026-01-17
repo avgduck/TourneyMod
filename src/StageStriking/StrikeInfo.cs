@@ -160,7 +160,7 @@ internal class StrikeInfo
         }
         
         ControllingTeam = ControlStartTeam;
-        int matchCount = SetTracker.Instance.IsTrackingSet ? SetTracker.Instance.CurrentSet.CompletedMatches.Count : 0;
+        int matchCount = SetTracker.Instance.CurrentSet.TotalWins;
         int banRulesCount = SetTracker.Instance.CurrentSet.ActiveRuleset.banAmounts.Length;
         int[] banAmounts = SetTracker.Instance.CurrentSet.ActiveRuleset.banAmounts[matchCount < banRulesCount ? matchCount : banRulesCount - 1];
         foreach (int banAmount in banAmounts)

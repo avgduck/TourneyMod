@@ -47,6 +47,39 @@ internal static class CursorPatch
             
             Cursors.ResetCursorColors();
         }
+        
+        // void GameStatesLobby::OpenOptions()
+        [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.IENCHDCADEA))]
+        [HarmonyPrefix]
+        private static void OpenOptions_Prefix(HPNLMFHPHFD __instance, ref CursorInfo __state)
+        {
+            CursorState[] playerStates = new CursorState[4];
+            Player.ForAll(player => playerStates[player.nr] = player.cursor.GetState());
+            __state = new CursorInfo(UIInput.GetControl(), UIInput.mainCursor.GetState(), playerStates);
+        }
+        
+        // void GameStatesLobby::OpenOptions()
+        [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.IENCHDCADEA))]
+        [HarmonyPostfix]
+        private static void OpenOptions_Postfix(HPNLMFHPHFD __instance, ref CursorInfo __state)
+        {
+            //__instance.LHCCKNCKCGD(); // GameStatesLobby::ShowActiveCursors()
+
+            UIInput.SetControl(__state.control);
+            
+            if (__state.control == UIControl.MAIN_POINTER)
+            {
+                UIInput.mainCursor.SetState(__state.mainState);
+                //UIInput.mainCursor.SetRelPos(0.5f, 0.5f);
+            }
+            else if (__state.control == UIControl.PLAYER_POINTERS)
+            {
+                CursorState[] playerStates = __state.playerStates;
+                Player.ForAll(player => player.cursor.SetState(playerStates[player.nr]));
+            }
+            
+            Cursors.ResetCursorColors();
+        }
 
         [HarmonyPatch(typeof(UIInput), nameof(UIInput.HandleCursors))]
         [HarmonyPostfix]

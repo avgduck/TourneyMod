@@ -1,6 +1,7 @@
 using System.Linq;
 using LLBML.Players;
 using LLBML.Settings;
+using LLBML.States;
 using LLScreen;
 using TMPro;
 using TourneyMod.SetTracking;
@@ -16,9 +17,9 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     private static readonly Vector2 SCORE_POSITION = new Vector2(0f, 204f);
     private const int SCORE_FONT_SIZE = 52;
     private static readonly Vector2 SCORE_OFFSET = new Vector2(50f, 0f);
-    private static readonly Vector2 RESET_SCALE = new Vector2(220f, 26f);
-    private static readonly Vector2 RESET_POSITION = new Vector2(0f, -346f);
-    private const int RESET_FONT_SIZE = 18;
+    private static readonly Vector2 BT_EDITSCORES_SCALE = new Vector2(220f, 26f);
+    private static readonly Vector2 BT_EDITSCORES_POSITION = new Vector2(0f, -346f);
+    private const int BT_EDITSCORES_FONT_SIZE = 18;
 
     private static readonly Vector2 LOCK_SCALE = new Vector2(128f, 128f);
     private static readonly Vector2 LOCK_POSITION = new Vector2(0f, 60f);
@@ -31,7 +32,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     private TextMeshProUGUI lbScoreDash;
     private TextMeshProUGUI lbScoreBlue;
     
-    private VoteButton btResetSetCount;
+    private VoteButton btEditScores;
 
     private StockDisplay[] stockDisplays;
     private Image[] imgsCharacterLock;
@@ -97,13 +98,13 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         UIUtils.CreateText(ref lbScoreBlue, "lbScoreBlue", transform, SCORE_POSITION + SCORE_OFFSET);
         lbScoreBlue.fontSize = SCORE_FONT_SIZE;
         lbScoreBlue.color = UIUtils.COLOR_TEAM[1];
-
-        UIUtils.CreateVoteButton(ref btResetSetCount, "btResetSetCount", transform, RESET_POSITION, RESET_SCALE);
-        VoteButton.ActiveVoteButtons.Add(btResetSetCount);
-        UIUtils.SetButtonBGVisibility(btResetSetCount, false);
-        btResetSetCount.textMesh.fontSize = RESET_FONT_SIZE;
-        btResetSetCount.label = "Reset set count";
-        btResetSetCount.onVote = OnVoteReset;
+        
+        UIUtils.CreateVoteButton(ref btEditScores, "btEditScores", transform, BT_EDITSCORES_POSITION, BT_EDITSCORES_SCALE);
+        VoteButton.ActiveVoteButtons.Add(btEditScores);
+        UIUtils.SetButtonBGVisibility(btEditScores, false);
+        btEditScores.textMesh.fontSize = BT_EDITSCORES_FONT_SIZE;
+        btEditScores.label = "Edit scores";
+        btEditScores.onVote = OnVoteEditScores;
 
         stockDisplays = new StockDisplay[4];
         imgsCharacterLock = new Image[4];
@@ -122,7 +123,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
 
     public override void OnClose(ScreenType screenTypeNext)
     {
-        VoteButton.ActiveVoteButtons.Remove(btResetSetCount);
+        VoteButton.ActiveVoteButtons.Remove(btEditScores);
         
         base.OnClose(screenTypeNext);
     }
@@ -135,7 +136,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         UpdateStockDisplays();
     }
     
-    private void UpdateSetCount()
+    internal void UpdateSetCount()
     {
         int gameNumber = SetTracker.Instance.CurrentSet.GameNumber;
         int[] winCounts = SetTracker.Instance.CurrentSet.WinCounts;
@@ -176,7 +177,7 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
         });
     }
 
-    private void UpdateLockIcons()
+    internal void UpdateLockIcons()
     {
         Player.ForAll((Player player) =>
         {
@@ -189,13 +190,13 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
             }
             
             img.rectTransform.anchoredPosition = playerSelections[player.nr].transform.localPosition + (Vector3)LOCK_POSITION;
-            img.gameObject.SetActive(!SetTracker.Instance.CurrentSet.PlayerCharacterLock[player.nr].IsEmpty);
+            img.gameObject.SetActive(!SetTracker.Instance.CurrentSet.PlayerCharacterLock[player.nr].IsEmpty && SetTracker.Instance.CurrentSet.LastWinnerOverride == Team.NONE);
         });
     }
     
-    private void OnVoteReset()
+    private void OnVoteEditScores()
     {
-        SetTracker.Instance.Reset();
-        UpdateSetCount();
+        Plugin.Instance.ScoreEditMenuOpen = true;
+        GameStates.Send(Msg.SEL_OPTIONS, -1, -1);
     }
 }

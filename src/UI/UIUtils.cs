@@ -57,8 +57,13 @@ internal static class UIUtils
 
     internal static void CreatePanel(ref RectTransform panel, string name, Transform parent, Vector2 position, Vector2 scale)
     {
+        CreatePanel(ref panel, name, parent, position, scale, Color.black);
+    }
+    
+    internal static void CreatePanel(ref RectTransform panel, string name, Transform parent, Vector2 position, Vector2 scale, Color bgColor)
+    {
         Image img = LLControl.CreateImage(parent, buttonBG);
-        img.color = Color.black;
+        img.color = bgColor;
         panel = img.rectTransform;
         panel.name = name;
         panel.anchorMin = new Vector2(0f, 0f);
@@ -67,6 +72,30 @@ internal static class UIUtils
         panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scale.y);
 
         panel.anchoredPosition = position;
+    }
+
+    internal static void CreateBorderPanel(ref RectTransform panel, string name, Transform parent, Vector2 position, Vector2 scale, Color bgColor, Color borderColor, int borderThickness)
+    {
+        CreatePanel(ref panel, name, parent, position, scale, bgColor);
+
+        Texture2D texBorder = CreateBorderTexture(borderColor, borderThickness, (int)scale.x, (int)scale.y);
+        Image imgBorder = LLControl.CreateImage(panel, Sprite.Create(texBorder, new Rect(0, 0, texBorder.width, texBorder.height), new Vector2(0.5f, 0.5f)));
+    }
+
+    internal static void CreateImageBorderPanel(ref Image panel, string name, Transform parent, Vector2 position, Vector2 scale, Color bgColor, Color borderColor, int borderThickness)
+    {
+        panel = LLControl.CreateImage(parent, buttonBG);
+        panel.color = bgColor;
+        panel.rectTransform.name = name;
+        panel.rectTransform.anchorMin = new Vector2(0f, 0f);
+        panel.rectTransform.anchorMax = new Vector2(1f, 1f);
+        panel.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scale.x);
+        panel.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scale.y);
+
+        panel.rectTransform.anchoredPosition = position;
+        
+        Texture2D texBorder = CreateBorderTexture(borderColor, borderThickness, (int)scale.x, (int)scale.y);
+        Image imgBorder = LLControl.CreateImage(panel.rectTransform, Sprite.Create(texBorder, new Rect(0, 0, texBorder.width, texBorder.height), new Vector2(0.5f, 0.5f)));
     }
     
     internal static void CreateText(ref TextMeshProUGUI text, string name, Transform parent)
@@ -100,6 +129,11 @@ internal static class UIUtils
 
     internal static void CreateButton(ref LLButton button, string name, Transform parent, Vector2 position, Vector2 scale)
     {
+        CreateButton(ref button, name, parent, position, scale, Color.black);
+    }
+
+    internal static void CreateButton(ref LLButton button, string name, Transform parent, Vector2 position, Vector2 scale, Color bgColor)
+    {
         Image img = LLControl.CreateImage(parent, buttonBG);
         img.color = new Color(1f, 1f, 0f, 0f);
         RectTransform panel = img.rectTransform;
@@ -121,7 +155,7 @@ internal static class UIUtils
         bg.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         bg.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scale.x);
         bg.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scale.y);
-        bg.color = Color.black;
+        bg.color = bgColor;
         bg.raycastTarget = false;
         
         CreateText(ref button.textMesh, "Text", button.transform);

@@ -78,6 +78,7 @@ internal static class LobbyPatch
     private static void GameStatesLobby_AddPlayer_Prefix(ref ALDOKEMAOMB LGACHGEPNNH)
     {
         if (SetTracker.Instance.ActiveTourneyMode is TourneyMode.NONE) return;
+        if (SetTracker.Instance.CurrentSet.LastWinnerOverride != Team.NONE) return;
 
         Player p = LGACHGEPNNH;
         PlayerCharacter characterLock = SetTracker.Instance.CurrentSet.PlayerCharacterLock[p.nr];
@@ -92,6 +93,7 @@ internal static class LobbyPatch
     private static void GameStatesLobby_UpdatePlayer_Prefix(ref ALDOKEMAOMB LGACHGEPNNH)
     {
         if (SetTracker.Instance.ActiveTourneyMode is TourneyMode.NONE) return;
+        if (SetTracker.Instance.CurrentSet.LastWinnerOverride != Team.NONE) return;
         
         Player p = LGACHGEPNNH;
         PlayerCharacter characterLock = SetTracker.Instance.CurrentSet.PlayerCharacterLock[p.nr];
@@ -110,9 +112,17 @@ internal static class LobbyPatch
             LLClickable.ControlDelegate onClick = characterButton.btCharacter.onClick;
             characterButton.btCharacter.onClick = (playerNr) =>
             {
-                if (SetTracker.Instance.ActiveTourneyMode is not TourneyMode.NONE && playerNr != -1 && !SetTracker.Instance.CurrentSet.PlayerCharacterLock[playerNr].IsEmpty) return;
+                if (SetTracker.Instance.ActiveTourneyMode is not TourneyMode.NONE && playerNr != -1 && !SetTracker.Instance.CurrentSet.PlayerCharacterLock[playerNr].IsEmpty && SetTracker.Instance.CurrentSet.LastWinnerOverride == Team.NONE) return;
                 onClick(playerNr);
             };
         }
+    }
+    
+    // void GameStatesLobby::CloseOptions()
+    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.BFKBMEJONDL))]
+    [HarmonyPostfix]
+    private static void CloseOptions_Postfix()
+    {
+        Plugin.Instance.ScoreEditMenuOpen = false;
     }
 }
