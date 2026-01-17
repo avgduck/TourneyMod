@@ -156,7 +156,8 @@ internal class ScreenMenuSetPreview : ScreenUnlocksStages, ICustomScreen<ScreenU
             lbName.SetText("Set Overview");
 
             string[] characterLock = Player.EPlayers().Where(p => !set.PlayerCharacterLock[((Player)p).nr].IsEmpty).Select(p => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)((Player)p).Team])}>{StringUtils.GetCharacterSafeName(set.PlayerCharacterLock[((Player)p).nr].character)}</color>").ToArray();
-            string[] stocklock = Player.EPlayers().Where(p => set.PlayerStockLock[((Player)p).nr] != 0).Select(p => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)((Player)p).Team])}>{set.PlayerStockLock[((Player)p).nr]}</color>").ToArray();
+            string[] stockLock = Player.EPlayers().Where(p => set.PlayerStockLock[((Player)p).nr] != 0).Select(p => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)((Player)p).Team])}>{set.PlayerStockLock[((Player)p).nr]}</color>").ToArray();
+            Stage stageLock = SetTracker.Instance.CurrentSet.StageLock;
             
             lbInfo.SetText(
                 $"Mode: <color=\"yellow\">{Plugin.GetModeName(SetTracker.Instance.ActiveTourneyMode, true)}</color>"
@@ -164,7 +165,8 @@ internal class ScreenMenuSetPreview : ScreenUnlocksStages, ICustomScreen<ScreenU
                 + $"\n\n<color=\"yellow\">Game {set.GameNumber}" + (set.IsTiebreaker ? " Tiebreaker" : "") + "</color>"
                 + $"\nScore: <color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[0])}>{set.WinCounts[0]}</color><color=\"yellow\"> - </color><color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[1])}>{set.WinCounts[1]}</color>"
                 + $"\n\nCharacter lock: <color=\"yellow\">{(characterLock.Length > 0 ? Plugin.PrintArray(characterLock, false) : "<color=\"yellow\">none</color>")}</color>"
-                + $"\nStock lock: <color=\"yellow\">{(stocklock.Length > 0 ? Plugin.PrintArray(stocklock, false) : "<color=\"yellow\">none</color>")}</color>"
+                + $"\nStock lock: <color=\"yellow\">{(stockLock.Length > 0 ? Plugin.PrintArray(stockLock, false) : "<color=\"yellow\">none</color>")}</color>"
+                + $"\nStage lock: <color=\"yellow\">{(stageLock != Stage.NONE ? StringUtils.GetStageReadableName(stageLock) : "none")}</color>"
             );
         }
         else if (buttonType == ButtonType.COMPLETED)
