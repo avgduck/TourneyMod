@@ -148,7 +148,7 @@ internal class Set
                 Player.ForAllInMatch((Player player) =>
                 {
                     PlayerCharacterLock[player.nr] = new PlayerCharacter(player.CharacterSelected, player.CharacterVariant, player.Team);
-                    PlayerStockLock[player.nr] = 1;
+                    PlayerStockLock[player.nr] = 2;
                 });
                 StageLock = CurrentMatch.PlayedStage;
                 IsTiebreaker = true;
