@@ -71,16 +71,24 @@ internal class Set
         
         if (isTimeout)
         {
-            int maxStocks = 0;
-            Team stockWinner = Team.NONE;
+            int[] teamStocks = [0, 0, 0, 0];
             for (int playerNr = 0; playerNr < 4; playerNr++)
             {
                 int score = scores[playerNr].Stocks;
+                if (score == 0 || scores[playerNr].Team == Team.NONE) continue;
+                teamStocks[(int)scores[playerNr].Team] += score;
+            }
+            
+            int maxStocks = 0;
+            Team stockWinner = Team.NONE;
+            for (int teamNr = 0; teamNr < 4; teamNr++)
+            {
+                int score = teamStocks[teamNr];
                 if (score == 0) continue;
                 if (score > maxStocks)
                 {
                     maxStocks = score;
-                    stockWinner = SetTracker.Instance.GetPlayerTeam(playerNr);
+                    stockWinner = (Team)teamNr;
                 }
                 else if (score == maxStocks)
                 {
@@ -96,19 +104,27 @@ internal class Set
             }
             else
             {
-                Floatf maxHp = Floatf.zero;
-                Team hpWinner = Team.NONE;
+                Floatf[] teamHp = [Floatf.zero, Floatf.zero, Floatf.zero, Floatf.zero];
                 for (int playerNr = 0; playerNr < 4; playerNr++)
                 {
-                    int score = scores[playerNr].Stocks;
+                    Floatf hp = scores[playerNr].Hp;
+                    if (Floatf.Equals(hp, Floatf.zero) || scores[playerNr].Team == Team.NONE) continue;
+                    teamHp[(int)scores[playerNr].Team] = Floatf.Add(teamHp[(int)scores[playerNr].Team], hp);
+                }
+                
+                Floatf maxHp = Floatf.zero;
+                Team hpWinner = Team.NONE;
+                for (int teamNr = 0; teamNr < 4; teamNr++)
+                {
+                    int score = teamStocks[teamNr];
                     if (score < maxStocks) continue;
                     
-                    Floatf hp = scores[playerNr].Hp;
+                    Floatf hp = teamHp[teamNr];
                     if (Floatf.Equals(hp, Floatf.zero)) continue;
                     if (Floatf.GreaterThan(hp, maxHp))
                     {
                         maxHp = hp;
-                        hpWinner = SetTracker.Instance.GetPlayerTeam(playerNr);
+                        hpWinner = (Team)teamNr;
                     }
                     else if (Floatf.Equals(hp, maxHp))
                     {
