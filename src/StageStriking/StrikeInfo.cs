@@ -36,7 +36,7 @@ internal class StrikeInfo
         else
         {
             Team winner = SetTracker.Instance.CurrentSet.LastWinner;
-            Team loser = winner == Team.RED ? Team.BLUE : Team.RED;
+            Team loser = winner == Team.NONE ? Team.NONE : (winner == Team.RED ? Team.BLUE : Team.RED);
             ControlStartTeam = SetTracker.Instance.CurrentSet.ActiveRuleset.laterGamesFirstTeam == Ruleset.FirstTeam.WINNER ? winner : loser;
         }
         
@@ -157,14 +157,15 @@ internal class StrikeInfo
 
     private void UpdateInteractMode()
     {
+        ControllingTeam = ControlStartTeam;
+        
         TotalBansRemaining = [0, 0, 0, 0];
-        if (SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced)
+        if (SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced || ControllingTeam == Team.NONE)
         {
             CurrentInteractMode = InteractMode.PICK;
             return;
         }
         
-        ControllingTeam = ControlStartTeam;
         int matchCount = SetTracker.Instance.CurrentSet.TotalWins;
         int banRulesCount = SetTracker.Instance.CurrentSet.ActiveRuleset.banAmounts.Length;
         int[] banAmounts = SetTracker.Instance.CurrentSet.ActiveRuleset.banAmounts[matchCount < banRulesCount ? matchCount : banRulesCount - 1];

@@ -175,17 +175,18 @@ internal class ScreenStageStrike : ScreenPlayersStage, ICustomScreen<ScreenPlaye
         btRandomBoth2D.onVote = () => OnVoteRandom(Ruleset.RandomStageMode.ANY_2D);
         btRandomBoth2D.enableVoting = !(SetTracker.Instance.CurrentSet.IsFreePickMode || SetTracker.Instance.CurrentSet.IsFreePickForced);
         if (randomStageMode != Ruleset.RandomStageMode.BOTH) btRandomBoth2D.gameObject.SetActive(false);
-
-        CreateStageContainers();
-        UpdateStageBans();
-        UpdateSetInfo();
-
+        
         if (SetTracker.Instance.ActiveTourneyMode is not TourneyMode.NONE && SetTracker.Instance.CurrentSet.StageLock != Stage.NONE && SetTracker.Instance.CurrentSet.LastWinnerOverride == Team.NONE)
         {
             UIScreen.blockGlobalInput = false;
             AudioHandler.PlaySfx(Sfx.LOBBY_START_GAME);
             selectedStage = StageStrikeTracker.Instance.CurrentStrikeInfo.PickStage(SetTracker.Instance.CurrentSet.StageLock, -1);
+            return;
         }
+
+        CreateStageContainers();
+        UpdateStageBans();
+        UpdateSetInfo();
     }
 
     public override void OnClose(ScreenType screenTypeNext)
