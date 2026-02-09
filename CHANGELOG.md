@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.2.0] - 2026-02-02
+
+### Added
+
+- Add local doubles tourney game mode ([`5e03cec`](https://github.com/avgduck/TourneyMod/commit/5e03cecd640da3f73d3e1c50cfaad3f493f88658))
+- Add crew battle tourney game mode ([`91d6b52`](https://github.com/avgduck/TourneyMod/commit/91d6b52d6a46676add4d7bd68f0d58a303be1ec3))
+- Add configs to select different ruleset for each tourney game mode ([`e404e2a`](https://github.com/avgduck/TourneyMod/commit/e404e2a5cb279f35c1b63699790049d9bf060d7b))
+- Add custom ruleset preview screen to tournament menu ([`aa0af14`](https://github.com/avgduck/TourneyMod/commit/aa0af14c15efb7effa99a6e64d9dee76a9229e28))
+- Add current set overview screen to tournament menu ([`6039748`](https://github.com/avgduck/TourneyMod/commit/60397488d817c35c4d4ee91c58c35a4b0b9ef959))
+- Add forced game options to rulesets ([`e9805c6`](https://github.com/avgduck/TourneyMod/commit/e9805c6a875fe9d29057b5ec3fc1173d78a67d87))
+- Add automatic winner character lock and add options to rulesets ([`40b1065`](https://github.com/avgduck/TourneyMod/commit/40b10655fbaed86c29959fb9a6b2397e238be535))
+- Add automatic timeout handling and tiebreaker matches ([`b516de1`](https://github.com/avgduck/TourneyMod/commit/b516de1edaf69c9786f66b9dc008f84197ff1dc3))
+- Add score override menu to tourney lobby screen ([`8ffb38e`](https://github.com/avgduck/TourneyMod/commit/8ffb38e62031bf8b56a6d52b190395610380aedb))
+- Display team color on player cursors ([`c2cbd2b`](https://github.com/avgduck/TourneyMod/commit/c2cbd2bb74646da0d585157163fc8b1071235f57))
+- Add dependency on [CharacterReroll](https://thunderstore.io/c/lethal-league-blaze/p/avg_duck/CharacterReroll/) mod ([`a9fb8fe`](https://github.com/avgduck/TourneyMod/commit/a9fb8fef3db6d82ab217152b3a803dd2190a04d4))
+
+### Removed
+
+- Remove ruleset preview in ModMenu ([`674f11b`](https://github.com/avgduck/TourneyMod/commit/674f11b9f36c0d4bd3c77709835f6f6aa964aebe))
+- Remove vote reset button on tourney lobby screen ([`8ffb38e`](https://github.com/avgduck/TourneyMod/commit/8ffb38e62031bf8b56a6d52b190395610380aedb))
+
+### Changed
+
+- Enable tourney set persisting after leaving lobby screen ([`c13f7af`](https://github.com/avgduck/TourneyMod/commit/c13f7af097da7ff33e5220f4da27b91545dab154))
+- Block entering other game modes when tourney set is active ([`c13f7af`](https://github.com/avgduck/TourneyMod/commit/c13f7af097da7ff33e5220f4da27b91545dab154))
+- Change set count text on lobby screen to use team color ([`3680604`](https://github.com/avgduck/TourneyMod/commit/3680604d1b8983883aa439c32d18546292530533))
+
 ## [1.1.0] - 2025-12-21
 
 ### Added
@@ -47,6 +74,7 @@
 
 _Initial release_
 
+[1.2.0]: https://github.com/avgduck/TourneyMod/releases/tag/v1.2.0
 [1.1.0]: https://github.com/avgduck/TourneyMod/releases/tag/v1.1.0
 [1.0.1]: https://github.com/avgduck/TourneyMod/releases/tag/v1.0.1
 [1.0.0]: https://github.com/avgduck/TourneyMod/releases/tag/v1.0.0
