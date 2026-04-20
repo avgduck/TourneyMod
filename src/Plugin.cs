@@ -4,6 +4,7 @@ using BepInEx;
 using BepInEx.Logging;
 using LLBML.Utils;
 using TourneyMod.Patches;
+using TourneyMod.PlayerTags;
 using TourneyMod.Rulesets;
 using TourneyMod.SetTracking;
 using TourneyMod.StageStriking;
@@ -58,6 +59,7 @@ public class Plugin : BaseUnityPlugin
         
         HarmonyPatches.PatchAll();
         RulesetIO.Init();
+        PlayerTagIO.Init();
 
         VoteButton.ActiveVoteButtons = new List<VoteButton>();
 
