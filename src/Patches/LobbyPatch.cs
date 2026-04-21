@@ -124,5 +124,6 @@ internal static class LobbyPatch
     private static void CloseOptions_Postfix()
     {
         Plugin.Instance.ScoreEditMenuOpen = false;
+        Plugin.Instance.TagEditMenuOpen = false;
     }
 }

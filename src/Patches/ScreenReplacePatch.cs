@@ -48,6 +48,7 @@ internal static class ScreenReplacePatch
             if (SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE)
             {
                 // TODO: add custom lobby screen with win tracking to other game modes
+                ReplaceScreen<ScreenPlayers, ScreenLobby>(ref __result);
             }
             else
             {
@@ -57,6 +58,10 @@ internal static class ScreenReplacePatch
         else if (screenType == ScreenType.PLAYERS_SETTINGS && Plugin.Instance.ScoreEditMenuOpen)
         {
             ReplaceScreen<ScreenPlayersSettings, ScreenEditScores>(ref __result);
+        }
+        else if (screenType == ScreenType.PLAYERS_SETTINGS && Plugin.Instance.TagEditMenuOpen)
+        {
+            ReplaceScreen<ScreenPlayersSettings, ScreenEditTags>(ref __result);
         }
         else if (screenType == ScreenType.PLAYERS_STAGE && SetTracker.Instance.IsTrackingSet)
         {

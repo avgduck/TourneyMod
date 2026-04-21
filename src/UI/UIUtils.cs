@@ -55,6 +55,25 @@ internal static class UIUtils
         image.rectTransform.anchoredPosition = position;
     }
 
+    internal static void CreateImageButton(ref LLButton button, Sprite sprite, string name, Transform parent, Vector2 position, Vector2 scale)
+    {
+        Image img = LLControl.CreateImage(parent, sprite);
+        RectTransform panel = img.rectTransform;
+        panel.name = name;
+        panel.anchorMin = new Vector2(0f, 0f);
+        panel.anchorMax = new Vector2(1f, 1f);
+        panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scale.x);
+        panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scale.y);
+        panel.anchoredPosition = position;
+
+        button = panel.gameObject.AddComponent<LLButton>();
+        button.colDefault = Color.white;
+        button.colHover = new Color(0.902f, 0.9529f, 0.051f);
+        button.hoverColorToImage = true;
+        button.hoverColorToOutline = false;
+        button.Init();
+    }
+
     internal static void CreatePanel(ref RectTransform panel, string name, Transform parent, Vector2 position, Vector2 scale)
     {
         CreatePanel(ref panel, name, parent, position, scale, Color.black);
