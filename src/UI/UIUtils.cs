@@ -78,7 +78,7 @@ internal static class UIUtils
     {
         CreatePanel(ref panel, name, parent, position, scale, Color.black);
     }
-    
+
     internal static void CreatePanel(ref RectTransform panel, string name, Transform parent, Vector2 position, Vector2 scale, Color bgColor)
     {
         Image img = LLControl.CreateImage(parent, buttonBG);

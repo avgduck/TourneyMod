@@ -59,10 +59,6 @@ internal static class ScreenReplacePatch
         {
             ReplaceScreen<ScreenPlayersSettings, ScreenEditScores>(ref __result);
         }
-        else if (screenType == ScreenType.PLAYERS_SETTINGS && Plugin.Instance.TagEditMenuOpen)
-        {
-            ReplaceScreen<ScreenPlayersSettings, ScreenEditTags>(ref __result);
-        }
         else if (screenType == ScreenType.PLAYERS_STAGE && SetTracker.Instance.IsTrackingSet)
         {
             ReplaceScreen<ScreenPlayersStage, ScreenStageStrike>(ref __result);

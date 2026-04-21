@@ -9,6 +9,7 @@ namespace TourneyMod.UI.Lobby;
 public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
 {
     private LLButton[] settingsButtons;
+    private PlayerTagMenu[] playerTagMenus;
     
     public void Init(ScreenPlayers screenPlayers)
     {
@@ -63,22 +64,28 @@ public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
         Sprite spriteGear = UIUtils.ToSprite(texGear);
 
         settingsButtons = new LLButton[4];
+        playerTagMenus = new PlayerTagMenu[4];
         for (int playerIndex = 0; playerIndex < 4; playerIndex++)
         {
             PlayersSelection playerSelection = playerSelections[playerIndex];
 
             LLButton btSettings = null;
             UIUtils.CreateImageButton(ref btSettings, spriteGear, "btSettings", playerSelection.btPlayerName.transform.parent, playerSelection.btPlayerName.transform.localPosition + new Vector3(0f, 2f, 0f), new Vector2(20f, 20f));
-            btSettings.onClick = OnClickSettings;
+            int i = playerIndex;
+            btSettings.onClick = (playerNr) => OnClickSettings(i, playerNr);
             settingsButtons[playerIndex] = btSettings;
             
             playerSelection.btPlayerName.transform.localPosition += new Vector3(15f, 0f, 0f);
+
+            playerTagMenus[playerIndex] = PlayerTagMenu.CreateMenu(playerSelection.transform);
         }
     }
 
-    private void OnClickSettings(int playerNr)
+    private void OnClickSettings(int playerIndex, int playerNr)
     {
-        Plugin.Instance.TagEditMenuOpen = true;
-        GameStates.Send(Msg.SEL_OPTIONS, -1, -1);
+        if (playerIndex == playerNr || playerNr == -1)
+        {
+            playerTagMenus[playerIndex].gameObject.SetActive(!playerTagMenus[playerIndex].gameObject.activeSelf);
+        }
     }
 }
