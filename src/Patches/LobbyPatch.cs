@@ -1,5 +1,6 @@
 using HarmonyLib;
 using LLBML.Players;
+using LLBML.Settings;
 using LLGUI;
 using LLScreen;
 using TourneyMod.SetTracking;
@@ -22,8 +23,24 @@ internal static class LobbyPatch
     [HarmonyPrefix]
     private static bool ScreenPlayers_UpdateTeamButtons_Prefix(ScreenPlayers __instance)
     {
+        ScreenLobby screenLobby = __instance as ScreenLobby;
+        if (screenLobby == null) return true;
+        
         ScreenLobbyTourney screenLobbyTourney = __instance as ScreenLobbyTourney;
-        if (screenLobbyTourney == null) return true;
+        if (screenLobbyTourney == null)
+        {
+            if (screenLobby.playerSelections == null || screenLobby.playerSelections.Length < 4) return false;
+
+            for (int playerIndex = 0; playerIndex < 4; playerIndex++)
+            {
+                bool isTagMenuEnabled = screenLobby.playerTagMenus != null && screenLobby.playerTagMenus[playerIndex].gameObject.activeSelf;
+                bool isTeamMode = NCMFHODLNAJ.BABJPAPBMIP(GameSettings.current.gameMode);
+                screenLobby.playerSelections[playerIndex].btTeam.SetActive(isTeamMode && !isTagMenuEnabled);
+                screenLobby.playerSelections[playerIndex].btSkin.SetActive(!isTagMenuEnabled);
+            }
+            
+            return false;
+        }
 
         foreach (PlayersSelection playerSelection in __instance.playerSelections)
         {

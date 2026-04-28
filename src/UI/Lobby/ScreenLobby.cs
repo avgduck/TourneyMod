@@ -9,7 +9,7 @@ namespace TourneyMod.UI.Lobby;
 public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
 {
     private LLButton[] settingsButtons;
-    private PlayerTagMenu[] playerTagMenus;
+    internal PlayerTagMenu[] playerTagMenus;
     
     public void Init(ScreenPlayers screenPlayers)
     {
@@ -86,6 +86,7 @@ public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
         if (playerIndex == playerNr || playerNr == -1)
         {
             playerTagMenus[playerIndex].gameObject.SetActive(!playerTagMenus[playerIndex].gameObject.activeSelf);
+            UpdateTeamButtons();
         }
     }
 }
