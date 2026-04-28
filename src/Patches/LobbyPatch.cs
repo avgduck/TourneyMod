@@ -142,4 +142,28 @@ internal static class LobbyPatch
     {
         Plugin.Instance.ScoreEditMenuOpen = false;
     }
+    
+    // bool GameStatesLobby::IsStartEnabled()
+    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.DJHHLDPLFMD))]
+    // bool GameStatesLobbySingle::IsStartEnabled()
+    [HarmonyPatch(typeof(HFAEJNGHDDM), nameof(HFAEJNGHDDM.DJHHLDPLFMD))]
+    [HarmonyPrefix]
+    private static bool GameStatesLobby_IsStartEnabled_Prefix(HPNLMFHPHFD __instance, ref bool __result)
+    {
+        ScreenPlayers screenPlayers = __instance.IMLMFFIEEAJ;
+        ScreenLobby screenLobby = screenPlayers as ScreenLobby;
+        if (screenLobby == null) return true;
+
+        for (int playerIndex = 0; playerIndex < 4; playerIndex++)
+        {
+            bool isTagMenuEnabled = screenLobby.playerTagMenus != null && screenLobby.playerTagMenus[playerIndex].gameObject.activeSelf;
+            if (isTagMenuEnabled)
+            {
+                __result = false;
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
