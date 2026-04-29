@@ -73,6 +73,7 @@ public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
             LLButton btSettings = null;
             UIUtils.CreateImageButton(ref btSettings, spriteGear, "btSettings", playerSelection.btPlayerName.transform.parent, playerSelection.btPlayerName.transform.localPosition + new Vector3(0f, 2f, 0f), new Vector2(20f, 20f));
             int i = playerIndex;
+            btSettings.soundClick = true;
             btSettings.onClick = playerNr => OnClickSettings(i, playerNr);
             settingsButtons[playerIndex] = btSettings;
             
