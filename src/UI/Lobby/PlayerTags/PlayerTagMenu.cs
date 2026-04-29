@@ -75,11 +75,14 @@ public class PlayerTagMenu : MonoBehaviour
     private TextMeshProUGUI lbCreateTag;
     private LLButton btBackspace;
     private LLButton btShift;
+    private LLButton btNumbers;
     private LLButton btEnter;
     private RectTransform pnKeypad;
     private List<CharsetButton> btCharsets;
+    private List<CharsetButton> btCharsetsAlpha;
+    private List<CharsetButton> btCharsetsNumbers;
     
-    private static readonly Charset[] charsets =
+    private static readonly Charset[] charsetAlpha =
     [
         new Charset(['a', 'b', 'c'], ['A', 'B', 'C']),
         new Charset(['d', 'e', 'f'], ['D', 'E', 'F']),
@@ -91,10 +94,24 @@ public class PlayerTagMenu : MonoBehaviour
         new Charset(['w', 'x', 'y', 'z'], ['W', 'X', 'Y', 'Z']),
     ];
 
+    private static readonly Charset[] charsetNumbers =
+    [
+        new Charset(['1', '2', '3']),
+        new Charset(['4', '5', '6']),
+        new Charset(['7', '8', '9', '0']),
+        new Charset(['\'', ',', '.', ';'], true),
+        new Charset(['_', '-', '~'], true),
+        new Charset(['!', '$', '@'], true),
+        new Charset(['#', '&', '%'], true),
+        new Charset(['(', ')', '[', ']'], true),
+        new Charset(['+', '=', '^'], true)
+    ];
+
     private const int TAG_MAX_LENGTH = 12;
     private const float TAG_REPEAT_TIME = 0.5f;
     private string tag;
     private bool upper;
+    private bool numbers;
 
     internal static PlayerTagMenu CreateMenu(Transform parent, int playerNr)
     {
@@ -171,23 +188,45 @@ public class PlayerTagMenu : MonoBehaviour
         
         UIUtils.CreatePanel(ref pnKeypad, "pnKeypad", pnCreate, KEYPAD_POSITION, KEYPAD_SCALE, Color.clear);
         
-        UIUtils.CreateButton(ref btShift, "btShift", pnKeypad, GetKeypadPosition(0, 0), KEYPAD_BUTTON_SCALE, Color.yellow);
+        UIUtils.CreateButton(ref btShift, "btShift", pnKeypad, GetKeypadPosition(3, 0), KEYPAD_BUTTON_SCALE, Color.yellow);
         btShift.textMesh.fontSize = CONTROL_FONT_SIZE;
         btShift.SetText("case");
         btShift.onClick = OnClickShift;
+        
+        UIUtils.CreateButton(ref btNumbers, "btNumbers", pnKeypad, GetKeypadPosition(3, 1), KEYPAD_BUTTON_SCALE, Color.yellow);
+        btNumbers.textMesh.fontSize = CONTROL_FONT_SIZE;
+        btNumbers.SetText("nums");
+        btNumbers.onClick = OnClickNumbers;
 
         btCharsets = new List<CharsetButton>();
-        for (int i = 0; i < charsets.Length; i++)
+        btCharsetsAlpha = new List<CharsetButton>();
+        for (int i = 0; i < charsetAlpha.Length; i++)
         {
             CharsetButton btCharset = null;
-            int col = (i + 1) % KEYPAD_COLS;
-            int row = (i + 1) / KEYPAD_COLS;
-            UIUtils.CreateCharsetButton(ref btCharset, "btCharset" + i, pnKeypad, GetKeypadPosition(row, col), KEYPAD_BUTTON_SCALE, Color.gray);
+            int col = (i + 0) % KEYPAD_COLS;
+            int row = (i + 0) / KEYPAD_COLS;
+            UIUtils.CreateCharsetButton(ref btCharset, "btCharsetAlpha" + i, pnKeypad, GetKeypadPosition(row, col), KEYPAD_BUTTON_SCALE, Color.gray);
             btCharset.textMesh.fontSize = CONTROL_FONT_SIZE;
-            btCharset.SetCharset(charsets[i]);
+            btCharset.SetCharset(charsetAlpha[i]);
             int btIndex = i;
             btCharset.onClick = playerNr => OnClickCharset(playerNr, btCharset, btIndex);
             btCharsets.Add(btCharset);
+            btCharsetsAlpha.Add(btCharset);
+        }
+
+        btCharsetsNumbers = new List<CharsetButton>();
+        for (int i = 0; i < charsetNumbers.Length; i++)
+        {
+            CharsetButton btCharset = null;
+            int col = (i + 0) % KEYPAD_COLS;
+            int row = (i + 0) / KEYPAD_COLS;
+            UIUtils.CreateCharsetButton(ref btCharset, "btCharsetNumbers" + i, pnKeypad, GetKeypadPosition(row, col), KEYPAD_BUTTON_SCALE, Color.gray);
+            btCharset.textMesh.fontSize = CONTROL_FONT_SIZE;
+            btCharset.SetCharset(charsetNumbers[i]);
+            int btIndex = i;
+            btCharset.onClick = playerNr => OnClickCharset(playerNr, btCharset, btIndex);
+            btCharsets.Add(btCharset);
+            btCharsetsNumbers.Add(btCharset);
         }
         
         UIUtils.CreateButton(ref btEnter, "btEnter", pnKeypad, GetKeypadPosition(3, 2), KEYPAD_BUTTON_SCALE, Color.yellow);
@@ -280,7 +319,10 @@ public class PlayerTagMenu : MonoBehaviour
         tag = "";
         TextHandler.SetText(lbCreateTag, tag);
         upper = false;
+        numbers = false;
         btCharsets.ForEach(btCharset => btCharset.SetUpper(upper));
+        btCharsetsAlpha.ForEach(btCharset => btCharset.gameObject.SetActive(true));
+        btCharsetsNumbers.ForEach(btCharset => btCharset.gameObject.SetActive(false));
         
         gameObject.SetActive(true);
     }
@@ -306,6 +348,18 @@ public class PlayerTagMenu : MonoBehaviour
         
         upper = !upper;
         btCharsets.ForEach(btCharset => btCharset.SetUpper(upper));
+        btShift.SetText(upper ? "CASE" : "case");
+        activeBtIndex = -1;
+    }
+    
+    private void OnClickNumbers(int playerNr)
+    {
+        if (playerNr != -1 && this.playerNr != playerNr) return;
+        
+        numbers = !numbers;
+        btCharsetsAlpha.ForEach(btCharset => btCharset.gameObject.SetActive(!numbers));
+        btCharsetsNumbers.ForEach(btCharset => btCharset.gameObject.SetActive(numbers));
+        btNumbers.SetText(numbers ? "alpha" : "nums");
         activeBtIndex = -1;
     }
 
