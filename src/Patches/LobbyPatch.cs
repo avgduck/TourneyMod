@@ -3,8 +3,10 @@ using LLBML.Players;
 using LLBML.Settings;
 using LLGUI;
 using LLScreen;
+using TourneyMod.PlayerTags;
 using TourneyMod.SetTracking;
 using TourneyMod.UI.Lobby;
+using TourneyMod.UI.Lobby.PlayerTags;
 
 namespace TourneyMod.Patches;
 
@@ -179,5 +181,34 @@ internal static class LobbyPatch
 
         Player p = LGACHGEPNNH;
         screenLobby.OnEject(p.nr);
+    }
+
+    // void GameStatesLobby::UpdatePlayer(Player p, bool play_selection_anim)
+    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.BDMIDGAHNLA))]
+    [HarmonyPostfix]
+    private static void GameStatesLobby_UpdatePlayer_Postfix(HPNLMFHPHFD __instance, ALDOKEMAOMB LGACHGEPNNH)
+    {
+        ScreenPlayers screenPlayers = __instance.IMLMFFIEEAJ;
+        ScreenLobby screenLobby = screenPlayers as ScreenLobby;
+        if (screenLobby == null) return;
+        if (screenLobby.playerTagMenus == null) return;
+        
+        Player p = LGACHGEPNNH;
+        PlayerTag playerTag = Plugin.Instance.SelectedPlayerTags[p.nr];
+        if (!p.IsInMatch && !p.IsSpectator) return;
+        if (!p.isLocal) return;
+
+        if (playerTag.IsDefault)
+        {
+            screenLobby.SetPlayerName(p.nr, $"PLAYER{p.nr+1}");
+            screenLobby.playerSelections[p.nr].btPlayerName.colDefault = PlayerTagMenu.COLOR_TAG_DEFAULT;
+            screenLobby.playerSelections[p.nr].btPlayerName.textMesh.color = PlayerTagMenu.COLOR_TAG_DEFAULT;
+        }
+        else
+        {
+            screenLobby.SetPlayerName(p.nr, playerTag.GetName());
+            screenLobby.playerSelections[p.nr].btPlayerName.colDefault = PlayerTagMenu.COLOR_TAG_CUSTOM;
+            screenLobby.playerSelections[p.nr].btPlayerName.textMesh.color = PlayerTagMenu.COLOR_TAG_CUSTOM;
+        }
     }
 }

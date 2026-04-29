@@ -34,6 +34,9 @@ public class Plugin : BaseUnityPlugin
     private const string defaultRulesetId = "all_stages";
     internal Dictionary<TourneyMode, string> SelectedRulesetIds;
     internal Dictionary<TourneyMode, Ruleset> SelectedRulesets;
+
+    internal string[] SelectedPlayerTagNames;
+    internal PlayerTag[] SelectedPlayerTags;
     
     internal bool TourneyMenuOpen = false;
     internal bool RulesetsMenuOpen = false;
@@ -60,6 +63,9 @@ public class Plugin : BaseUnityPlugin
         HarmonyPatches.PatchAll();
         RulesetIO.Init();
         PlayerTagIO.Init();
+
+        SelectedPlayerTagNames = ["", "", "", ""];
+        SelectedPlayerTags = [PlayerTag.DEFAULT, PlayerTag.DEFAULT, PlayerTag.DEFAULT, PlayerTag.DEFAULT];
 
         VoteButton.ActiveVoteButtons = new List<VoteButton>();
 
@@ -92,6 +98,37 @@ public class Plugin : BaseUnityPlugin
 
             SelectedRulesets[mode] = ruleset;
         });
+
+        SelectedPlayerTagNames[0] = Configs.SelectedTagPlayer1.Value;
+        SelectedPlayerTagNames[1] = Configs.SelectedTagPlayer2.Value;
+        SelectedPlayerTagNames[2] = Configs.SelectedTagPlayer3.Value;
+        SelectedPlayerTagNames[3] = Configs.SelectedTagPlayer4.Value;
+
+        for (int playerNr = 0; playerNr < 4; playerNr++)
+        {
+            PlayerTag selectedTag = PlayerTagIO.GetPlayerTagByName(SelectedPlayerTagNames[playerNr].ToLower());
+
+            if (selectedTag == null)
+            {
+                //if (SelectedPlayerTags[playerNr] != PlayerTag.DEFAULT) LogGlobal.LogWarning($"Could not find P{playerNr} selected player tag '{SelectedPlayerTagNames[playerNr]}': setting to default");
+                SelectedPlayerTags[playerNr] = PlayerTag.DEFAULT;
+            }
+            else
+            {
+                if (SelectedPlayerTags[playerNr] != selectedTag) LogGlobal.LogInfo($"Setting P{playerNr} selected player tag '{selectedTag.GetName()}'");
+                SelectedPlayerTags[playerNr] = selectedTag;
+            }
+        }
+    }
+
+    internal void SelectPlayerTag(int playerNr, PlayerTag playerTag)
+    {
+        SelectedPlayerTags[playerNr] = playerTag;
+
+        if (playerNr == 0) Configs.SelectedTagPlayer1.Value = playerTag.GetName();
+        else if (playerNr == 1) Configs.SelectedTagPlayer2.Value = playerTag.GetName();
+        else if (playerNr == 2) Configs.SelectedTagPlayer3.Value = playerTag.GetName();
+        else if (playerNr == 3) Configs.SelectedTagPlayer4.Value = playerTag.GetName();
     }
 
     internal static string PrintArray<T>(T[] arr, bool includeBrackets)

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using LLBML.Players;
+using LLBML.States;
 using LLGUI;
 using LLHandlers;
 using TMPro;
@@ -249,10 +251,25 @@ public class PlayerTagMenu : MonoBehaviour
             if (tagIndex >= loadedTags.Count) break;
             
             PlayerTag displayTag = loadedTags[tagIndex];
-            btSelectTags[displayIndex].SetText(displayTag.IsDefault ? $"PLAYER{playerNr+1}" : displayTag.GetName());
-            btSelectTags[displayIndex].colDefault = displayTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
-            btSelectTags[displayIndex].textMesh.color = displayTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
+            LLButton btSelectTag = btSelectTags[displayIndex];
+            btSelectTag.SetText(displayTag.IsDefault ? $"PLAYER{playerNr+1}" : displayTag.GetName());
+            btSelectTag.colDefault = displayTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
+            btSelectTag.textMesh.color = displayTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
+            btSelectTag.onClick = playerNr => OnClickSelectTag(playerNr, displayTag);
         }
+    }
+
+    private void OnClickSelectTag(int playerNr, PlayerTag playerTag)
+    {
+        if (playerNr != -1 && this.playerNr != playerNr) return;
+
+        Plugin.Instance.SelectPlayerTag(this.playerNr, playerTag);
+        Close();
+        
+        HPNLMFHPHFD gameStatesLobby = GameStates.GetCurrentGameStateObject() as HPNLMFHPHFD;
+        if (gameStatesLobby == null) return;
+        
+        gameStatesLobby.BDMIDGAHNLA(Player.GetPlayer(this.playerNr));
     }
 
     private void OpenCreate()
@@ -295,9 +312,18 @@ public class PlayerTagMenu : MonoBehaviour
     private void OnClickEnter(int playerNr)
     {
         if (playerNr != -1 && this.playerNr != playerNr) return;
-        
-        PlayerTagIO.SavePlayerTag(tag);
-        OpenBrowse();
+
+        PlayerTag createdTag = PlayerTagIO.SavePlayerTag(tag);
+
+        if (createdTag == null)
+        {
+            OpenBrowse();
+        }
+        else
+        {
+            OnClickSelectTag(this.playerNr, createdTag);
+            Close();
+        }
     }
 
     private int activeBtIndex = -1;
