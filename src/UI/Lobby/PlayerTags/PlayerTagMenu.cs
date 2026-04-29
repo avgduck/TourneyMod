@@ -11,6 +11,7 @@ namespace TourneyMod.UI.Lobby.PlayerTags;
 public class PlayerTagMenu : MonoBehaviour
 {
     private RectTransform rectTransform;
+    private int playerNr;
     
     private static readonly Vector2 MAIN_SCALE = new Vector2(320f, 320f);
     private static readonly Vector2 MAIN_POSITION = new Vector2(0f, 319.5f - MAIN_SCALE.y / 2f + 13f);
@@ -51,6 +52,9 @@ public class PlayerTagMenu : MonoBehaviour
     private int maxPages;
     private int currentPage;
 
+    private static readonly Color COLOR_DEFAULT = Color.red;
+    private static readonly Color COLOR_CUSTOM = Color.white;
+
     private static readonly Vector2 CREATETAG_SCALE = new Vector2(280f - PADDING, 40f);
     private static readonly Vector2 CREATETAG_POSITION = new Vector2(-MAIN_SCALE.x / 2f + CREATETAG_SCALE.x / 2f + PADDING, MAIN_SCALE.y / 2f - CREATETAG_SCALE.y / 2f - PADDING);
     
@@ -89,13 +93,14 @@ public class PlayerTagMenu : MonoBehaviour
     private const float TAG_REPEAT_TIME = 0.5f;
     private string tag;
     private bool upper;
-    
-    internal static PlayerTagMenu CreateMenu(Transform parent)
+
+    internal static PlayerTagMenu CreateMenu(Transform parent, int playerNr)
     {
         RectTransform panel = null;
         UIUtils.CreatePanel(ref panel, "Player Tag Menu", parent, MAIN_POSITION, MAIN_SCALE, Color.clear);
         PlayerTagMenu playerTagMenu = panel.gameObject.AddComponent<PlayerTagMenu>();
         playerTagMenu.rectTransform = panel;
+        playerTagMenu.playerNr = playerNr;
         playerTagMenu.Init();
         playerTagMenu.gameObject.SetActive(false);
         return playerTagMenu;
@@ -197,6 +202,7 @@ public class PlayerTagMenu : MonoBehaviour
         pnCreate.gameObject.SetActive(false);
 
         loadedTags = PlayerTagIO.PlayerTags.Values.OrderBy(pt => pt.GetName()).ToList();
+        loadedTags.Insert(0, PlayerTag.DEFAULT);
         maxPages = 1 + (loadedTags.Count - 1) / TAG_LIST_ROWS;
         currentPage = 0;
         TextHandler.SetText(lbPageNumber, $"{currentPage+1}/{maxPages}");
@@ -235,7 +241,9 @@ public class PlayerTagMenu : MonoBehaviour
             if (tagIndex >= loadedTags.Count) break;
             
             PlayerTag displayTag = loadedTags[tagIndex];
-            btSelectTags[displayIndex].SetText(displayTag.GetName());
+            btSelectTags[displayIndex].SetText(displayTag.IsDefault ? $"PLAYER{playerNr+1}" : displayTag.GetName());
+            btSelectTags[displayIndex].colDefault = displayTag.IsDefault ? COLOR_DEFAULT : COLOR_CUSTOM;
+            btSelectTags[displayIndex].textMesh.color = displayTag.IsDefault ? COLOR_DEFAULT : COLOR_CUSTOM;
         }
     }
 

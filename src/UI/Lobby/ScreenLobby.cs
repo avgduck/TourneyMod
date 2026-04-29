@@ -78,7 +78,7 @@ public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
             
             playerSelection.btPlayerName.transform.localPosition += new Vector3(15f, 0f, 0f);
 
-            playerTagMenus[playerIndex] = PlayerTagMenu.CreateMenu(playerSelection.transform);
+            playerTagMenus[playerIndex] = PlayerTagMenu.CreateMenu(playerSelection.transform, playerIndex);
         }
     }
 
