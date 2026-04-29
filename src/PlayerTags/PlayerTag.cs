@@ -8,6 +8,7 @@ public class PlayerTag
     private PlayerTag(bool isDefault)
     {
         IsDefault = isDefault;
+        name = "";
     }
 
     internal PlayerTag()

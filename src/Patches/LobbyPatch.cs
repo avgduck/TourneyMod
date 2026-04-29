@@ -198,7 +198,7 @@ internal static class LobbyPatch
         if (!p.IsInMatch && !p.IsSpectator) return;
         if (!p.isLocal) return;
 
-        if (playerTag.IsDefault)
+        if (playerTag.IsDefault || p.IsAI)
         {
             screenLobby.SetPlayerName(p.nr, $"PLAYER{p.nr+1}");
             screenLobby.playerSelections[p.nr].btPlayerName.colDefault = PlayerTagMenu.COLOR_TAG_DEFAULT;
