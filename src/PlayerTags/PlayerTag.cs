@@ -2,11 +2,16 @@ namespace TourneyMod.PlayerTags;
 
 public class PlayerTag
 {
-    public string Name { get; private set; }
+    private string name;
 
-    internal void InitName(string name)
+    internal void SetName(string name)
     {
-        if (Name != null) Plugin.LogGlobal.LogWarning($"Failed to set name '{name}' for player tag with existing name '{Name}'");
-        else Name = name;
+        if (this.name != null) Plugin.LogGlobal.LogWarning($"Failed to set name '{name}' for player tag with existing name '{this.name}'");
+        else this.name = name;
+    }
+
+    internal string GetName()
+    {
+        return name;
     }
 }

@@ -24,14 +24,14 @@ public static class PlayerTagIO
             PlayerTag playerTag = LoadTagFile(file);
 
             if (playerTag == null) continue;
-            if (PlayerTags.ContainsKey(playerTag.Name))
+            if (PlayerTags.ContainsKey(playerTag.GetName()))
             {
-                Plugin.LogGlobal.LogWarning($"Failed to load player tag '{playerTag.Name}': player tag with name '{playerTag.Name}' already exists");
+                Plugin.LogGlobal.LogWarning($"Failed to load player tag '{playerTag.GetName()}': player tag with name '{playerTag.GetName()}' already exists");
                 continue;
             }
             
-            Plugin.LogGlobal.LogInfo($"Loaded player tag: {playerTag.Name}");
-            PlayerTags.Add(playerTag.Name, playerTag);
+            Plugin.LogGlobal.LogInfo($"Loaded player tag: {playerTag.GetName()}");
+            PlayerTags.Add(playerTag.GetName(), playerTag);
         }
     }
 
@@ -42,8 +42,28 @@ public static class PlayerTagIO
 
         string json = JsonIO.ReadFile(file);
         PlayerTag playerTag = json.FromJson<PlayerTag>();
-        playerTag.InitName(name);
+        playerTag.SetName(name);
         return playerTag;
+    }
+
+    internal static PlayerTag SavePlayerTag(string name)
+    {
+        PlayerTag existing = GetPlayerTagByName(name);
+        if (existing != null)
+        {
+            Plugin.LogGlobal.LogWarning($"Could not save player tag '{name}': a tag with that name already exists!");
+            return existing;
+        }
+
+        PlayerTag tag = new PlayerTag();
+        tag.SetName(name);
+
+        string path = Path.Combine(PlayerTagsDirectory.FullName, name + ".json");
+        string json = tag.ToJson();
+        JsonIO.WriteFile(path, json);
+        PlayerTags.Add(name, tag);
+        Plugin.LogGlobal.LogInfo($"Saved new player tag '{name}'");
+        return tag;
     }
 
     internal static PlayerTag GetPlayerTagByName(string name)

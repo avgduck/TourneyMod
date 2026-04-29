@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using LLGUI;
 using LLHandlers;
 using TMPro;
+using TourneyMod.PlayerTags;
 using UnityEngine;
 
 namespace TourneyMod.UI.Lobby.PlayerTags;
@@ -207,6 +208,7 @@ public class PlayerTagMenu : MonoBehaviour
 
     private void OnClickEnter()
     {
+        PlayerTagIO.SavePlayerTag(tag);
         OpenBrowse();
     }
 
