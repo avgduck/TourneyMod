@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using BepInEx;
 using TinyJson;
 
 namespace TourneyMod.PlayerTags;
@@ -48,6 +49,8 @@ public static class PlayerTagIO
 
     internal static PlayerTag SavePlayerTag(string name)
     {
+        if (name.IsNullOrWhiteSpace()) return null;
+        
         PlayerTag existing = GetPlayerTagByName(name);
         if (existing != null)
         {
