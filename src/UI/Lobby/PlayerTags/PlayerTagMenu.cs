@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using LLGUI;
 using LLHandlers;
 using TMPro;
@@ -39,6 +40,16 @@ public class PlayerTagMenu : MonoBehaviour
     private TextMeshProUGUI lbPageNumber;
     private LLButton btPageBack;
     private LLButton btPageForward;
+
+    private RectTransform pnTagList;
+    private static readonly Vector2 TAG_LIST_SCALE = new Vector2(320f - PADDING*2f, 260f);
+    private static readonly Vector2 TAG_LIST_POSITION = new Vector2(0f, 0f);
+    private const int TAG_LIST_ROWS = 8;
+    private static readonly Vector2 TAG_LIST_ENTRY_SCALE = new Vector2(TAG_LIST_SCALE.x, (TAG_LIST_SCALE.y - SPACING * (TAG_LIST_ROWS + 1)) / TAG_LIST_ROWS);
+    private List<PlayerTag> loadedTags;
+    private LLButton[] btSelectTags;
+    private int maxPages;
+    private int currentPage;
 
     private static readonly Vector2 CREATETAG_SCALE = new Vector2(280f - PADDING, 40f);
     private static readonly Vector2 CREATETAG_POSITION = new Vector2(-MAIN_SCALE.x / 2f + CREATETAG_SCALE.x / 2f + PADDING, MAIN_SCALE.y / 2f - CREATETAG_SCALE.y / 2f - PADDING);
@@ -110,15 +121,29 @@ public class PlayerTagMenu : MonoBehaviour
         
         UIUtils.CreateText(ref lbPageNumber, "lbPageNumber", pnPages, PAGE_NUMBER_POSITION, PAGE_NUMBER_SCALE);
         lbPageNumber.fontSize = CONTROL_FONT_SIZE;
-        TextHandler.SetText(lbPageNumber, "1/1");
         
         UIUtils.CreateButton(ref btPageForward, "btPageForward", pnPages, PAGE_BUTTON_FORWARD_POSITION, PAGE_BUTTON_SCALE, Color.clear);
         btPageForward.textMesh.fontSize = CONTROL_FONT_SIZE;
         btPageForward.SetText(">");
+        btPageForward.onClick = playerNr => OnClickPageForward();
         
         UIUtils.CreateButton(ref btPageBack, "btPageBack", pnPages, PAGE_BUTTON_BACK_POSITION, PAGE_BUTTON_SCALE, Color.clear);
         btPageBack.textMesh.fontSize = CONTROL_FONT_SIZE;
         btPageBack.SetText("<");
+        btPageBack.onClick = playerNr => OnClickPageBack();
+        
+        UIUtils.CreatePanel(ref pnTagList, "pnTagList", pnBrowse, TAG_LIST_POSITION, TAG_LIST_SCALE, Color.clear);
+        Vector2 top = new Vector2(0f, TAG_LIST_SCALE.y / 2f - TAG_LIST_ENTRY_SCALE.y / 2f - SPACING);
+
+        btSelectTags = new LLButton[TAG_LIST_ROWS];
+        for (int i = 0; i < TAG_LIST_ROWS; i++)
+        {
+            LLButton btSelectTag = null;
+            Vector2 pos = new Vector2(0f, top.y - (TAG_LIST_ENTRY_SCALE.y + SPACING) * i);
+            UIUtils.CreateButton(ref btSelectTag, "btSelectTag" + i, pnTagList, pos, TAG_LIST_ENTRY_SCALE, Color.clear);
+            btSelectTag.textMesh.fontSize = TAG_FONT_SIZE;
+            btSelectTags[i] = btSelectTag;
+        }
     }
 
     private void InitCreatePanel()
@@ -170,7 +195,48 @@ public class PlayerTagMenu : MonoBehaviour
     {
         pnBrowse.gameObject.SetActive(true);
         pnCreate.gameObject.SetActive(false);
+
+        loadedTags = PlayerTagIO.PlayerTags.Values.OrderBy(pt => pt.GetName()).ToList();
+        maxPages = 1 + (loadedTags.Count - 1) / TAG_LIST_ROWS;
+        currentPage = 0;
+        TextHandler.SetText(lbPageNumber, $"{currentPage+1}/{maxPages}");
+
+        LoadPage();
+        
         gameObject.SetActive(true);
+    }
+
+    internal void OnClickPageBack()
+    {
+        if (currentPage > 0) currentPage--;
+        LoadPage();
+        TextHandler.SetText(lbPageNumber, $"{currentPage+1}/{maxPages}");
+    }
+    
+    internal void OnClickPageForward()
+    {
+        if (currentPage < maxPages - 1) currentPage++;
+        LoadPage();
+        TextHandler.SetText(lbPageNumber, $"{currentPage+1}/{maxPages}");
+    }
+
+    private void LoadPage()
+    {
+        foreach (LLButton btSelectTag in btSelectTags)
+        {
+            btSelectTag.SetText("");
+            btSelectTag.onClick = null;
+            btSelectTag.enabled = false;
+        }
+
+        for (int displayIndex = 0; displayIndex < TAG_LIST_ROWS; displayIndex++)
+        {
+            int tagIndex = currentPage * TAG_LIST_ROWS + displayIndex;
+            if (tagIndex >= loadedTags.Count) break;
+            
+            PlayerTag displayTag = loadedTags[tagIndex];
+            btSelectTags[displayIndex].SetText(displayTag.GetName());
+        }
     }
 
     internal void OpenCreate()
