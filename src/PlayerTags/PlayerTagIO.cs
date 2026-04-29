@@ -25,14 +25,14 @@ public static class PlayerTagIO
             PlayerTag playerTag = LoadTagFile(file);
 
             if (playerTag == null) continue;
-            if (PlayerTags.ContainsKey(playerTag.GetName()))
+            if (PlayerTags.ContainsKey(playerTag.GetName().ToLower()))
             {
-                Plugin.LogGlobal.LogWarning($"Failed to load player tag '{playerTag.GetName()}': player tag with name '{playerTag.GetName()}' already exists");
+                Plugin.LogGlobal.LogWarning($"Failed to load player tag '{playerTag.GetName()}': player tag with name '{PlayerTags[playerTag.GetName().ToLower()].GetName()}' (case insensitive) already exists");
                 continue;
             }
             
             Plugin.LogGlobal.LogInfo($"Loaded player tag: {playerTag.GetName()}");
-            PlayerTags.Add(playerTag.GetName(), playerTag);
+            PlayerTags.Add(playerTag.GetName().ToLower(), playerTag);
         }
     }
 
@@ -51,10 +51,10 @@ public static class PlayerTagIO
     {
         if (name.IsNullOrWhiteSpace()) return null;
         
-        PlayerTag existing = GetPlayerTagByName(name);
+        PlayerTag existing = GetPlayerTagByName(name.ToLower());
         if (existing != null)
         {
-            Plugin.LogGlobal.LogWarning($"Could not save player tag '{name}': a tag with that name already exists!");
+            Plugin.LogGlobal.LogWarning($"Could not save player tag '{name}': a tag with name '{existing.GetName()}' (case insensitive) already exists!");
             return existing;
         }
 
