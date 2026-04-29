@@ -73,13 +73,20 @@ public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
             LLButton btSettings = null;
             UIUtils.CreateImageButton(ref btSettings, spriteGear, "btSettings", playerSelection.btPlayerName.transform.parent, playerSelection.btPlayerName.transform.localPosition + new Vector3(0f, 2f, 0f), new Vector2(20f, 20f));
             int i = playerIndex;
-            btSettings.onClick = (playerNr) => OnClickSettings(i, playerNr);
+            btSettings.onClick = playerNr => OnClickSettings(i, playerNr);
             settingsButtons[playerIndex] = btSettings;
             
             playerSelection.btPlayerName.transform.localPosition += new Vector3(15f, 0f, 0f);
 
             playerTagMenus[playerIndex] = PlayerTagMenu.CreateMenu(playerSelection.transform);
         }
+    }
+
+    internal void OnEject(int playerNr)
+    {
+        PlayerTagMenu tagMenu = playerTagMenus[playerNr];
+        tagMenu.Close();
+        UpdateTeamButtons();
     }
 
     private void OnClickSettings(int playerIndex, int playerNr)

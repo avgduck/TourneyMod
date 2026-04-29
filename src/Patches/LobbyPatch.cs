@@ -166,4 +166,18 @@ internal static class LobbyPatch
 
         return true;
     }
+
+    // void GameStatesLobby::RemovePlayer(Player p)
+    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.GNBKBMENOMO))]
+    [HarmonyPostfix]
+    private static void GameStatesLobby_RemovePlayer_Postfix(HPNLMFHPHFD __instance, ALDOKEMAOMB LGACHGEPNNH)
+    {
+        ScreenPlayers screenPlayers = __instance.IMLMFFIEEAJ;
+        ScreenLobby screenLobby = screenPlayers as ScreenLobby;
+        if (screenLobby == null) return;
+        if (screenLobby.playerTagMenus == null) return;
+
+        Player p = LGACHGEPNNH;
+        screenLobby.OnEject(p.nr);
+    }
 }
