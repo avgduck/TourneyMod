@@ -91,12 +91,11 @@ public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
 
     private void OnClickSettings(int playerIndex, int playerNr)
     {
-        if (playerIndex == playerNr || playerNr == -1)
-        {
-            PlayerTagMenu tagMenu = playerTagMenus[playerIndex];
-            if (tagMenu.gameObject.activeSelf) tagMenu.Close();
-            else tagMenu.OpenBrowse();
-            UpdateTeamButtons();
-        }
+        if (playerNr != -1 && playerIndex != playerNr) return;
+        
+        PlayerTagMenu tagMenu = playerTagMenus[playerIndex];
+        if (tagMenu.gameObject.activeSelf) tagMenu.Close();
+        else tagMenu.OpenBrowse();
+        UpdateTeamButtons();
     }
 }

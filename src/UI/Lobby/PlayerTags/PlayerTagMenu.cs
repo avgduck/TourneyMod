@@ -52,8 +52,8 @@ public class PlayerTagMenu : MonoBehaviour
     private int maxPages;
     private int currentPage;
 
-    private static readonly Color COLOR_DEFAULT = Color.red;
-    private static readonly Color COLOR_CUSTOM = Color.white;
+    internal static readonly Color COLOR_TAG_DEFAULT = Color.red;
+    internal static readonly Color COLOR_TAG_CUSTOM = Color.white;
 
     private static readonly Vector2 CREATETAG_SCALE = new Vector2(280f - PADDING, 40f);
     private static readonly Vector2 CREATETAG_POSITION = new Vector2(-MAIN_SCALE.x / 2f + CREATETAG_SCALE.x / 2f + PADDING, MAIN_SCALE.y / 2f - CREATETAG_SCALE.y / 2f - PADDING);
@@ -120,7 +120,11 @@ public class PlayerTagMenu : MonoBehaviour
         UIUtils.CreateButton(ref btNewTag, "btNewTag", pnBrowse, NEWTAG_POSITION, NEWTAG_SCALE, Color.yellow);
         btNewTag.textMesh.fontSize = CONTROL_FONT_SIZE;
         btNewTag.SetText("+ new tag");
-        btNewTag.onClick = (int playerNr) => OpenCreate();
+        btNewTag.onClick = playerNr =>
+        {
+            if (playerNr != -1 && this.playerNr != playerNr) return;
+            OpenCreate();
+        };
         
         UIUtils.CreatePanel(ref pnPages, "pnPages", pnBrowse, PAGES_POSITION, PAGES_SCALE, Color.yellow);
         
@@ -130,12 +134,12 @@ public class PlayerTagMenu : MonoBehaviour
         UIUtils.CreateButton(ref btPageForward, "btPageForward", pnPages, PAGE_BUTTON_FORWARD_POSITION, PAGE_BUTTON_SCALE, Color.clear);
         btPageForward.textMesh.fontSize = CONTROL_FONT_SIZE;
         btPageForward.SetText(">");
-        btPageForward.onClick = playerNr => OnClickPageForward();
+        btPageForward.onClick = OnClickPageForward;
         
         UIUtils.CreateButton(ref btPageBack, "btPageBack", pnPages, PAGE_BUTTON_BACK_POSITION, PAGE_BUTTON_SCALE, Color.clear);
         btPageBack.textMesh.fontSize = CONTROL_FONT_SIZE;
         btPageBack.SetText("<");
-        btPageBack.onClick = playerNr => OnClickPageBack();
+        btPageBack.onClick = OnClickPageBack;
         
         UIUtils.CreatePanel(ref pnTagList, "pnTagList", pnBrowse, TAG_LIST_POSITION, TAG_LIST_SCALE, Color.clear);
         Vector2 top = new Vector2(0f, TAG_LIST_SCALE.y / 2f - TAG_LIST_ENTRY_SCALE.y / 2f - SPACING);
@@ -161,14 +165,14 @@ public class PlayerTagMenu : MonoBehaviour
         UIUtils.CreateButton(ref btBackspace, "btBackspace", pnCreate, BACKSPACE_POSITION, BACKSPACE_SCALE, Color.yellow);
         btBackspace.textMesh.fontSize = CONTROL_FONT_SIZE;
         btBackspace.SetText("<");
-        btBackspace.onClick = playerNr => OnClickBackspace();
+        btBackspace.onClick = OnClickBackspace;
         
         UIUtils.CreatePanel(ref pnKeypad, "pnKeypad", pnCreate, KEYPAD_POSITION, KEYPAD_SCALE, Color.clear);
         
         UIUtils.CreateButton(ref btShift, "btShift", pnKeypad, GetKeypadPosition(0, 0), KEYPAD_BUTTON_SCALE, Color.yellow);
         btShift.textMesh.fontSize = CONTROL_FONT_SIZE;
         btShift.SetText("case");
-        btShift.onClick = playerNr => OnClickShift();
+        btShift.onClick = OnClickShift;
 
         btCharsets = new List<CharsetButton>();
         for (int i = 0; i < charsets.Length; i++)
@@ -180,14 +184,14 @@ public class PlayerTagMenu : MonoBehaviour
             btCharset.textMesh.fontSize = CONTROL_FONT_SIZE;
             btCharset.SetCharset(charsets[i]);
             int btIndex = i;
-            btCharset.onClick = playerNr => OnClickCharset(btCharset, btIndex);
+            btCharset.onClick = playerNr => OnClickCharset(playerNr, btCharset, btIndex);
             btCharsets.Add(btCharset);
         }
         
         UIUtils.CreateButton(ref btEnter, "btEnter", pnKeypad, GetKeypadPosition(3, 2), KEYPAD_BUTTON_SCALE, Color.yellow);
         btEnter.textMesh.fontSize = CONTROL_FONT_SIZE;
         btEnter.SetText("done");
-        btEnter.onClick = playerNr => OnClickEnter();
+        btEnter.onClick = OnClickEnter;
     }
 
     private Vector2 GetKeypadPosition(int row, int col)
@@ -212,15 +216,19 @@ public class PlayerTagMenu : MonoBehaviour
         gameObject.SetActive(true);
     }
 
-    internal void OnClickPageBack()
+    private void OnClickPageBack(int playerNr)
     {
+        if (playerNr != -1 && this.playerNr != playerNr) return;
+        
         if (currentPage > 0) currentPage--;
         LoadPage();
         TextHandler.SetText(lbPageNumber, $"{currentPage+1}/{maxPages}");
     }
     
-    internal void OnClickPageForward()
+    private void OnClickPageForward(int playerNr)
     {
+        if (playerNr != -1 && this.playerNr != playerNr) return;
+        
         if (currentPage < maxPages - 1) currentPage++;
         LoadPage();
         TextHandler.SetText(lbPageNumber, $"{currentPage+1}/{maxPages}");
@@ -242,12 +250,12 @@ public class PlayerTagMenu : MonoBehaviour
             
             PlayerTag displayTag = loadedTags[tagIndex];
             btSelectTags[displayIndex].SetText(displayTag.IsDefault ? $"PLAYER{playerNr+1}" : displayTag.GetName());
-            btSelectTags[displayIndex].colDefault = displayTag.IsDefault ? COLOR_DEFAULT : COLOR_CUSTOM;
-            btSelectTags[displayIndex].textMesh.color = displayTag.IsDefault ? COLOR_DEFAULT : COLOR_CUSTOM;
+            btSelectTags[displayIndex].colDefault = displayTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
+            btSelectTags[displayIndex].textMesh.color = displayTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
         }
     }
 
-    internal void OpenCreate()
+    private void OpenCreate()
     {
         pnBrowse.gameObject.SetActive(false);
         pnCreate.gameObject.SetActive(true);
@@ -265,23 +273,29 @@ public class PlayerTagMenu : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void OnClickBackspace()
+    private void OnClickBackspace(int playerNr)
     {
+        if (playerNr != -1 && this.playerNr != playerNr) return;
+        
         if (tag.Length < 1) return;
         tag = tag.Remove(tag.Length - 1);
         TextHandler.SetText(lbCreateTag, tag);
         activeBtIndex = -1;
     }
 
-    private void OnClickShift()
+    private void OnClickShift(int playerNr)
     {
+        if (playerNr != -1 && this.playerNr != playerNr) return;
+        
         upper = !upper;
         btCharsets.ForEach(btCharset => btCharset.SetUpper(upper));
         activeBtIndex = -1;
     }
 
-    private void OnClickEnter()
+    private void OnClickEnter(int playerNr)
     {
+        if (playerNr != -1 && this.playerNr != playerNr) return;
+        
         PlayerTagIO.SavePlayerTag(tag);
         OpenBrowse();
     }
@@ -289,8 +303,10 @@ public class PlayerTagMenu : MonoBehaviour
     private int activeBtIndex = -1;
     private int count = 0;
     private float repeatTimer = 0f;
-    private void OnClickCharset(CharsetButton btCharset, int btIndex)
+    private void OnClickCharset(int playerNr, CharsetButton btCharset, int btIndex)
     {
+        if (playerNr != -1 && this.playerNr != playerNr) return;
+        
         if (btIndex != activeBtIndex)
         {
             activeBtIndex = btIndex;
