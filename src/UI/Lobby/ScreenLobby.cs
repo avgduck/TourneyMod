@@ -1,6 +1,7 @@
 using LLBML.States;
 using LLGUI;
 using LLScreen;
+using TourneyMod.UI.Lobby.PlayerTags;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -85,7 +86,9 @@ public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
     {
         if (playerIndex == playerNr || playerNr == -1)
         {
-            playerTagMenus[playerIndex].gameObject.SetActive(!playerTagMenus[playerIndex].gameObject.activeSelf);
+            PlayerTagMenu tagMenu = playerTagMenus[playerIndex];
+            if (tagMenu.gameObject.activeSelf) tagMenu.Close();
+            else tagMenu.OpenBrowse();
             UpdateTeamButtons();
         }
     }

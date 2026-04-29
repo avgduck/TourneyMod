@@ -1,5 +1,6 @@
 using LLGUI;
 using TMPro;
+using TourneyMod.UI.Lobby.PlayerTags;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -223,6 +224,43 @@ internal static class UIUtils
         border.color = Color.clear;
         border.raycastTarget = false;
         button.imgBorder = border;
+        
+        CreateText(ref button.textMesh, "Text", button.transform);
+        button.textMesh.rectTransform.anchorMin = new Vector2(0f, 0f);
+        button.textMesh.rectTransform.anchorMax = new Vector2(1f, 1f);
+        button.textMesh.raycastTarget = false;
+        button.SetText("");
+        button.textMesh.color = Color.white;
+        button.textMesh.alignment = TextAlignmentOptions.Center;
+        button.Init();
+    }
+
+    internal static void CreateCharsetButton(ref CharsetButton button, string name, Transform parent, Vector2 position, Vector2 scale, Color bgColor)
+    {
+        Image img = LLControl.CreateImage(parent, buttonBG);
+        img.color = new Color(1f, 1f, 0f, 0f);
+        RectTransform panel = img.rectTransform;
+        panel.name = name;
+        panel.anchorMin = new Vector2(0f, 0f);
+        panel.anchorMax = new Vector2(1f, 1f);
+        panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scale.x);
+        panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scale.y);
+
+        panel.anchoredPosition = position;
+        
+        button = panel.gameObject.AddComponent<CharsetButton>();
+        button.keepIconColor = true;
+        button.colHover = new Color(0.902f, 0.9529f, 0.051f);
+        button.colDisabled = new Color(0.5f, 0.5f, 0.5f);
+        button.soundClick = true;
+        
+        Image bg = LLControl.CreateImage(button.transform, buttonBG);
+        bg.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        bg.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        bg.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scale.x);
+        bg.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scale.y);
+        bg.color = bgColor;
+        bg.raycastTarget = false;
         
         CreateText(ref button.textMesh, "Text", button.transform);
         button.textMesh.rectTransform.anchorMin = new Vector2(0f, 0f);
