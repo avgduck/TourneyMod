@@ -2,6 +2,7 @@ using HarmonyLib;
 using LLBML.Players;
 using LLBML.Settings;
 using LLGUI;
+using LLHandlers;
 using LLScreen;
 using TourneyMod.PlayerTags;
 using TourneyMod.SetTracking;
@@ -210,5 +211,17 @@ internal static class LobbyPatch
             screenLobby.playerSelections[p.nr].btPlayerName.colDefault = PlayerTagMenu.COLOR_TAG_CUSTOM;
             screenLobby.playerSelections[p.nr].btPlayerName.textMesh.color = PlayerTagMenu.COLOR_TAG_CUSTOM;
         }
+    }
+    
+    // void GameHudPlayerInfo::SetPlayer(Player player, int playerNameSize)
+    [HarmonyPatch(typeof(GameHudPlayerInfo), nameof(GameHudPlayerInfo.SetPlayer))]
+    [HarmonyPostfix]
+    private static void GameHudPlayerInfo_SetPlayer_Postfix(GameHudPlayerInfo __instance, ALDOKEMAOMB player)
+    {
+        Player p = player;
+        if (GameSettings.IsOnline) return;
+        PlayerTag playerTag = Plugin.Instance.SelectedPlayerTags[p.nr];
+        if (playerTag.IsDefault) return;
+        TextHandler.SetTextBestFont(__instance.lbName, playerTag.GetName());
     }
 }
