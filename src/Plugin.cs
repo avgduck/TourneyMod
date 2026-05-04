@@ -2,6 +2,7 @@
 using System.Linq;
 using BepInEx;
 using BepInEx.Logging;
+using LLBML.Players;
 using LLBML.Utils;
 using TourneyMod.Patches;
 using TourneyMod.PlayerTags;
@@ -35,7 +36,9 @@ public class Plugin : BaseUnityPlugin
     internal Dictionary<TourneyMode, string> SelectedRulesetIds;
     internal Dictionary<TourneyMode, Ruleset> SelectedRulesets;
 
+    internal string SelectedPlayerTagNameKeyboard;
     internal string[] SelectedPlayerTagNames;
+    internal PlayerTag SelectedPlayerTagKeyboard;
     internal PlayerTag[] SelectedPlayerTags;
     
     internal bool TourneyMenuOpen = false;
@@ -64,7 +67,9 @@ public class Plugin : BaseUnityPlugin
         RulesetIO.Init();
         PlayerTagIO.Init();
 
+        SelectedPlayerTagNameKeyboard = "";
         SelectedPlayerTagNames = ["", "", "", ""];
+        SelectedPlayerTagKeyboard = PlayerTag.DEFAULT;
         SelectedPlayerTags = [PlayerTag.DEFAULT, PlayerTag.DEFAULT, PlayerTag.DEFAULT, PlayerTag.DEFAULT];
 
         VoteButton.ActiveVoteButtons = new List<VoteButton>();
@@ -99,10 +104,22 @@ public class Plugin : BaseUnityPlugin
             SelectedRulesets[mode] = ruleset;
         });
 
+        SelectedPlayerTagNameKeyboard = Configs.SelectedTagKeyboard.Value;
         SelectedPlayerTagNames[0] = Configs.SelectedTagPlayer1.Value;
         SelectedPlayerTagNames[1] = Configs.SelectedTagPlayer2.Value;
         SelectedPlayerTagNames[2] = Configs.SelectedTagPlayer3.Value;
         SelectedPlayerTagNames[3] = Configs.SelectedTagPlayer4.Value;
+        
+        PlayerTag selectedTagKeyboard = PlayerTagIO.GetPlayerTagByName(SelectedPlayerTagNameKeyboard.ToLower());
+        if (selectedTagKeyboard == null)
+        {
+            SelectedPlayerTagKeyboard = PlayerTag.DEFAULT;
+        }
+        else
+        {
+            if (SelectedPlayerTagKeyboard != selectedTagKeyboard) LogGlobal.LogInfo($"Setting keyboard player selected player tag '{selectedTagKeyboard.GetName()}'");
+            SelectedPlayerTagKeyboard = selectedTagKeyboard;
+        }
 
         for (int playerNr = 0; playerNr < 4; playerNr++)
         {
@@ -123,12 +140,26 @@ public class Plugin : BaseUnityPlugin
 
     internal void SelectPlayerTag(int playerNr, PlayerTag playerTag)
     {
+        Player player = Player.GetPlayer(playerNr);
+        if (player.controller.IncludesMouse())
+        {
+            SelectedPlayerTagKeyboard = playerTag;
+            Configs.SelectedTagKeyboard.Value = playerTag.GetName();
+            return;
+        }
+        
         SelectedPlayerTags[playerNr] = playerTag;
 
         if (playerNr == 0) Configs.SelectedTagPlayer1.Value = playerTag.GetName();
         else if (playerNr == 1) Configs.SelectedTagPlayer2.Value = playerTag.GetName();
         else if (playerNr == 2) Configs.SelectedTagPlayer3.Value = playerTag.GetName();
         else if (playerNr == 3) Configs.SelectedTagPlayer4.Value = playerTag.GetName();
+    }
+
+    internal PlayerTag GetPlayerTag(int playerNr)
+    {
+        Player player = Player.GetPlayer(playerNr);
+        return player.controller.IncludesMouse() ? SelectedPlayerTagKeyboard : SelectedPlayerTags[playerNr];
     }
 
     internal static string PrintArray<T>(T[] arr, bool includeBrackets)

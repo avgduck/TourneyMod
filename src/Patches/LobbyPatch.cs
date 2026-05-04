@@ -195,7 +195,7 @@ internal static class LobbyPatch
         if (screenLobby.playerTagMenus == null) return;
         
         Player p = LGACHGEPNNH;
-        PlayerTag playerTag = Plugin.Instance.SelectedPlayerTags[p.nr];
+        PlayerTag playerTag = Plugin.Instance.GetPlayerTag(p.nr);
         if (!p.IsInMatch && !p.IsSpectator) return;
         if (!p.isLocal) return;
 
@@ -220,7 +220,7 @@ internal static class LobbyPatch
     {
         Player p = player;
         if (GameSettings.IsOnline) return;
-        PlayerTag playerTag = Plugin.Instance.SelectedPlayerTags[p.nr];
+        PlayerTag playerTag = Plugin.Instance.GetPlayerTag(p.nr);
         if (playerTag.IsDefault) return;
         TextHandler.SetTextBestFont(__instance.lbName, playerTag.GetName());
     }

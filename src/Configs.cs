@@ -10,6 +10,7 @@ public static class Configs
     internal static ConfigEntry<string> RulesetLocalCrew { get; private set; }
     internal static ConfigEntry<string> RulesetOnline1v1 { get; private set; }
     
+    internal static ConfigEntry<string> SelectedTagKeyboard { get; private set; }
     internal static ConfigEntry<string> SelectedTagPlayer1 { get; private set; }
     internal static ConfigEntry<string> SelectedTagPlayer2 { get; private set; }
     internal static ConfigEntry<string> SelectedTagPlayer3 { get; private set; }
@@ -24,6 +25,7 @@ public static class Configs
         RulesetLocalCrew = config.Bind<string>("Selected Rulesets", "RulesetLocalCrew", "standard_online", "Selected ruleset for crew battle mode");
         RulesetOnline1v1 = config.Bind<string>("Selected Rulesets", "RulesetOnline1v1", "standard_online", "Selected ruleset for online 1v1 mode");
 
+        SelectedTagKeyboard = config.Bind<string>("Selected Player Tags", "SelectedTagKeyboard", "", "Player tag selected for the keyboard player. Tag selections are case insensitive");
         SelectedTagPlayer1 = config.Bind<string>("Selected Player Tags", "SelectedTagPlayer1", "", "Player tag selected for player 1. Tag selections are case insensitive");
         SelectedTagPlayer2 = config.Bind<string>("Selected Player Tags", "SelectedTagPlayer2", "", "Player tag selected for player 2. Tag selections are case insensitive");
         SelectedTagPlayer3 = config.Bind<string>("Selected Player Tags", "SelectedTagPlayer3", "", "Player tag selected for player 3. Tag selections are case insensitive");
