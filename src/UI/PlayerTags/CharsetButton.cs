@@ -1,6 +1,6 @@
 using LLGUI;
 
-namespace TourneyMod.UI.Lobby.PlayerTags;
+namespace TourneyMod.UI.PlayerTags;
 
 public class CharsetButton : LLButton
 {

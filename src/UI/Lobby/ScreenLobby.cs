@@ -1,9 +1,7 @@
-using LLBML.States;
 using LLGUI;
 using LLScreen;
-using TourneyMod.UI.Lobby.PlayerTags;
+using TourneyMod.UI.PlayerTags;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace TourneyMod.UI.Lobby;
 

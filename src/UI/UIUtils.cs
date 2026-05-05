@@ -1,6 +1,6 @@
 using LLGUI;
 using TMPro;
-using TourneyMod.UI.Lobby.PlayerTags;
+using TourneyMod.UI.PlayerTags;
 using UnityEngine;
 using UnityEngine.UI;
 

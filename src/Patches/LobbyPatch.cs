@@ -7,7 +7,7 @@ using LLScreen;
 using TourneyMod.PlayerTags;
 using TourneyMod.SetTracking;
 using TourneyMod.UI.Lobby;
-using TourneyMod.UI.Lobby.PlayerTags;
+using TourneyMod.UI.PlayerTags;
 
 namespace TourneyMod.Patches;
 

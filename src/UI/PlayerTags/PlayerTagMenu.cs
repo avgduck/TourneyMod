@@ -8,7 +8,7 @@ using TMPro;
 using TourneyMod.PlayerTags;
 using UnityEngine;
 
-namespace TourneyMod.UI.Lobby.PlayerTags;
+namespace TourneyMod.UI.PlayerTags;
 
 public class PlayerTagMenu : MonoBehaviour
 {
