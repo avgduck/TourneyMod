@@ -35,6 +35,9 @@
       <Reference Include="ModMenu">
         <HintPath>libs\ModMenu.dll</HintPath>
       </Reference>
+      <Reference Include="Rewired_Core">
+        <HintPath>libs\Rewired_Core.dll</HintPath>
+      </Reference>
       <Reference Include="TextMeshPro">
         <HintPath>libs\TextMeshPro.dll</HintPath>
       </Reference>

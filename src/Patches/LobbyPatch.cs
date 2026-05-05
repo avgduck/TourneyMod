@@ -97,10 +97,12 @@ internal static class LobbyPatch
     [HarmonyPrefix]
     private static void GameStatesLobby_AddPlayer_Prefix(ref ALDOKEMAOMB LGACHGEPNNH)
     {
+        Player p = LGACHGEPNNH;
+        //Plugin.LogGlobal.LogWarning($"AddPlayer P{p.nr} controller {p.controller}");
+        
         if (SetTracker.Instance.ActiveTourneyMode is TourneyMode.NONE) return;
         if (SetTracker.Instance.CurrentSet.LastWinnerOverride != Team.NONE) return;
-
-        Player p = LGACHGEPNNH;
+        
         PlayerCharacter characterLock = SetTracker.Instance.CurrentSet.PlayerCharacterLock[p.nr];
         if (characterLock.IsEmpty) return;
         

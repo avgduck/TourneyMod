@@ -105,10 +105,10 @@ public class Plugin : BaseUnityPlugin
         });
 
         SelectedPlayerTagNameKeyboard = Configs.SelectedTagKeyboard.Value;
-        SelectedPlayerTagNames[0] = Configs.SelectedTagPlayer1.Value;
-        SelectedPlayerTagNames[1] = Configs.SelectedTagPlayer2.Value;
-        SelectedPlayerTagNames[2] = Configs.SelectedTagPlayer3.Value;
-        SelectedPlayerTagNames[3] = Configs.SelectedTagPlayer4.Value;
+        SelectedPlayerTagNames[0] = Configs.SelectedTagController1.Value;
+        SelectedPlayerTagNames[1] = Configs.SelectedTagController2.Value;
+        SelectedPlayerTagNames[2] = Configs.SelectedTagController3.Value;
+        SelectedPlayerTagNames[3] = Configs.SelectedTagController4.Value;
         
         PlayerTag selectedTagKeyboard = PlayerTagIO.GetPlayerTagByName(SelectedPlayerTagNameKeyboard.ToLower());
         if (selectedTagKeyboard == null)
@@ -117,23 +117,23 @@ public class Plugin : BaseUnityPlugin
         }
         else
         {
-            if (SelectedPlayerTagKeyboard != selectedTagKeyboard) LogGlobal.LogInfo($"Setting keyboard player selected player tag '{selectedTagKeyboard.GetName()}'");
+            if (SelectedPlayerTagKeyboard != selectedTagKeyboard) LogGlobal.LogInfo($"Setting keyboard selected player tag '{selectedTagKeyboard.GetName()}'");
             SelectedPlayerTagKeyboard = selectedTagKeyboard;
         }
 
-        for (int playerNr = 0; playerNr < 4; playerNr++)
+        for (int controllerNr = 0; controllerNr < 4; controllerNr++)
         {
-            PlayerTag selectedTag = PlayerTagIO.GetPlayerTagByName(SelectedPlayerTagNames[playerNr].ToLower());
+            PlayerTag selectedTag = PlayerTagIO.GetPlayerTagByName(SelectedPlayerTagNames[controllerNr].ToLower());
 
             if (selectedTag == null)
             {
                 //if (SelectedPlayerTags[playerNr] != PlayerTag.DEFAULT) LogGlobal.LogWarning($"Could not find P{playerNr} selected player tag '{SelectedPlayerTagNames[playerNr]}': setting to default");
-                SelectedPlayerTags[playerNr] = PlayerTag.DEFAULT;
+                SelectedPlayerTags[controllerNr] = PlayerTag.DEFAULT;
             }
             else
             {
-                if (SelectedPlayerTags[playerNr] != selectedTag) LogGlobal.LogInfo($"Setting P{playerNr} selected player tag '{selectedTag.GetName()}'");
-                SelectedPlayerTags[playerNr] = selectedTag;
+                if (SelectedPlayerTags[controllerNr] != selectedTag) LogGlobal.LogInfo($"Setting controller {controllerNr} selected player tag '{selectedTag.GetName()}'");
+                SelectedPlayerTags[controllerNr] = selectedTag;
             }
         }
     }
@@ -141,25 +141,39 @@ public class Plugin : BaseUnityPlugin
     internal void SelectPlayerTag(int playerNr, PlayerTag playerTag)
     {
         Player player = Player.GetPlayer(playerNr);
-        if (player.controller.IncludesMouse())
+        Rewired.Player rePlayer = player.controller.GetInputPlayer();
+        
+        if (rePlayer.id == 0)
         {
             SelectedPlayerTagKeyboard = playerTag;
             Configs.SelectedTagKeyboard.Value = playerTag.GetName();
+            Plugin.LogGlobal.LogInfo($"Setting keyboard selected player tag '{playerTag.GetName()}'");
             return;
         }
-        
-        SelectedPlayerTags[playerNr] = playerTag;
 
-        if (playerNr == 0) Configs.SelectedTagPlayer1.Value = playerTag.GetName();
-        else if (playerNr == 1) Configs.SelectedTagPlayer2.Value = playerTag.GetName();
-        else if (playerNr == 2) Configs.SelectedTagPlayer3.Value = playerTag.GetName();
-        else if (playerNr == 3) Configs.SelectedTagPlayer4.Value = playerTag.GetName();
+        int controllerNr = rePlayer.id - 1;
+        SelectedPlayerTags[controllerNr] = playerTag;
+        Plugin.LogGlobal.LogInfo($"Setting controller {controllerNr} selected player tag '{playerTag.GetName()}'");
+
+        if (controllerNr == 0) Configs.SelectedTagController1.Value = playerTag.GetName();
+        else if (controllerNr == 1) Configs.SelectedTagController2.Value = playerTag.GetName();
+        else if (controllerNr == 2) Configs.SelectedTagController3.Value = playerTag.GetName();
+        else if (controllerNr == 3) Configs.SelectedTagController4.Value = playerTag.GetName();
     }
 
     internal PlayerTag GetPlayerTag(int playerNr)
     {
         Player player = Player.GetPlayer(playerNr);
-        return player.controller.IncludesMouse() ? SelectedPlayerTagKeyboard : SelectedPlayerTags[playerNr];
+        Rewired.Player rePlayer = player.controller.GetInputPlayer();
+        if (rePlayer == null) return PlayerTag.DEFAULT;
+
+        if (rePlayer.id == 0)
+        {
+            return SelectedPlayerTagKeyboard;
+        }
+
+        int controllerNr = rePlayer.id - 1;
+        return SelectedPlayerTags[controllerNr];
     }
 
     internal static string PrintArray<T>(T[] arr, bool includeBrackets)
