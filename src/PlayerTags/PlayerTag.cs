@@ -9,14 +9,17 @@ public class PlayerTag
     {
         IsDefault = isDefault;
         name = "";
+        isEditing = false;
     }
 
     internal PlayerTag()
     {
         IsDefault = false;
+        isEditing = false;
     }
     
     private string name;
+    private bool isEditing;
 
     internal void SetName(string name)
     {
@@ -27,5 +30,15 @@ public class PlayerTag
     internal string GetName()
     {
         return name;
+    }
+
+    internal void SetEditing(bool isEditing)
+    {
+        this.isEditing = isEditing;
+    }
+
+    internal bool GetEditing()
+    {
+        return isEditing;
     }
 }

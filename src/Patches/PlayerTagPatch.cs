@@ -1,6 +1,7 @@
 using HarmonyLib;
 using LLGUI;
 using LLHandlers;
+using LLScreen;
 using TourneyMod.UI.PlayerTags;
 using UnityEngine;
 
@@ -95,5 +96,13 @@ public class PlayerTagPatch
         
         custom.CustomButtonClick(playerNr);
         return false;
+    }
+
+    [HarmonyPatch(typeof(InputConfigElement), nameof(InputConfigElement.ButtonClick))]
+    [HarmonyPostfix]
+    private static void InputConfigElement_ButtonClick_Postfix(InputConfigElement __instance)
+    {
+        ScreenInput screenInput = UIScreen.GetScreen(ScreenType.OPTIONS) as ScreenInput;
+        if (screenInput != null) screenInput.UpdateBarButtons();
     }
 }

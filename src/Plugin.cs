@@ -47,7 +47,6 @@ public class Plugin : BaseUnityPlugin
     internal bool SetPreviewMenuOpen = false;
     internal bool ScoreEditMenuOpen = false;
     internal bool RecolorCursors = false;
-    internal bool[] InputMenuEditingTags = [false, false, false, false, false];
 
     private void Awake()
     {
