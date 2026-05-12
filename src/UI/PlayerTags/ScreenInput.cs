@@ -62,6 +62,22 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
         }
     }
 
+    public override bool DirectMove(Vector2 move, LLClickable curFocus, bool shouldMove)
+    {
+        int playerIndex = -1;
+
+        for (int i = 0; i < playerTagMenus.Length; i++)
+        {
+            if (playerTagMenus[i].CheckControlFocus(curFocus))
+            {
+                playerIndex = i;
+                break;
+            }
+        }
+
+        return playerIndex != -1 && playerTagMenus[playerIndex].DirectMove(move, curFocus, shouldMove);
+    }
+
     private JBKFDDKLDDG GetInputConfigController(LLCursor cursor)
     {
         // GameStatesOptions.inputConfigControllers

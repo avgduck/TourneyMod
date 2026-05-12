@@ -3,6 +3,7 @@ using System.Linq;
 using LLBML.Players;
 using LLGUI;
 using LLHandlers;
+using LLScreen;
 using TMPro;
 using TourneyMod.PlayerTags;
 using UnityEngine;
@@ -39,6 +40,8 @@ public class PlayerTagMenuOptions : MonoBehaviour
 
     private static readonly int ROWS = InputAction.EConfigurables().Count() + 5;
 
+    private List<LLClickable> allControls;
+
     private RectTransform pnBrowse;
     private Image[] rowsBrowse = new Image[ROWS];
     
@@ -71,6 +74,7 @@ public class PlayerTagMenuOptions : MonoBehaviour
 
     private void Init()
     {
+        allControls = new List<LLClickable>();
         ignoreMouse = playerIndex != 0;
         InitBrowsePanel();
     }
@@ -95,6 +99,7 @@ public class PlayerTagMenuOptions : MonoBehaviour
         btNewTag.SetText("+ new tag");
         btNewTag.ignoreMouseHover = ignoreMouse;
         btNewTag.soundHover = true;
+        allControls.Add(btNewTag);
         
         UIUtils.CreatePanel(ref pnPages, "pnPages", pnBrowse, rowsBrowse[ROWS - 2].rectTransform.localPosition, BUTTON_SCALE, Color.clear);
         
@@ -111,6 +116,7 @@ public class PlayerTagMenuOptions : MonoBehaviour
         btPageBack.ignoreMouseHover = ignoreMouse;
         btPageBack.soundHover = true;
         btPageBack.onClick = OnClickPageBack;
+        allControls.Add(btPageBack);
         
         UIUtils.CreateButton(ref btPageForward, "btPageForward", pnPages, new Vector2(BUTTON_SCALE.x / 2f - BUTTON_SCALE.x / 8f, 0f), new Vector2(BUTTON_SCALE.x / 4f, BUTTON_SCALE.y), Color.clear);
         btPageForward.textMesh.color = COLOR_CONTROL;
@@ -121,6 +127,7 @@ public class PlayerTagMenuOptions : MonoBehaviour
         btPageForward.ignoreMouseHover = ignoreMouse;
         btPageForward.soundHover = true;
         btPageForward.onClick = OnClickPageForward;
+        allControls.Add(btPageForward);
         
         UIUtils.CreatePanel(ref pnTagList, "pnTagList", pnBrowse, Vector2.zero, Vector2.one, Color.clear);
 
@@ -135,6 +142,7 @@ public class PlayerTagMenuOptions : MonoBehaviour
             btSelectTag.ignoreMouseHover = ignoreMouse;
             btSelectTag.soundHover = true;
             btSelectTags[i] = btSelectTag;
+            allControls.Add(btSelectTag);
         }
     }
 
@@ -212,8 +220,44 @@ public class PlayerTagMenuOptions : MonoBehaviour
         {
             list.AddRange(btSelectTags);
             list.Add(btPageBack);
-            list.Add(btPageForward);
             list.Add(btNewTag);
         }
+    }
+
+    internal bool DirectMove(Vector2 move, LLClickable curFocus, bool shouldMove)
+    {
+        if (!shouldMove) return false;
+        bool vert = move.y != 0f && Mathf.Abs(move.y) > Mathf.Abs(move.x);
+        // GameStatesOptions.inputConfigControllers[playerIndex].cursor
+        LLCursor cursor = HGFCCNMEEEF.inputConfigControllers[playerIndex].OBELDJGOOIJ;
+
+        if ((curFocus == btPageBack || curFocus == btPageForward) && vert)
+        {
+            cursor.SetFocus(move.y > 0 ? btSelectTags[btSelectTags.Length - 1] : btNewTag);
+            return true;
+        }
+        else if (curFocus == btPageBack)
+        {
+            cursor.SetFocus(btPageForward);
+            return true;
+        }
+        else if (curFocus == btPageForward)
+        {
+            cursor.SetFocus(btPageBack);
+            return true;
+        }
+        return false;
+    }
+
+    internal bool CheckControlFocus(LLClickable curFocus)
+    {
+        bool match = false;
+        
+        foreach (LLClickable control in allControls)
+        {
+            if (curFocus == control) match = true;
+        }
+
+        return match;
     }
 }
