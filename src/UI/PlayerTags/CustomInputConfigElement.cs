@@ -10,10 +10,12 @@ public class CustomInputConfigElement : InputConfigElement
     internal static readonly Color COLOR_TAG_CUSTOM = Color.white;
 
     internal CustomInputConfigBarType customInputConfigBarType;
+    private ScreenInput screenInput;
     
-    public CustomInputConfigElement(LLButton _button, JBKFDDKLDDG _inputConfigController, int _inputAction, bool _altInput, CustomInputConfigBarType _customInputConfigBarType) : base(_button, _inputConfigController, _inputAction, _altInput, InputConfigBarType.EMPTY)
+    public CustomInputConfigElement(LLButton _button, JBKFDDKLDDG _inputConfigController, int _inputAction, bool _altInput, CustomInputConfigBarType _customInputConfigBarType, ScreenInput _screenInput) : base(_button, _inputConfigController, _inputAction, _altInput, InputConfigBarType.EMPTY)
     {
         customInputConfigBarType = _customInputConfigBarType;
+        screenInput = _screenInput;
     }
 
     internal void CustomUpdateLooks()
@@ -25,5 +27,15 @@ public class CustomInputConfigElement : InputConfigElement
             button.colDefault = playerTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
             button.textMesh.color = playerTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
         }
+    }
+
+    internal void CustomButtonClick(int playerNr)
+    {
+        if (inputConfigController.LNDBODJBNFM != playerNr) return;
+
+        // inputConfigController.index
+        PlayerTagMenuOptions tagMenuOptions = screenInput.playerTagMenus[inputConfigController.LNDBODJBNFM];
+        if (tagMenuOptions.gameObject.activeSelf) tagMenuOptions.Close();
+        else tagMenuOptions.OpenBrowse();
     }
 }

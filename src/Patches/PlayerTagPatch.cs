@@ -28,6 +28,8 @@ public class PlayerTagPatch
         
         screenInput.offsetBars = new Vector3(-6.4f, -36f, 0f);
         screenInput.posBarNext -= screenInput.offsetBars;
+        PlayerTagMenuOptions.BarStartPos = screenInput.posBarNext;
+        PlayerTagMenuOptions.BarOffset = screenInput.offsetBars;
         
         OptionsBarInputConfig optionsBarInputTitle = (OptionsBarInputConfig)screenInput.AddBar(OptionsBarType.INPUT_CONFIG, string.Empty, configVarNone);
         optionsBarInputTitle.inputConfigBarType = InputConfigBarType.TITLES;
@@ -57,6 +59,8 @@ public class PlayerTagPatch
         OptionsBarInputConfig optionsBarInputButton2 = (OptionsBarInputConfig)screenInput.AddBar(OptionsBarType.INPUT_CONFIG, string.Empty, configVarNone);
         optionsBarInputButton2.inputConfigBarType = InputConfigBarType.BUTTON2;
         
+        screenInput.SetupPlayerTagMenu(customOptionsBarInputConfig.imBar.sprite);
+        
         return false;
     }
     
@@ -79,6 +83,17 @@ public class PlayerTagPatch
         if (custom == null) return true;
         
         custom.CustomUpdateLooks();
+        return false;
+    }
+    
+    [HarmonyPatch(typeof(InputConfigElement), nameof(InputConfigElement.ButtonClick))]
+    [HarmonyPrefix]
+    private static bool InputConfigElement_ButtonClick_Prefix(InputConfigElement __instance, int playerNr)
+    {
+        CustomInputConfigElement custom = __instance as CustomInputConfigElement;
+        if (custom == null) return true;
+        
+        custom.CustomButtonClick(playerNr);
         return false;
     }
 }

@@ -6,6 +6,8 @@ namespace TourneyMod.UI.PlayerTags;
 
 public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
 {
+    internal PlayerTagMenuOptions[] playerTagMenus;
+    
     public void Init(ScreenOptions screenOptions)
     {
         screenType = screenOptions.screenType;
@@ -56,6 +58,7 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
         
         customOptionsBarInputConfig.Copy(optionsBarInputConfig);
         customOptionsBarInputConfig.customInputConfigBarType = customInputConfigBarType;
+        customOptionsBarInputConfig.screenInput = this;
         DestroyImmediate(optionsBarInputConfig);
         
         HNEDEAGADKO configVarNone = HNEDEAGADKO.NMJDMHNMDNJ;
@@ -63,5 +66,14 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
         optionBars.Add(customOptionsBarInputConfig);
         posBarNext += offsetBars;
         return customOptionsBarInputConfig;
+    }
+
+    internal void SetupPlayerTagMenu(Sprite barSprite)
+    {
+        playerTagMenus = new PlayerTagMenuOptions[5];
+        for (int playerIndex = 0; playerIndex < 5; playerIndex++)
+        {
+            playerTagMenus[playerIndex] = PlayerTagMenuOptions.CreateMenu(tfBars, playerIndex, barSprite);
+        }
     }
 }

@@ -7,6 +7,7 @@ namespace TourneyMod.UI.PlayerTags;
 public class CustomOptionsBarInputConfig : OptionsBarInputConfig
 {
     internal CustomInputConfigBarType customInputConfigBarType;
+    internal ScreenInput screenInput;
     
     internal void Copy(OptionsBarInputConfig copy)
     {
@@ -53,7 +54,7 @@ public class CustomOptionsBarInputConfig : OptionsBarInputConfig
         component.SetFontSize(TextHandler.GetFontSize("MENU_SETTING"));
         component.ignoreMouseHover = !inputConfigController.GDEMBCKIDMA.IncludesMouse();
         
-        inputElements.Add(new CustomInputConfigElement(component, inputConfigController, inputAction, altInput, customInputConfigBarType));
+        inputElements.Add(new CustomInputConfigElement(component, inputConfigController, inputAction, altInput, customInputConfigBarType, screenInput));
         UpdateBar();
         UpdateButton(inputConfigController);
     }
