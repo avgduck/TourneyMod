@@ -281,7 +281,7 @@ public class PlayerTagMenuLobby : MonoBehaviour
         {
             btSelectTag.SetText("");
             btSelectTag.onClick = null;
-            btSelectTag.enabled = false;
+            btSelectTag.SetActive(false);
         }
 
         for (int displayIndex = 0; displayIndex < TAG_LIST_ROWS; displayIndex++)
@@ -295,6 +295,7 @@ public class PlayerTagMenuLobby : MonoBehaviour
             btSelectTag.colDefault = displayTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
             btSelectTag.textMesh.color = displayTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
             btSelectTag.onClick = playerNr => OnClickSelectTag(playerNr, displayTag);
+            btSelectTag.SetActive(true);
         }
     }
 

@@ -58,4 +58,11 @@ public class CustomOptionsBarInputConfig : OptionsBarInputConfig
         UpdateBar();
         UpdateButton(inputConfigController);
     }
+
+    public override LLClickable GetDefaultFocus(LLCursor cursor)
+    {
+        JBKFDDKLDDG inputConfigController = GetInputConfigController(cursor);
+        int elementIndex = GetElementIndex(inputConfigController);
+        return elementIndex >= 0 ? inputElements[elementIndex].button : null;
+    }
 }

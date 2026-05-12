@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using LLBML.Players;
 using LLGUI;
 using LLHandlers;
 using TMPro;
@@ -158,7 +159,8 @@ public class PlayerTagMenuOptions : MonoBehaviour
         {
             btSelectTag.SetText("");
             btSelectTag.onClick = null;
-            btSelectTag.enabled = false;
+            btSelectTag.SetActive(false);
+            btSelectTag.OnHoverOut(-1);
         }
 
         for (int displayIndex = 0; displayIndex < TAG_LIST_ROWS; displayIndex++)
@@ -172,6 +174,7 @@ public class PlayerTagMenuOptions : MonoBehaviour
             btSelectTag.textMesh.color = displayTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
             btSelectTag.colDefault = displayTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
             btSelectTag.onClick = playerNr => OnClickSelectTag(playerNr, displayTag);
+            btSelectTag.SetActive(true);
         }
     }
 
@@ -199,5 +202,18 @@ public class PlayerTagMenuOptions : MonoBehaviour
     internal void Close()
     {
         gameObject.SetActive(false);
+    }
+
+    internal void GetControls(ref List<LLClickable> list, LLClickable curFocus, LLCursor cursor)
+    {
+        if (!gameObject.activeSelf) return;
+
+        if (pnBrowse.gameObject.activeSelf)
+        {
+            list.AddRange(btSelectTags);
+            list.Add(btPageBack);
+            list.Add(btPageForward);
+            list.Add(btNewTag);
+        }
     }
 }

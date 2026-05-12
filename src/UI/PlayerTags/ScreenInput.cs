@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using LLGUI;
 using LLHandlers;
 using LLScreen;
@@ -47,6 +48,31 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
         base.OnClose(screenTypeNext);
         
         EditingTags = [false, false, false, false, false];
+    }
+
+    public override void GetControls(ref List<LLClickable> list, bool vert, LLClickable curFocus, LLCursor cursor)
+    {
+        if (!vert) return;
+        JBKFDDKLDDG inputConfigController = GetInputConfigController(cursor);
+
+        playerTagMenus[inputConfigController.LNDBODJBNFM].GetControls(ref list, curFocus, cursor);
+        foreach (OptionsBar optionsBar in optionBars)
+        {
+            optionsBar.GetControls(ref list, curFocus, cursor);
+        }
+    }
+
+    private JBKFDDKLDDG GetInputConfigController(LLCursor cursor)
+    {
+        // GameStatesOptions.inputConfigControllers
+        for (int i = 0; i < HGFCCNMEEEF.inputConfigControllers.Count; i++)
+        {
+            JBKFDDKLDDG inputConfigController = HGFCCNMEEEF.inputConfigControllers[i];
+            // inputConfigController.cursor
+            if (inputConfigController.OBELDJGOOIJ == cursor) return inputConfigController;
+        }
+
+        return null;
     }
 
     internal CustomOptionsBarInputConfig AddCustomInputConfigBar(CustomInputConfigBarType customInputConfigBarType, string text)
