@@ -40,14 +40,6 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
         base.OnOpen(screenTypePrev);
 
         EditingTags = [false, false, false, false, false];
-        UpdateBarButtons();
-    }
-
-    public override void OnClose(ScreenType screenTypeNext)
-    {
-        base.OnClose(screenTypeNext);
-        
-        EditingTags = [false, false, false, false, false];
     }
 
     public override void GetControls(ref List<LLClickable> list, bool vert, LLClickable curFocus, LLCursor cursor)
@@ -168,5 +160,20 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
                 });
             }
         }
+
+        bool blockGlobalInput = false;
+        
+        foreach (bool edit in EditingTags)
+        {
+            if (edit) blockGlobalInput = true;
+        }
+        foreach (PlayerTagMenuOptions tagMenu in playerTagMenus)
+        {
+            if (tagMenu.gameObject.activeSelf) blockGlobalInput = true;
+        }
+        
+        UIScreen.blockGlobalInput = blockGlobalInput;
+        // GameStatesMenu.SetBackButtonVisible(bool visible)
+        IOGKKINMEFB.GMBFKKNCMOO(!blockGlobalInput);
     }
 }

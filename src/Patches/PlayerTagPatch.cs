@@ -61,6 +61,7 @@ public class PlayerTagPatch
         optionsBarInputButton2.inputConfigBarType = InputConfigBarType.BUTTON2;
         
         screenInput.SetupPlayerTagMenu();
+        screenInput.UpdateBarButtons();
         
         return false;
     }
