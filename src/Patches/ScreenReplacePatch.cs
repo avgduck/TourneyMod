@@ -9,6 +9,7 @@ using TourneyMod.SetTracking;
 using TourneyMod.UI;
 using TourneyMod.UI.Lobby;
 using TourneyMod.UI.Menu;
+using TourneyMod.UI.PlayerTags;
 using TourneyMod.UI.StageSelect;
 using UnityEngine;
 using ScreenMenuMain = LLScreen.ScreenMenuMain;
@@ -42,6 +43,10 @@ internal static class ScreenReplacePatch
         else if (screenType == ScreenType.UNLOCKS_STAGES && Plugin.Instance.SetPreviewMenuOpen)
         {
             ReplaceScreen<ScreenUnlocksStages, ScreenMenuSetPreview>(ref __result);
+        }
+        else if (screenType == ScreenType.OPTIONS && GameStates.GetCurrent() == GameState.OPTIONS_INPUT)
+        {
+            ReplaceScreen<ScreenOptions, ScreenInput>(ref __result);
         }
         else if (screenType == ScreenType.PLAYERS && SetTracker.Instance.IsTrackingSet)
         {

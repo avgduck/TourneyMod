@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace TourneyMod.UI.PlayerTags;
 
-public class PlayerTagMenu : MonoBehaviour
+public class PlayerTagMenuLobby : MonoBehaviour
 {
     private RectTransform rectTransform;
     private int playerNr;
@@ -113,16 +113,16 @@ public class PlayerTagMenu : MonoBehaviour
     private bool upper;
     private bool numbers;
 
-    internal static PlayerTagMenu CreateMenu(Transform parent, int playerNr)
+    internal static PlayerTagMenuLobby CreateMenu(Transform parent, int playerNr)
     {
         RectTransform panel = null;
         UIUtils.CreatePanel(ref panel, "Player Tag Menu", parent, MAIN_POSITION, MAIN_SCALE, Color.clear);
-        PlayerTagMenu playerTagMenu = panel.gameObject.AddComponent<PlayerTagMenu>();
-        playerTagMenu.rectTransform = panel;
-        playerTagMenu.playerNr = playerNr;
-        playerTagMenu.Init();
-        playerTagMenu.gameObject.SetActive(false);
-        return playerTagMenu;
+        PlayerTagMenuLobby playerTagMenuLobby = panel.gameObject.AddComponent<PlayerTagMenuLobby>();
+        playerTagMenuLobby.rectTransform = panel;
+        playerTagMenuLobby.playerNr = playerNr;
+        playerTagMenuLobby.Init();
+        playerTagMenuLobby.gameObject.SetActive(false);
+        return playerTagMenuLobby;
     }
 
     private void Init()

@@ -4,6 +4,7 @@ using BepInEx;
 using BepInEx.Logging;
 using LLBML.Players;
 using LLBML.Utils;
+using LLHandlers;
 using TourneyMod.Patches;
 using TourneyMod.PlayerTags;
 using TourneyMod.Rulesets;
@@ -46,6 +47,7 @@ public class Plugin : BaseUnityPlugin
     internal bool SetPreviewMenuOpen = false;
     internal bool ScoreEditMenuOpen = false;
     internal bool RecolorCursors = false;
+    internal bool[] InputMenuEditingTags = [false, false, false, false, false];
 
     private void Awake()
     {
@@ -164,7 +166,12 @@ public class Plugin : BaseUnityPlugin
     internal PlayerTag GetPlayerTag(int playerNr)
     {
         Player player = Player.GetPlayer(playerNr);
-        Rewired.Player rePlayer = player.controller.GetInputPlayer();
+        return GetPlayerTag(player.controller);
+    }
+    
+    internal PlayerTag GetPlayerTag(Controller controller)
+    {
+        Rewired.Player rePlayer = controller.GetInputPlayer();
         if (rePlayer == null) return PlayerTag.DEFAULT;
 
         if (rePlayer.id == 0)

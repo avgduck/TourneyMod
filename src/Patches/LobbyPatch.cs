@@ -204,14 +204,14 @@ internal static class LobbyPatch
         if (playerTag.IsDefault || p.IsAI)
         {
             screenLobby.SetPlayerName(p.nr, $"PLAYER{p.nr+1}");
-            screenLobby.playerSelections[p.nr].btPlayerName.colDefault = PlayerTagMenu.COLOR_TAG_DEFAULT;
-            screenLobby.playerSelections[p.nr].btPlayerName.textMesh.color = PlayerTagMenu.COLOR_TAG_DEFAULT;
+            screenLobby.playerSelections[p.nr].btPlayerName.colDefault = PlayerTagMenuLobby.COLOR_TAG_DEFAULT;
+            screenLobby.playerSelections[p.nr].btPlayerName.textMesh.color = PlayerTagMenuLobby.COLOR_TAG_DEFAULT;
         }
         else
         {
             screenLobby.SetPlayerName(p.nr, playerTag.GetName());
-            screenLobby.playerSelections[p.nr].btPlayerName.colDefault = PlayerTagMenu.COLOR_TAG_CUSTOM;
-            screenLobby.playerSelections[p.nr].btPlayerName.textMesh.color = PlayerTagMenu.COLOR_TAG_CUSTOM;
+            screenLobby.playerSelections[p.nr].btPlayerName.colDefault = PlayerTagMenuLobby.COLOR_TAG_CUSTOM;
+            screenLobby.playerSelections[p.nr].btPlayerName.textMesh.color = PlayerTagMenuLobby.COLOR_TAG_CUSTOM;
         }
     }
     

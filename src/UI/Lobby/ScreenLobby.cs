@@ -8,7 +8,7 @@ namespace TourneyMod.UI.Lobby;
 public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
 {
     private LLButton[] settingsButtons;
-    internal PlayerTagMenu[] playerTagMenus;
+    internal PlayerTagMenuLobby[] playerTagMenus;
     
     public void Init(ScreenPlayers screenPlayers)
     {
@@ -63,7 +63,7 @@ public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
         Sprite spriteGear = UIUtils.ToSprite(texGear);
 
         settingsButtons = new LLButton[4];
-        playerTagMenus = new PlayerTagMenu[4];
+        playerTagMenus = new PlayerTagMenuLobby[4];
         for (int playerIndex = 0; playerIndex < 4; playerIndex++)
         {
             PlayersSelection playerSelection = playerSelections[playerIndex];
@@ -77,14 +77,14 @@ public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
             
             playerSelection.btPlayerName.transform.localPosition += new Vector3(15f, 0f, 0f);
 
-            playerTagMenus[playerIndex] = PlayerTagMenu.CreateMenu(playerSelection.transform, playerIndex);
+            playerTagMenus[playerIndex] = PlayerTagMenuLobby.CreateMenu(playerSelection.transform, playerIndex);
         }
     }
 
     internal void OnEject(int playerNr)
     {
-        PlayerTagMenu tagMenu = playerTagMenus[playerNr];
-        tagMenu.Close();
+        PlayerTagMenuLobby tagMenuLobby = playerTagMenus[playerNr];
+        tagMenuLobby.Close();
         UpdateTeamButtons();
     }
 
@@ -92,9 +92,9 @@ public class ScreenLobby : ScreenPlayers, ICustomScreen<ScreenPlayers>
     {
         if (playerNr != -1 && playerIndex != playerNr) return;
         
-        PlayerTagMenu tagMenu = playerTagMenus[playerIndex];
-        if (tagMenu.gameObject.activeSelf) tagMenu.Close();
-        else tagMenu.OpenBrowse();
+        PlayerTagMenuLobby tagMenuLobby = playerTagMenus[playerIndex];
+        if (tagMenuLobby.gameObject.activeSelf) tagMenuLobby.Close();
+        else tagMenuLobby.OpenBrowse();
         UpdateTeamButtons();
     }
 }
