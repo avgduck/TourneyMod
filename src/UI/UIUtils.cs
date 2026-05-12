@@ -278,6 +278,19 @@ internal static class UIUtils
         if (img == null) return;
         img.gameObject.SetActive(visible);
     }
+
+    internal static void SetTextAutoSize(LLButton button, string text, int maxFontSize, Vector2 maxBounds)
+    {
+        int fontSize = maxFontSize;
+        do
+        {
+            button.SetText(text, fontSize);
+            //button.textMesh.ForceMeshUpdate();
+            //Vector2 values = button.textMesh.GetPreferredValues();
+            //Plugin.LogGlobal.LogWarning($"{button.name}, '{text}', {fontSize}, {values}, {maxBounds}");
+            fontSize--;
+        } while ((button.textMesh.GetPreferredValues().x > maxBounds.x || button.textMesh.GetPreferredValues().y > maxBounds.y) && fontSize > 0);
+    }
     
     // texture editing code from ColorSwap
     internal static void SetTextureCopy(ref Texture2D destination, Texture2D source)

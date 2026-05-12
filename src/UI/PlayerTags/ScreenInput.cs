@@ -68,12 +68,27 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
         return customOptionsBarInputConfig;
     }
 
-    internal void SetupPlayerTagMenu(Sprite barSprite)
+    internal void SetupPlayerTagMenu()
     {
         playerTagMenus = new PlayerTagMenuOptions[5];
         for (int playerIndex = 0; playerIndex < 5; playerIndex++)
         {
-            playerTagMenus[playerIndex] = PlayerTagMenuOptions.CreateMenu(tfBars, playerIndex, barSprite);
+            playerTagMenus[playerIndex] = PlayerTagMenuOptions.CreateMenu(tfBars, playerIndex, this);
+        }
+    }
+
+    internal void UpdateBarButtons()
+    {
+        foreach (OptionsBar optionsBar in optionBars)
+        {
+            OptionsBarInputConfig bar = optionsBar as OptionsBarInputConfig;
+            
+            CustomOptionsBarInputConfig custom = bar as CustomOptionsBarInputConfig;
+            if (custom != null)
+            {
+                custom.inputElements.ForEach(element => element?.UpdateLooks());
+                continue;
+            }
         }
     }
 }

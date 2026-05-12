@@ -6,8 +6,9 @@ namespace TourneyMod.UI.PlayerTags;
 
 public class CustomInputConfigElement : InputConfigElement
 {
-    internal static readonly Color COLOR_TAG_DEFAULT = Color.red;
-    internal static readonly Color COLOR_TAG_CUSTOM = Color.white;
+    private static readonly Color COLOR_TAG_DEFAULT = Color.red;
+    private static readonly Color COLOR_TAG_CUSTOM = Color.white;
+    private const int TAG_FONT_SIZE = 14;
 
     internal CustomInputConfigBarType customInputConfigBarType;
     private ScreenInput screenInput;
@@ -23,7 +24,7 @@ public class CustomInputConfigElement : InputConfigElement
         if (customInputConfigBarType == CustomInputConfigBarType.TAG_MENU_TOGGLE)
         {
             PlayerTag playerTag = Plugin.Instance.GetPlayerTag(inputConfigController.GDEMBCKIDMA);
-            SetText(playerTag.IsDefault ? "DEFAULT" : playerTag.GetName());
+            UIUtils.SetTextAutoSize(button, playerTag.IsDefault ? "DEFAULT" : playerTag.GetName(), TAG_FONT_SIZE, new Vector2(120f, 36f));
             button.colDefault = playerTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
             button.textMesh.color = playerTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
         }

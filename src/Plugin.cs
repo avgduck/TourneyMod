@@ -143,7 +143,12 @@ public class Plugin : BaseUnityPlugin
     internal void SelectPlayerTag(int playerNr, PlayerTag playerTag)
     {
         Player player = Player.GetPlayer(playerNr);
-        Rewired.Player rePlayer = player.controller.GetInputPlayer();
+        SelectPlayerTag(player.controller, playerTag);
+    }
+
+    internal void SelectPlayerTag(Controller controller, PlayerTag playerTag)
+    {
+        Rewired.Player rePlayer = controller.GetInputPlayer();
         
         if (rePlayer.id == 0)
         {

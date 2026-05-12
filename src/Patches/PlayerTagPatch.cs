@@ -59,7 +59,7 @@ public class PlayerTagPatch
         OptionsBarInputConfig optionsBarInputButton2 = (OptionsBarInputConfig)screenInput.AddBar(OptionsBarType.INPUT_CONFIG, string.Empty, configVarNone);
         optionsBarInputButton2.inputConfigBarType = InputConfigBarType.BUTTON2;
         
-        screenInput.SetupPlayerTagMenu(customOptionsBarInputConfig.imBar.sprite);
+        screenInput.SetupPlayerTagMenu();
         
         return false;
     }
