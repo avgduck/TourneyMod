@@ -117,6 +117,12 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
 
     internal void UpdateBarButtons()
     {
+        for (int i = 0; i < 5; i++)
+        {
+            PlayerTag playerTag = Plugin.Instance.GetPlayerTag(Controller.FromNr(i, false));
+            playerTag.SetEditing(false);
+        }
+        
         foreach (OptionsBar optionsBar in optionBars)
         {
             OptionsBarInputConfig bar = optionsBar as OptionsBarInputConfig;
@@ -125,11 +131,6 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
             CustomOptionsBarInputConfig custom = bar as CustomOptionsBarInputConfig;
             if (custom != null)
             {
-                for (int i = 0; i < 5; i++)
-                {
-                    PlayerTag tag = Plugin.Instance.GetPlayerTag(Controller.FromNr(i, false));
-                    tag.SetEditing(false);
-                }
                 custom.inputElements.ForEach(element =>
                 {
                     if (element == null) return;

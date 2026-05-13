@@ -16,7 +16,7 @@ public class PlayerTagPatch
         Controller controller = GDEMBCKIDMA;
         //Plugin.LogGlobal.LogWarning($"InputConfigAddController: {controller}");
     }
-
+    
     [HarmonyPatch(typeof(HGFCCNMEEEF), nameof(HGFCCNMEEEF.PCBBCFNFDJL))]
     [HarmonyPrefix]
     private static bool GameStatesOptions_SetupBarsInput_Prefix(HGFCCNMEEEF __instance)
@@ -61,9 +61,18 @@ public class PlayerTagPatch
         optionsBarInputButton2.inputConfigBarType = InputConfigBarType.BUTTON2;
         
         screenInput.SetupPlayerTagMenu();
-        screenInput.UpdateBarButtons();
         
         return false;
+    }
+
+    [HarmonyPatch(typeof(HGFCCNMEEEF), nameof(HGFCCNMEEEF.GDOBNEONNII))]
+    [HarmonyPostfix]
+    private static void GameStatesOptions_InitInputConfig_Postfix(HGFCCNMEEEF __instance)
+    {
+        ScreenInput screenInput = __instance.CNINOFJOLNP as ScreenInput;
+        if (screenInput == null) return;
+        
+        screenInput.UpdateBarButtons();
     }
     
     [HarmonyPatch(typeof(OptionsBarInputConfig), nameof(OptionsBarInputConfig.AddController))]
