@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using LLBML.Players;
 using LLGUI;
 using LLHandlers;
-using LLScreen;
 using TMPro;
 using TourneyMod.PlayerTags;
 using UnityEngine;
@@ -425,6 +423,7 @@ public class PlayerTagMenuOptions : MonoBehaviour
         }
         else
         {
+            OpenBrowse();
             OnClickSelectTag(playerNr, createdTag);
         }
     }
