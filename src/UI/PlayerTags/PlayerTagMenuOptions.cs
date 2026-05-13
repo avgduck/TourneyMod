@@ -365,6 +365,8 @@ public class PlayerTagMenuOptions : MonoBehaviour
         TextHandler.SetText(lbCreateTag, tag);
         upper = false;
         numbers = false;
+        btShift.SetText("case");
+        btNumbers.SetText("nums");
         btCharsets.ForEach(btCharset => btCharset.SetUpper(upper));
         btCharsetsAlpha.ForEach(btCharset => btCharset.gameObject.SetActive(true));
         btCharsetsNumbers.ForEach(btCharset => btCharset.gameObject.SetActive(false));
