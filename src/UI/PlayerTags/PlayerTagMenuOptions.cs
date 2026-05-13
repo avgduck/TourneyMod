@@ -483,6 +483,11 @@ public class PlayerTagMenuOptions : MonoBehaviour
         }
     }
 
+    internal LLClickable GetDefaultFocus(LLCursor cursor)
+    {
+        return pnCreate.gameObject.activeSelf ? btEnter : null;
+    }
+
     internal bool DirectMove(Vector2 move, LLClickable curFocus, bool shouldMove)
     {
         if (!shouldMove) return false;

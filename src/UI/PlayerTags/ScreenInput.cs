@@ -54,6 +54,17 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
         }
     }
 
+    public override LLClickable GetDefaultFocus(LLCursor cursor)
+    {
+        if (playerTagMenus == null || playerTagMenus.Length != 5) return base.GetDefaultFocus(cursor);
+        
+        JBKFDDKLDDG inputConfigController = GetInputConfigController(cursor);
+        PlayerTagMenuOptions tagMenuOptions = playerTagMenus[inputConfigController.LNDBODJBNFM];
+
+        LLClickable tagMenuFocus = tagMenuOptions.GetDefaultFocus(cursor);
+        return tagMenuFocus == null ? base.GetDefaultFocus(cursor) : tagMenuFocus;
+    }
+
     public override bool DirectMove(Vector2 move, LLClickable curFocus, bool shouldMove)
     {
         int playerIndex = -1;

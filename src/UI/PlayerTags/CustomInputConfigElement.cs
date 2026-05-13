@@ -28,6 +28,8 @@ public class CustomInputConfigElement : InputConfigElement
             button.colDefault = playerTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
             button.textMesh.color = playerTag.IsDefault ? COLOR_TAG_DEFAULT : COLOR_TAG_CUSTOM;
         }
+        
+        button.UpdateColor();
     }
 
     internal void CustomButtonClick(int playerNr)
