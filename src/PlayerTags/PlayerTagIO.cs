@@ -51,7 +51,7 @@ public static class PlayerTagIO
     {
         if (name.IsNullOrWhiteSpace()) return null;
         
-        PlayerTag existing = GetPlayerTagByName(name.ToLower());
+        PlayerTag existing = GetPlayerTagByName(name);
         if (existing != null)
         {
             Plugin.LogGlobal.LogWarning($"Could not save player tag '{name}': a tag with name '{existing.GetName()}' (case insensitive) already exists!");
@@ -64,14 +64,14 @@ public static class PlayerTagIO
         string path = Path.Combine(PlayerTagsDirectory.FullName, name + ".json");
         string json = tag.ToJson();
         JsonIO.WriteFile(path, json);
-        PlayerTags.Add(name, tag);
+        PlayerTags.Add(name.ToLower(), tag);
         Plugin.LogGlobal.LogInfo($"Saved new player tag '{name}'");
         return tag;
     }
 
     internal static PlayerTag GetPlayerTagByName(string name)
     {
-        if (PlayerTags.ContainsKey(name)) return PlayerTags[name];
+        if (PlayerTags.ContainsKey(name.ToLower())) return PlayerTags[name.ToLower()];
 
         return null;
     }

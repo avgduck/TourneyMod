@@ -111,7 +111,7 @@ public class Plugin : BaseUnityPlugin
         SelectedPlayerTagNames[2] = Configs.SelectedTagController3.Value;
         SelectedPlayerTagNames[3] = Configs.SelectedTagController4.Value;
         
-        PlayerTag selectedTagKeyboard = PlayerTagIO.GetPlayerTagByName(SelectedPlayerTagNameKeyboard.ToLower());
+        PlayerTag selectedTagKeyboard = PlayerTagIO.GetPlayerTagByName(SelectedPlayerTagNameKeyboard);
         if (selectedTagKeyboard == null)
         {
             SelectedPlayerTagKeyboard = PlayerTag.DEFAULT;
@@ -124,7 +124,7 @@ public class Plugin : BaseUnityPlugin
 
         for (int controllerNr = 0; controllerNr < 4; controllerNr++)
         {
-            PlayerTag selectedTag = PlayerTagIO.GetPlayerTagByName(SelectedPlayerTagNames[controllerNr].ToLower());
+            PlayerTag selectedTag = PlayerTagIO.GetPlayerTagByName(SelectedPlayerTagNames[controllerNr]);
 
             if (selectedTag == null)
             {

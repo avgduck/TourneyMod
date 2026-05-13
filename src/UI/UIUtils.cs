@@ -1,4 +1,5 @@
 using LLGUI;
+using LLHandlers;
 using TMPro;
 using TourneyMod.UI.PlayerTags;
 using UnityEngine;
@@ -285,11 +286,19 @@ internal static class UIUtils
         do
         {
             button.SetText(text, fontSize);
-            //button.textMesh.ForceMeshUpdate();
-            //Vector2 values = button.textMesh.GetPreferredValues();
-            //Plugin.LogGlobal.LogWarning($"{button.name}, '{text}', {fontSize}, {values}, {maxBounds}");
             fontSize--;
         } while ((button.textMesh.GetPreferredValues().x > maxBounds.x || button.textMesh.GetPreferredValues().y > maxBounds.y) && fontSize > 0);
+    }
+
+    internal static void SetTextAutoSize(TextMeshProUGUI label, string text, int maxFontSize, Vector2 maxBounds)
+    {
+        int fontSize = maxFontSize;
+        do
+        {
+            TextHandler.SetText(label, text);
+            label.fontSize = fontSize;
+            fontSize--;
+        } while ((label.GetPreferredValues().x > maxBounds.x || label.GetPreferredValues().y > maxBounds.y) && fontSize > 0);
     }
     
     // texture editing code from ColorSwap
