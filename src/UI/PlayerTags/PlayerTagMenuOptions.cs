@@ -425,10 +425,10 @@ public class PlayerTagMenuOptions : MonoBehaviour
     {
         if (btIndex != activeBtIndex)
         {
+            if (tag.Length >= TAG_MAX_LENGTH) return;
+            
             activeBtIndex = btIndex;
             count = 0;
-
-            if (tag.Length >= TAG_MAX_LENGTH) return;
         }
         else
         {
