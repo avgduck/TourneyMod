@@ -266,6 +266,7 @@ public class PlayerTagMenuOptions : MonoBehaviour
             btCharset.onClick = playerNr => OnClickCharset(playerNr, btCharset, btIndex);
             btCharsets.Add(btCharset);
             btCharsetsAlpha.Add(btCharset);
+            allControls.Add(btCharset);
         }
         
         btCharsetsNumbers = new List<CharsetButton>();
@@ -284,6 +285,7 @@ public class PlayerTagMenuOptions : MonoBehaviour
             btCharset.onClick = playerNr => OnClickCharset(playerNr, btCharset, btIndex);
             btCharsets.Add(btCharset);
             btCharsetsNumbers.Add(btCharset);
+            allControls.Add(btCharset);
         }
     }
 
@@ -294,10 +296,17 @@ public class PlayerTagMenuOptions : MonoBehaviour
         return left + new Vector2((KEYPAD_BUTTON_SCALE.x + SPACING) * col, 0f);
     }
 
+    private int GetKeypadIndex(int row, int col)
+    {
+        return row * KEYPAD_COLS + col;
+    }
+
     internal void OpenBrowse()
     {
         pnBrowse.gameObject.SetActive(true);
         pnCreate.gameObject.SetActive(false);
+        
+        allControls.ForEach(control => control.OnHoverOut(-1));
 
         loadedTags = PlayerTagIO.PlayerTags.Values.OrderBy(pt => pt.GetName()).ToList();
         loadedTags.Insert(0, PlayerTag.DEFAULT);
@@ -360,6 +369,8 @@ public class PlayerTagMenuOptions : MonoBehaviour
     {
         pnBrowse.gameObject.SetActive(false);
         pnCreate.gameObject.SetActive(true);
+        
+        allControls.ForEach(control => control.OnHoverOut(-1));
         
         tag = "";
         TextHandler.SetText(lbCreateTag, tag);
@@ -466,6 +477,10 @@ public class PlayerTagMenuOptions : MonoBehaviour
             list.Add(btPageBack);
             list.Add(btNewTag);
         }
+        else if (pnCreate.gameObject.activeSelf)
+        {
+            list.Add(btEnter);
+        }
     }
 
     internal bool DirectMove(Vector2 move, LLClickable curFocus, bool shouldMove)
@@ -495,7 +510,140 @@ public class PlayerTagMenuOptions : MonoBehaviour
         }
         else if (pnCreate.gameObject.activeSelf)
         {
+            if (curFocus == btBackspace)
+            {
+                if (vert)
+                {
+                    if (move.y > 0) cursor.SetFocus(btEnter);
+                    else cursor.SetFocus(numbers ? btCharsetsNumbers[GetKeypadIndex(0, 2)] : btCharsetsAlpha[GetKeypadIndex(0, 2)]);
+                }
+
+                return true;
+            }
             
+            if (curFocus == btEnter && vert)
+            {
+                if (move.y > 0) cursor.SetFocus(numbers ? btCharsetsNumbers[GetKeypadIndex(2, 2)] : btCharsetsAlpha[GetKeypadIndex(1, 2)]);
+                else cursor.SetFocus(btBackspace);
+                return true;
+            }
+            else if (curFocus == btEnter)
+            {
+                if (move.x > 0) cursor.SetFocus(btShift);
+                else cursor.SetFocus(btNumbers);
+                return true;
+            }
+
+            if (curFocus == btNumbers && vert)
+            {
+                if (move.y > 0) cursor.SetFocus(numbers ? btCharsetsNumbers[GetKeypadIndex(2, 1)] : btCharsetsAlpha[GetKeypadIndex(2, 1)]);
+                else cursor.SetFocus(numbers ? btCharsetsNumbers[GetKeypadIndex(0, 1)] : btCharsetsAlpha[GetKeypadIndex(0, 1)]);
+                return true;
+            }
+            else if (curFocus == btNumbers)
+            {
+                if (move.x > 0) cursor.SetFocus(btEnter);
+                else cursor.SetFocus(btShift);
+                return true;
+            }
+
+            if (curFocus == btShift && vert)
+            {
+                if (move.y > 0) cursor.SetFocus(numbers ? btCharsetsNumbers[GetKeypadIndex(2, 0)] : btCharsetsAlpha[GetKeypadIndex(2, 0)]);
+                else cursor.SetFocus(numbers ? btCharsetsNumbers[GetKeypadIndex(0, 0)] : btCharsetsAlpha[GetKeypadIndex(0, 0)]);
+                return true;
+            }
+            else if (curFocus == btShift)
+            {
+                if (move.x > 0) cursor.SetFocus(btNumbers);
+                else cursor.SetFocus(btEnter);
+                return true;
+            }
+            
+            for (int row = 0; row < KEYPAD_ROWS - 1; row++)
+            {
+                for (int col = 0; col < KEYPAD_COLS; col++)
+                {
+                    if (numbers)
+                    {
+                        if (GetKeypadIndex(row, col) >= btCharsetsNumbers.Count) break;
+                        if (curFocus != btCharsetsNumbers[GetKeypadIndex(row, col)]) continue;
+
+                        if (vert)
+                        {
+                            if (move.y > 0)
+                            {
+                                if (col == 2 && row == 0) cursor.SetFocus(btBackspace);
+                                else if (col == 1 && row == 0) cursor.SetFocus(btNumbers);
+                                else if (col == 0 && row == 0) cursor.SetFocus(btShift);
+                                else cursor.SetFocus(btCharsetsNumbers[GetKeypadIndex(row - 1, col)]);
+                            }
+                            else
+                            {
+                                if (col == 2 && row == 2) cursor.SetFocus(btEnter);
+                                else if (col == 1 && row == 2) cursor.SetFocus(btNumbers);
+                                else if (col == 0 && row == 2) cursor.SetFocus(btShift);
+                                else cursor.SetFocus(btCharsetsNumbers[GetKeypadIndex(row + 1, col)]);
+                            }
+                        }
+                        else
+                        {
+                            if (move.x > 0)
+                            {
+                                if (col == 2) cursor.SetFocus(btCharsetsNumbers[GetKeypadIndex(row, 0)]);
+                                else cursor.SetFocus(btCharsetsNumbers[GetKeypadIndex(row, col + 1)]);
+                            }
+                            else
+                            {
+                                if (col == 0) cursor.SetFocus(btCharsetsNumbers[GetKeypadIndex(row, 2)]);
+                                else cursor.SetFocus(btCharsetsNumbers[GetKeypadIndex(row, col - 1)]);
+                            }
+                        }
+                        
+                        return true;
+                    }
+                    else
+                    {
+                        if (GetKeypadIndex(row, col) >= btCharsetsAlpha.Count) break;
+                        if (curFocus != btCharsetsAlpha[GetKeypadIndex(row, col)]) continue;
+                        
+                        if (vert)
+                        {
+                            if (move.y > 0)
+                            {
+                                if (col == 2 && row == 0) cursor.SetFocus(btBackspace);
+                                else if (col == 1 && row == 0) cursor.SetFocus(btNumbers);
+                                else if (col == 0 && row == 0) cursor.SetFocus(btShift);
+                                else cursor.SetFocus(btCharsetsAlpha[GetKeypadIndex(row - 1, col)]);
+                            }
+                            else
+                            {
+                                if (col == 2 && row == 1) cursor.SetFocus(btEnter);
+                                else if (col == 1 && row == 2) cursor.SetFocus(btNumbers);
+                                else if (col == 0 && row == 2) cursor.SetFocus(btShift);
+                                else cursor.SetFocus(btCharsetsAlpha[GetKeypadIndex(row + 1, col)]);
+                            }
+                        }
+                        else
+                        {
+                            if (move.x > 0)
+                            {
+                                if (col == 1 && row == 2) cursor.SetFocus(btCharsetsAlpha[GetKeypadIndex(row, 0)]);
+                                else if (col == 2) cursor.SetFocus(btCharsetsAlpha[GetKeypadIndex(row, 0)]);
+                                else cursor.SetFocus(btCharsetsAlpha[GetKeypadIndex(row, col + 1)]);
+                            }
+                            else
+                            {
+                                if (col == 0 && row == 2) cursor.SetFocus(btCharsetsAlpha[GetKeypadIndex(row, 1)]);
+                                else if (col == 0) cursor.SetFocus(btCharsetsAlpha[GetKeypadIndex(row, 2)]);
+                                else cursor.SetFocus(btCharsetsAlpha[GetKeypadIndex(row, col - 1)]);
+                            }
+                        }
+                        
+                        return true;
+                    }
+                }
+            }
         }
         
         return false;
