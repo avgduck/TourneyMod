@@ -148,10 +148,13 @@ public class Plugin : BaseUnityPlugin
     internal void SelectPlayerTag(Controller controller, PlayerTag playerTag)
     {
         Rewired.Player rePlayer = controller.GetInputPlayer();
+        Controller c = Controller.FromNr(rePlayer.id, false);
         
         if (rePlayer.id == 0)
         {
             SelectedPlayerTagKeyboard = playerTag;
+            LoadTagConfig(rePlayer, c.GetHardwareName(), c.GetReControllerType());
+            LoadTagMovementKeys();
             Configs.SelectedTagKeyboard.Value = playerTag.GetName();
             Plugin.LogGlobal.LogInfo($"Setting keyboard selected player tag '{playerTag.GetName()}'");
             return;
@@ -159,7 +162,8 @@ public class Plugin : BaseUnityPlugin
 
         int controllerNr = rePlayer.id - 1;
         SelectedPlayerTags[controllerNr] = playerTag;
-        Plugin.LogGlobal.LogInfo($"Setting controller {controllerNr} selected player tag '{playerTag.GetName()}'");
+        LoadTagConfig(rePlayer, c.GetHardwareName(), c.GetReControllerType());
+        Plugin.LogGlobal.LogInfo($"Setting controller {controllerNr+1} selected player tag '{playerTag.GetName()}'");
 
         if (controllerNr == 0) Configs.SelectedTagController1.Value = playerTag.GetName();
         else if (controllerNr == 1) Configs.SelectedTagController2.Value = playerTag.GetName();
@@ -175,7 +179,11 @@ public class Plugin : BaseUnityPlugin
     
     internal PlayerTag GetPlayerTag(Controller controller)
     {
-        Rewired.Player rePlayer = controller.GetInputPlayer();
+        return GetPlayerTag(controller.GetInputPlayer());
+    }
+
+    internal PlayerTag GetPlayerTag(Rewired.Player rePlayer)
+    {
         if (rePlayer == null) return PlayerTag.DEFAULT;
 
         if (rePlayer.id == 0)
@@ -185,6 +193,41 @@ public class Plugin : BaseUnityPlugin
 
         int controllerNr = rePlayer.id - 1;
         return SelectedPlayerTags[controllerNr];
+    }
+
+    internal void LoadTagMovementKeys()
+    {
+        InputHandler.SetMovementKeys(SelectedPlayerTagKeyboard.GetMovementKeys());
+    }
+
+    internal void UpdateAllWithTag(PlayerTag playerTag)
+    {
+        InputHandler.ForAllControllers(controller =>
+        {
+            Rewired.Player rePlayer = controller.GetInputPlayer();
+            Controller c = Controller.FromNr(rePlayer.id, false);
+            
+            if (rePlayer.id < 0 || rePlayer.id > 4) return;
+            if (GetPlayerTag(c) != playerTag) return;
+            
+            LoadTagConfig(rePlayer, c.GetHardwareName(), c.GetReControllerType());
+        });
+    }
+
+    internal void LoadTagConfig(Rewired.Player rePlayer, string hardwareName, Rewired.ControllerType controllerType)
+    {
+        if (rePlayer.id < 0 || rePlayer.id > 4) return;
+        // InputConfig.GetMap(...)
+        Rewired.ControllerMap controllerMap = PPHBCKEFJEP.AMIGAPOBFPJ(rePlayer, controllerType);
+        if (controllerMap == null) return;
+
+        PlayerTag playerTag = GetPlayerTag(rePlayer);
+        List<InputConfigAssignment> list = playerTag.GetBindings(hardwareName);
+        foreach (InputConfigAssignment inputConfigAssignment in list)
+        {
+            // InputConfig.SetAssignment(...)
+            PPHBCKEFJEP.IJJPHFJAMGK(controllerMap, controllerType, inputConfigAssignment);
+        }
     }
 
     internal static string PrintArray<T>(T[] arr, bool includeBrackets)

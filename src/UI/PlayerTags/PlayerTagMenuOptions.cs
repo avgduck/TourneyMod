@@ -415,7 +415,7 @@ public class PlayerTagMenuOptions : MonoBehaviour
 
     private void OnClickEnter(int playerNr)
     {
-        PlayerTag createdTag = PlayerTagIO.SavePlayerTag(tag);
+        PlayerTag createdTag = PlayerTagIO.CreatePlayerTag(tag);
 
         if (createdTag == null)
         {

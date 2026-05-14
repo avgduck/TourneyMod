@@ -2,6 +2,7 @@ using HarmonyLib;
 using LLGUI;
 using LLHandlers;
 using LLScreen;
+using TourneyMod.PlayerTags;
 using TourneyMod.UI.PlayerTags;
 using UnityEngine;
 
@@ -115,4 +116,52 @@ public class PlayerTagPatch
         ScreenInput screenInput = UIScreen.GetScreen(ScreenType.OPTIONS) as ScreenInput;
         if (screenInput != null) screenInput.UpdateBarButtons();
     }
+
+    [HarmonyPatch(typeof(InputHandler), nameof(InputHandler.LoadConfig))]
+    [HarmonyPostfix]
+    private static void InputHandler_LoadConfig_Postfix(Rewired.Player rePlayer, string hardwareName, Rewired.ControllerType controllerType)
+    {
+        Plugin.Instance.LoadTagConfig(rePlayer, hardwareName, controllerType);
+        Plugin.Instance.LoadTagMovementKeys();
+    }
+
+    [HarmonyPatch(typeof(JBKFDDKLDDG), nameof(JBKFDDKLDDG.HHBBAKCECEP))]
+    [HarmonyPrefix]
+    private static void InputConfigController_Button1_Prefix(JBKFDDKLDDG __instance, ref bool __state)
+    {
+        __state = __instance.DJFKIGINECC;
+    }
+    [HarmonyPatch(typeof(JBKFDDKLDDG), nameof(JBKFDDKLDDG.HHBBAKCECEP))]
+    [HarmonyPostfix]
+    private static void InputConfigController_Button1_Postfix(JBKFDDKLDDG __instance, bool __state)
+    {
+        if (!__state) return;
+        
+        Controller controller = __instance.GDEMBCKIDMA;
+        PlayerTag playerTag = Plugin.Instance.GetPlayerTag(controller);
+        // InputConfig.GetInputConfig(...)
+        if (controller.IncludesMouse()) playerTag.SetMovementKeys(InputHandler.movementKeys);
+        playerTag.SetBindings(controller.GetHardwareName(), PPHBCKEFJEP.JMNLMPPOEDC(__instance.PIPEFDJDICP));
+    }
+    
+    [HarmonyPatch(typeof(JBKFDDKLDDG), nameof(JBKFDDKLDDG.GMCFPNDNNJP))]
+    [HarmonyPrefix]
+    private static void InputConfigController_Button2_Prefix(JBKFDDKLDDG __instance, ref bool __state)
+    {
+        __state = __instance.DJFKIGINECC;
+    }
+    [HarmonyPatch(typeof(JBKFDDKLDDG), nameof(JBKFDDKLDDG.GMCFPNDNNJP))]
+    [HarmonyPostfix]
+    private static void InputConfigController_Button2_Postfix(JBKFDDKLDDG __instance, bool __state)
+    {
+        if (__state) return;
+        
+        Controller controller = __instance.GDEMBCKIDMA;
+        PlayerTag playerTag = Plugin.Instance.GetPlayerTag(controller);
+        // InputConfig.GetInputConfig(...)
+        if (!controller.IncludesMouse()) InputHandler.SetMovementKeys(Plugin.Instance.SelectedPlayerTagKeyboard.GetMovementKeys());
+        if (controller.IncludesMouse()) playerTag.SetMovementKeys(InputHandler.movementKeys);
+        playerTag.SetBindings(controller.GetHardwareName(), PPHBCKEFJEP.JMNLMPPOEDC(__instance.PIPEFDJDICP));
+    }
+
 }

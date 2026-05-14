@@ -170,6 +170,12 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
                     
                     element.button.SetActive(!tagMenuOpen && !tagDefault && !editingOther);
                 });
+                continue;
+            }
+            
+            if (bar.inputConfigBarType is InputConfigBarType.ACTION or InputConfigBarType.MOVEMENT)
+            {
+                bar.inputElements.ForEach(element => element.UpdateLooks());
             }
         }
 

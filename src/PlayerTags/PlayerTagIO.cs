@@ -47,26 +47,32 @@ public static class PlayerTagIO
         return playerTag;
     }
 
-    internal static PlayerTag SavePlayerTag(string name)
+    internal static PlayerTag CreatePlayerTag(string name)
     {
         if (name.IsNullOrWhiteSpace()) return null;
         
         PlayerTag existing = GetPlayerTagByName(name);
         if (existing != null)
         {
-            Plugin.LogGlobal.LogWarning($"Could not save player tag '{name}': a tag with name '{existing.GetName()}' (case insensitive) already exists!");
+            Plugin.LogGlobal.LogWarning($"Could not create player tag '{name}': a tag with name '{existing.GetName()}' (case insensitive) already exists!");
             return existing;
         }
 
         PlayerTag tag = new PlayerTag();
         tag.SetName(name);
-
-        string path = Path.Combine(PlayerTagsDirectory.FullName, name + ".json");
-        string json = tag.ToJson();
-        JsonIO.WriteFile(path, json);
+        
+        Plugin.LogGlobal.LogInfo($"Created new player tag '{name}'");
+        SavePlayerTag(tag);
         PlayerTags.Add(name.ToLower(), tag);
-        Plugin.LogGlobal.LogInfo($"Saved new player tag '{name}'");
         return tag;
+    }
+
+    internal static void SavePlayerTag(PlayerTag playerTag)
+    {
+        Plugin.LogGlobal.LogInfo($"Saving player tag '{playerTag.GetName()}'");
+        string path = Path.Combine(PlayerTagsDirectory.FullName, playerTag.GetName() + ".json");
+        string json = playerTag.ToJson();
+        JsonIO.WriteFile(path, json);
     }
 
     internal static PlayerTag GetPlayerTagByName(string name)

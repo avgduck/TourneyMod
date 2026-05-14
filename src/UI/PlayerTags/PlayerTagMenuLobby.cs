@@ -370,7 +370,7 @@ public class PlayerTagMenuLobby : MonoBehaviour
     {
         if (playerNr != -1 && this.playerNr != playerNr) return;
 
-        PlayerTag createdTag = PlayerTagIO.SavePlayerTag(tag);
+        PlayerTag createdTag = PlayerTagIO.CreatePlayerTag(tag);
 
         if (createdTag == null)
         {

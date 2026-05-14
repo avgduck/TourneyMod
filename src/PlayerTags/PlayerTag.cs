@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using LLHandlers;
+
 namespace TourneyMod.PlayerTags;
 
 public class PlayerTag
@@ -10,16 +13,22 @@ public class PlayerTag
         IsDefault = isDefault;
         name = "";
         isEditing = false;
+        inputBindings = new Dictionary<string, List<InputConfigAssignment>>();
+        movementKeys = MovementKeys.ARROWS;
     }
 
     internal PlayerTag()
     {
         IsDefault = false;
         isEditing = false;
+        inputBindings = new Dictionary<string, List<InputConfigAssignment>>();
     }
     
     private string name;
     private bool isEditing;
+
+    public MovementKeys movementKeys;
+    public Dictionary<string, List<InputConfigAssignment>> inputBindings;
 
     internal void SetName(string name)
     {
@@ -40,5 +49,51 @@ public class PlayerTag
     internal bool GetEditing()
     {
         return isEditing;
+    }
+
+    internal MovementKeys GetMovementKeys()
+    {
+        if (movementKeys == MovementKeys.NONE)
+        {
+            if (!IsDefault) Plugin.LogGlobal.LogWarning($"Tag '{name}' keyboard movement keys not found: creating defaults");
+            SetMovementKeys(MovementKeys.ARROWS);
+        }
+
+        return movementKeys;
+    }
+
+    internal void SetMovementKeys(MovementKeys mk)
+    {
+        movementKeys = mk;
+        if (!IsDefault) PlayerTagIO.SavePlayerTag(this);
+    }
+
+    internal List<InputConfigAssignment> GetBindings(string hardwareName)
+    {
+        List<InputConfigAssignment> list;
+        if (!inputBindings.ContainsKey(hardwareName))
+        {
+            if (!IsDefault) Plugin.LogGlobal.LogWarning($"Tag '{name}' bindings for hardware '{hardwareName}' not found: creating defaults");
+            list = InputHandler.GetDefaultConfig(hardwareName);
+            SetBindings(hardwareName, list);
+        }
+        else
+        {
+            list = inputBindings[hardwareName];
+        }
+        
+        return list;
+    }
+
+    internal void SetBindings(string hardwareName, List<InputConfigAssignment> list)
+    {
+        if (inputBindings.ContainsKey(hardwareName)) inputBindings[hardwareName] = list;
+        else inputBindings.Add(hardwareName, list);
+
+        if (!IsDefault)
+        {
+            PlayerTagIO.SavePlayerTag(this);
+            Plugin.Instance.UpdateAllWithTag(this);
+        }
     }
 }
