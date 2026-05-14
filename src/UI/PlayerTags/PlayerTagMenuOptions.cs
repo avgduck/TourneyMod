@@ -216,6 +216,8 @@ public class PlayerTagMenuOptions : MonoBehaviour
         btBackspace.textMesh.fontSize = KEYPAD_FONT_SIZE;
         btBackspace.SetText("<");
         btBackspace.onClick = OnClickBackspace;
+        btBackspace.ignoreMouseHover = ignoreMouse;
+        btBackspace.soundHover = true;
         allControls.Add(btBackspace);
         
         UIUtils.CreatePanel(ref pnKeypad, "pnKeypad", pnCreate, Vector2.zero, Vector2.one, Color.clear);
@@ -227,6 +229,8 @@ public class PlayerTagMenuOptions : MonoBehaviour
         btShift.textMesh.fontSize = KEYPAD_FONT_SIZE;
         btShift.SetText("case");
         btShift.onClick = OnClickShift;
+        btShift.ignoreMouseHover = ignoreMouse;
+        btShift.soundHover = true;
         allControls.Add(btShift);
         
         UIUtils.CreateButton(ref btNumbers, "btNumbers", pnKeypad, GetKeypadPosition(3, 1), KEYPAD_BUTTON_SCALE, Color.yellow);
@@ -236,6 +240,8 @@ public class PlayerTagMenuOptions : MonoBehaviour
         btNumbers.textMesh.fontSize = KEYPAD_FONT_SIZE;
         btNumbers.SetText("nums");
         btNumbers.onClick = OnClickNumbers;
+        btNumbers.ignoreMouseHover = ignoreMouse;
+        btNumbers.soundHover = true;
         allControls.Add(btNumbers);
         
         UIUtils.CreateButton(ref btEnter, "btEnter", pnKeypad, GetKeypadPosition(3, 2), KEYPAD_BUTTON_SCALE, Color.yellow);
@@ -245,6 +251,8 @@ public class PlayerTagMenuOptions : MonoBehaviour
         btEnter.textMesh.fontSize = KEYPAD_FONT_SIZE;
         btEnter.SetText("done");
         btEnter.onClick = OnClickEnter;
+        btEnter.ignoreMouseHover = ignoreMouse;
+        btEnter.soundHover = true;
         allControls.Add(btEnter);
 
         btCharsets = new List<CharsetButton>();
@@ -262,6 +270,8 @@ public class PlayerTagMenuOptions : MonoBehaviour
             btCharset.SetCharset(charsetAlpha[i]);
             int btIndex = i;
             btCharset.onClick = playerNr => OnClickCharset(playerNr, btCharset, btIndex);
+            btCharset.ignoreMouseHover = ignoreMouse;
+            btCharset.soundHover = true;
             btCharsets.Add(btCharset);
             btCharsetsAlpha.Add(btCharset);
             allControls.Add(btCharset);
@@ -281,6 +291,8 @@ public class PlayerTagMenuOptions : MonoBehaviour
             btCharset.SetCharset(charsetNumbers[i]);
             int btIndex = i;
             btCharset.onClick = playerNr => OnClickCharset(playerNr, btCharset, btIndex);
+            btCharset.ignoreMouseHover = ignoreMouse;
+            btCharset.soundHover = true;
             btCharsets.Add(btCharset);
             btCharsetsNumbers.Add(btCharset);
             allControls.Add(btCharset);
