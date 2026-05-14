@@ -62,7 +62,7 @@ internal class ScreenLobbyTourney : ScreenLobby
         
         UIUtils.CreateText(ref lbScoreDash, "lbScoreDash", transform, SCORE_POSITION);
         lbScoreDash.fontSize = SCORE_FONT_SIZE;
-        lbScoreDash.SetText("-");
+        TextHandler.SetText(lbScoreDash, "-");
         UIUtils.CreateText(ref lbScoreRed, "lbScoreRed", transform, SCORE_POSITION - SCORE_OFFSET);
         lbScoreRed.fontSize = SCORE_FONT_SIZE;
         lbScoreRed.color = UIUtils.COLOR_TEAM[0];
@@ -140,15 +140,15 @@ internal class ScreenLobbyTourney : ScreenLobby
         int gameNumber = SetTracker.Instance.CurrentSet.GameNumber;
         int[] winCounts = SetTracker.Instance.CurrentSet.WinCounts;
         
-        lbGame.SetText($"Game {gameNumber}");
+        TextHandler.SetText(lbGame, $"Game {gameNumber}");
         
-        lbScoreRed.SetText(winCounts[0].ToString());
-        lbScoreBlue.SetText(winCounts[1].ToString());
+        TextHandler.SetText(lbScoreRed, winCounts[0].ToString());
+        TextHandler.SetText(lbScoreBlue, winCounts[1].ToString());
 
         bool showRps = SetTracker.Instance.CurrentSet.IsGame1 && !SetTracker.Instance.CurrentSet.IsTiebreaker;
         
-        lbTiebreaker.SetText(SetTracker.Instance.CurrentSet.IsTiebreaker && SetTracker.Instance.CurrentSet.LastWinnerOverride == Team.NONE ? "Tiebreaker!" + (SetTracker.Instance.CurrentSet.StageLock != Stage.NONE ? $"\n<color=\"yellow\">{StringUtils.GetStageReadableName(SetTracker.Instance.CurrentSet.StageLock)}</color>" : "") : "");
-        lbRpsWinner.SetText(showRps ? $"RPS Winner\n<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)SetTracker.Instance.CurrentSet.RpsWinner])}>{SetTracker.Instance.CurrentSet.RpsWinner}</color>" : "");
+        TextHandler.SetText(lbTiebreaker, SetTracker.Instance.CurrentSet.IsTiebreaker && SetTracker.Instance.CurrentSet.LastWinnerOverride == Team.NONE ? "Tiebreaker!" + (SetTracker.Instance.CurrentSet.StageLock != Stage.NONE ? $"\n<color=\"yellow\">{StringUtils.GetStageReadableName(SetTracker.Instance.CurrentSet.StageLock)}</color>" : "") : "");
+        TextHandler.SetText(lbRpsWinner, showRps ? $"RPS Winner\n<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)SetTracker.Instance.CurrentSet.RpsWinner])}>{SetTracker.Instance.CurrentSet.RpsWinner}</color>" : "");
         btRpsRed.SetActive(showRps);
         btRpsBlue.SetActive(showRps);
     }

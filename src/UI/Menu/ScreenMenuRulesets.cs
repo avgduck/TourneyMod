@@ -213,8 +213,8 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
     {
         Ruleset ruleset = Plugin.Instance.SelectedRulesets[tourneyMode];
         
-        lbName.SetText(Plugin.GetModeName(tourneyMode, true));
-        lbRuleset.SetText($"Ruleset: <color=\"yellow\">{ruleset.name}</color>");
+        TextHandler.SetText(lbName, Plugin.GetModeName(tourneyMode, true));
+        TextHandler.SetText(lbRuleset, $"Ruleset: <color=\"yellow\">{ruleset.name}</color>");
 
         int linesNeutral = 0;
         string sNeutral = "";
@@ -231,7 +231,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
             }
             sNeutral += StringUtils.GetStageReadableName(ruleset.stagesNeutral[i]);
         }
-        lbStagesNeutral.SetText($"Neutral stages:\n<color=\"yellow\"><size={FONTSIZE_MAIN}pt>{sNeutral}</size></color>");
+        TextHandler.SetText(lbStagesNeutral, $"Neutral stages:\n<color=\"yellow\"><size={FONTSIZE_MAIN}pt>{sNeutral}</size></color>");
 
         int linesCounterpick = 0;
         string sCounterpick = "";
@@ -248,15 +248,15 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
             }
             sCounterpick += StringUtils.GetStageReadableName(ruleset.stagesCounterpick[i]);
         }
-        lbStagesCounterpick.SetText($"Counterpick stages:\n<color=\"yellow\"><size={FONTSIZE_MAIN}pt>{sCounterpick}</size></color>");
+        TextHandler.SetText(lbStagesCounterpick, $"Counterpick stages:\n<color=\"yellow\"><size={FONTSIZE_MAIN}pt>{sCounterpick}</size></color>");
         int linesStages = Mathf.Max(linesNeutral, linesCounterpick);
 
         lbBanOrder.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 3.5f + SPACING_MAIN * (linesStages);
-        lbBanOrder.SetText($"Ban order: <color=\"yellow\"><size={FONTSIZE_MAIN}pt>{GetBanOrder(ruleset)}</size></color>");
+        TextHandler.SetText(lbBanOrder, $"Ban order: <color=\"yellow\"><size={FONTSIZE_MAIN}pt>{GetBanOrder(ruleset)}</size></color>");
         int linesBans = ruleset.banAmounts.Length;
 
         lbDsrMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 5f + SPACING_MAIN * (linesStages + linesBans);
-        lbDsrMode.SetText($"DSR: <color=\"yellow\">{ruleset.dsrMode switch {
+        TextHandler.SetText(lbDsrMode, $"DSR: <color=\"yellow\">{ruleset.dsrMode switch {
             Ruleset.DsrMode.FULL_SET => $"ON\n<size={FONTSIZE_MAIN}pt>(includes all wins)</size>",
             Ruleset.DsrMode.LAST_WIN => $"ON\n<size={FONTSIZE_MAIN}pt>(only last win)</size>",
             _ => "OFF"
@@ -264,7 +264,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         int linesDsr = ruleset.dsrMode == Ruleset.DsrMode.OFF ? 0 : 1;
 
         lbRandomStageMode.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 6.5f + SPACING_MAIN * (linesStages + linesBans + linesDsr);
-        lbRandomStageMode.SetText($"Random stage select: <color=\"yellow\">{ruleset.randomStageMode switch {
+        TextHandler.SetText(lbRandomStageMode, $"Random stage select: <color=\"yellow\">{ruleset.randomStageMode switch {
             Ruleset.RandomStageMode.ANY_3D => $"ON\n<size={FONTSIZE_MAIN}pt>(any 3D stage)</size>",
             Ruleset.RandomStageMode.ANY_2D => $"ON\n<size={FONTSIZE_MAIN}pt>(any 2D stage)</size>",
             Ruleset.RandomStageMode.BOTH => $"ON\n<size={FONTSIZE_MAIN}pt>(both any 3D/any 2D stage options)</size>",
@@ -275,7 +275,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         int linesRandomStage = ruleset.randomStageMode == Ruleset.RandomStageMode.OFF ? 0 : 1;
 
         lbWinnerCharacterLock.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 8f + SPACING_MAIN * (linesStages + linesBans + linesDsr + linesRandomStage);
-        lbWinnerCharacterLock.SetText($"Winner character lock: <color=\"yellow\">{(ruleset.winnerCharacterLock ? "ON" : "OFF")}{(tourneyMode is TourneyMode.LOCAL_CREW ? $"\n<size={FONTSIZE_MAIN}pt>(forced on for crew battles)</size>" : "")}</color>");
+        TextHandler.SetText(lbWinnerCharacterLock, $"Winner character lock: <color=\"yellow\">{(ruleset.winnerCharacterLock ? "ON" : "OFF")}{(tourneyMode is TourneyMode.LOCAL_CREW ? $"\n<size={FONTSIZE_MAIN}pt>(forced on for crew battles)</size>" : "")}</color>");
         int linesCharacterLock = tourneyMode is TourneyMode.LOCAL_CREW ? 1 : 0;
 
         lbGameOptions.transform.localPosition = TOP + SPACING_RULESET + SPACING_HEADER * 9.5f + SPACING_MAIN * (linesStages + linesBans + linesDsr + linesRandomStage + linesCharacterLock);
@@ -295,7 +295,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
             ScreenPlayersSettings.GetSettingTexts(out stockHeader, out stocks, out time, out tag, out speed, out ballType, out energy, out hpFactor, out powerupSelection);
 
 
-            lbGameOptions.SetText(
+            TextHandler.SetText(lbGameOptions,
                 $"Game options:<size={FONTSIZE_MAIN}pt>"
                   + $"\n{stockHeader} <color=\"yellow\">{stocks}</color>"
                   + $"\nTime: <color=\"yellow\">{time}" + (tourneyMode is TourneyMode.LOCAL_CREW ? "\n(forced infinite for crew battles)" : "") + "</color>"
@@ -308,7 +308,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         }
         else
         {
-            lbGameOptions.SetText("");
+            TextHandler.SetText(lbGameOptions, "");
         }
     }
 }

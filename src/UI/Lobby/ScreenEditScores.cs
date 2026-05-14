@@ -1,6 +1,7 @@
 using LLBML.Players;
 using LLBML.States;
 using LLGUI;
+using LLHandlers;
 using LLScreen;
 using TMPro;
 using TourneyMod.SetTracking;
@@ -116,11 +117,11 @@ internal class ScreenEditScores : ScreenPlayersSettings, ICustomScreen<ScreenPla
 
         UIUtils.CreateText(ref lbScoreHeader, "lbScoreHeader", pnEditScores, SCORE_HEADER_POSITION);
         lbScoreHeader.fontSize = HEADER_FONT_SIZE;
-        lbScoreHeader.SetText("Score override");
+        TextHandler.SetText(lbScoreHeader, "Score override");
 
         UIUtils.CreateText(ref lbScoreOverrideDash, "lbScoreOverrideDash", pnEditScores, SCORE_POSITION);
         lbScoreOverrideDash.fontSize = SCORE_FONT_SIZE;
-        lbScoreOverrideDash.SetText("-");
+        TextHandler.SetText(lbScoreOverrideDash, "-");
         UIUtils.CreateText(ref lbScoreOverrideRed, "lbScoreOverrideRed", pnEditScores, SCORE_POSITION - SCORE_OFFSET);
         lbScoreOverrideRed.fontSize = SCORE_FONT_SIZE;
         lbScoreOverrideRed.color = UIUtils.COLOR_TEAM[0];
@@ -164,7 +165,7 @@ internal class ScreenEditScores : ScreenPlayersSettings, ICustomScreen<ScreenPla
         
         UIUtils.CreateText(ref lbWinnerHeader, "lbWinnerHeader", pnEditScores, WINNER_HEADER_POSITION);
         lbWinnerHeader.fontSize = HEADER_FONT_SIZE;
-        lbWinnerHeader.SetText("Last winner override");
+        TextHandler.SetText(lbWinnerHeader, "Last winner override");
         
         UIUtils.CreateImageBorderPanel(ref imgLastWinnerRed, "imgLastWinnerRed", pnEditScores, WINNER_POSITION - WINNER_OFFSET, WINNER_SCALE, WINNER_COLOR_INACTIVE, Color.black, 2);
         UIUtils.CreateButton(ref btLastWinnerRed, "btLastWinnerRed", pnEditScores, WINNER_POSITION - WINNER_OFFSET, WINNER_SCALE, Color.clear);
@@ -207,8 +208,8 @@ internal class ScreenEditScores : ScreenPlayersSettings, ICustomScreen<ScreenPla
         screenLobbyTourney.UpdateLockIcons();
         screenLobbyTourney.UpdateStockDisplays();
         
-        lbScoreOverrideRed.SetText(SetTracker.Instance.CurrentSet.WinCountOverride[0].ToString());
-        lbScoreOverrideBlue.SetText(SetTracker.Instance.CurrentSet.WinCountOverride[1].ToString());
+        TextHandler.SetText(lbScoreOverrideRed, SetTracker.Instance.CurrentSet.WinCountOverride[0].ToString());
+        TextHandler.SetText(lbScoreOverrideBlue, SetTracker.Instance.CurrentSet.WinCountOverride[1].ToString());
 
         imgLastWinnerRed.color = SetTracker.Instance.CurrentSet.LastWinnerOverride == Team.RED
             ? UIUtils.COLOR_TEAM[0]

@@ -140,7 +140,7 @@ internal static class UIUtils
         
         text = panel.gameObject.AddComponent<TextMeshProUGUI>();
         text.raycastTarget = false;
-        text.SetText("");
+        TextHandler.SetText(text, "");
         text.color = Color.white;
         text.fontSize = 32;
         text.alignment = TextAlignmentOptions.Center;

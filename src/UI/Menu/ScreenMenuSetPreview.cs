@@ -76,7 +76,7 @@ internal class ScreenMenuSetPreview : ScreenUnlocksStages, ICustomScreen<ScreenU
         LLButton btBuy = pfBuyButton.GetComponentInChildren<LLButton>();
         btBuy.visible = false;
         btStageButtons = [];
-        lbDescription.SetText("");
+        TextHandler.SetText(lbDescription, "");
         pnBuy.gameObject.SetActive(false);
 
         btGames = new List<LLButton>();
@@ -153,13 +153,13 @@ internal class ScreenMenuSetPreview : ScreenUnlocksStages, ICustomScreen<ScreenU
         if (buttonType == ButtonType.OVERVIEW)
         {
             Set set = SetTracker.Instance.CurrentSet;
-            lbName.SetText("Set Overview");
+            TextHandler.SetText(lbName, "Set Overview");
 
             string[] characterLock = Player.EPlayers().Where(p => !set.PlayerCharacterLock[((Player)p).nr].IsEmpty).Select(p => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)SetTracker.Instance.GetPlayerTeam(((Player)p).nr)])}>{StringUtils.GetCharacterSafeName(set.PlayerCharacterLock[((Player)p).nr].character)}</color>").ToArray();
             string[] stockLock = Player.EPlayers().Where(p => set.PlayerStockLock[((Player)p).nr] != 0).Select(p => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)SetTracker.Instance.GetPlayerTeam(((Player)p).nr)])}>{set.PlayerStockLock[((Player)p).nr]}</color>").ToArray();
             Stage stageLock = SetTracker.Instance.CurrentSet.StageLock;
             
-            lbInfo.SetText(
+            TextHandler.SetText(lbInfo,
                 $"Mode: <color=\"yellow\">{Plugin.GetModeName(SetTracker.Instance.ActiveTourneyMode, true)}</color>"
                 + $"\nRuleset: <color=\"yellow\">{set.ActiveRuleset.name}</color>"
                 + $"\n\n<color=\"yellow\">Game {set.GameNumber}" + (set.IsTiebreaker ? " Tiebreaker" : "") + "</color>"
@@ -172,13 +172,13 @@ internal class ScreenMenuSetPreview : ScreenUnlocksStages, ICustomScreen<ScreenU
         else if (buttonType == ButtonType.COMPLETED)
         {
             Match match = reversed[matchIndex];
-            lbName.SetText($"Game {match.GameNumber}" + (match.IsTiebreaker ? " Tiebreaker" : ""));
+            TextHandler.SetText(lbName, $"Game {match.GameNumber}" + (match.IsTiebreaker ? " Tiebreaker" : ""));
 
             string[] characters = match.PlayerCharacters.Where(pc => !pc.IsEmpty).Select(pc => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)pc.team])}>{StringUtils.GetCharacterSafeName(pc.character)}</color>").ToArray();
             string[] stocks = match.FinalScores.Where(ps => ps.Team != Team.NONE).Select(ps => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)ps.Team])}>{ps.Stocks}</color>").ToArray();
             string[] hp = match.FinalScores.Where(ps => ps.Team != Team.NONE).Select(ps => $"<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)ps.Team])}>{Mathf.RoundToInt(Floatf.ToFloat(ps.Hp) * 100f)}%</color>").ToArray();
             
-            lbInfo.SetText(
+            TextHandler.SetText(lbInfo,
                 $"Stage: <color=\"yellow\">{StringUtils.GetStageReadableName(match.PlayedStage)}</color>"
                 + $"\nCharacters: <color=\"yellow\">{Plugin.PrintArray(characters, false)}</color>"
                 + $"\n\nStocks: <color=\"yellow\">{Plugin.PrintArray(stocks, false)}</color>"
