@@ -498,7 +498,14 @@ public class PlayerTagMenuOptions : MonoBehaviour
         {
             if ((curFocus == btPageBack || curFocus == btPageForward) && vert)
             {
-                cursor.SetFocus(move.y > 0 ? btSelectTags[btSelectTags.Length - 1] : btNewTag);
+                LLButton btLastTag = btSelectTags[0];
+                for (int i = 1; i < btSelectTags.Length; i++)
+                {
+                    if (!btSelectTags[i].GetActive()) break;
+                    btLastTag = btSelectTags[i];
+                }
+                
+                cursor.SetFocus(move.y > 0 ? btLastTag : btNewTag);
                 return true;
             }
             if (curFocus == btPageBack)
