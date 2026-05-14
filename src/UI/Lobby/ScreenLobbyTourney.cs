@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace TourneyMod.UI.Lobby;
 
-internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
+internal class ScreenLobbyTourney : ScreenLobby
 {
     private static readonly Vector2 GAME_POSITION = new Vector2(0f, 250f);
     private const int GAME_FONT_SIZE = 28;
@@ -42,51 +42,6 @@ internal class ScreenLobbyTourney : ScreenPlayers, ICustomScreen<ScreenPlayers>
     private Image[] imgsCharacterLock;
 
     private TextMeshProUGUI lbTiebreaker;
-    
-    public void Init(ScreenPlayers screenPlayers)
-    {
-        screenType = screenPlayers.screenType;
-        layer = screenPlayers.layer;
-        isActive = screenPlayers.isActive;
-        msgEsc = screenPlayers.msgEsc;
-        msgMenu = screenPlayers.msgMenu;
-        msgCancel = screenPlayers.msgCancel;
-        
-        btBack = screenPlayers.btBack;
-        btStart = screenPlayers.btStart;
-        characterButtons = screenPlayers.characterButtons;
-        playerSelections = screenPlayers.playerSelections;
-        lbCharInfo = screenPlayers.lbCharInfo;
-        lbCountdown = screenPlayers.lbCountdown;
-        lbGameModeHeader = screenPlayers.lbGameModeHeader;
-        lbGameMode = screenPlayers.lbGameMode;
-        btGameMode = screenPlayers.btGameMode;
-        btOptions = screenPlayers.btOptions;
-        btInviteFriends = screenPlayers.btInviteFriends;
-        lbStocksHeader = screenPlayers.lbStocksHeader;
-        lbTimeHeader = screenPlayers.lbTimeHeader;
-        lbSpeedHeader = screenPlayers.lbSpeedHeader;
-        lbBallTypeHeader = screenPlayers.lbBallTypeHeader;
-        lbEnergyHeader = screenPlayers.lbEnergyHeader;
-        lbHpFactorHeader = screenPlayers.lbHpFactorHeader;
-        lbPowerupSelectionHeader = screenPlayers.lbPowerupSelectionHeader;
-        lbStocks = screenPlayers.lbStocks;
-        lbTime = screenPlayers.lbTime;
-        lbSpeed = screenPlayers.lbSpeed;
-        lbBallType = screenPlayers.lbBallType;
-        lbEnergy = screenPlayers.lbEnergy;
-        lbHpFactor = screenPlayers.lbHpFactor;
-        lbPowerupSelection = screenPlayers.lbPowerupSelection;
-        obSettings = screenPlayers.obSettings;
-        pfPlayerSelection = screenPlayers.pfPlayerSelection;
-        pfCharacterButton = screenPlayers.pfCharacterButton;
-        pnCharacterButtons = screenPlayers.pnCharacterButtons;
-        pnPlayers = screenPlayers.pnPlayers;
-        curCountDown = screenPlayers.curCountDown;
-        kCountDown = screenPlayers.kCountDown;
-        countDownState = screenPlayers.countDownState;
-        nPlayersShown = screenPlayers.nPlayersShown;
-    }
 
     public override void OnOpen(ScreenType screenTypePrev)
     {

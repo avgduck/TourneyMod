@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text;
 
-namespace TourneyMod.Rulesets;
+namespace TourneyMod;
 
 internal static class JsonIO
 {

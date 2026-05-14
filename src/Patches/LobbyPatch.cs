@@ -1,9 +1,13 @@
 using HarmonyLib;
 using LLBML.Players;
+using LLBML.Settings;
 using LLGUI;
+using LLHandlers;
 using LLScreen;
+using TourneyMod.PlayerTags;
 using TourneyMod.SetTracking;
 using TourneyMod.UI.Lobby;
+using TourneyMod.UI.PlayerTags;
 
 namespace TourneyMod.Patches;
 
@@ -22,8 +26,24 @@ internal static class LobbyPatch
     [HarmonyPrefix]
     private static bool ScreenPlayers_UpdateTeamButtons_Prefix(ScreenPlayers __instance)
     {
+        ScreenLobby screenLobby = __instance as ScreenLobby;
+        if (screenLobby == null) return true;
+        
         ScreenLobbyTourney screenLobbyTourney = __instance as ScreenLobbyTourney;
-        if (screenLobbyTourney == null) return true;
+        if (screenLobbyTourney == null)
+        {
+            if (screenLobby.playerSelections == null || screenLobby.playerSelections.Length < 4) return false;
+
+            for (int playerIndex = 0; playerIndex < 4; playerIndex++)
+            {
+                bool isTagMenuEnabled = screenLobby.playerTagMenus != null && screenLobby.playerTagMenus[playerIndex].gameObject.activeSelf;
+                bool isTeamMode = NCMFHODLNAJ.BABJPAPBMIP(GameSettings.current.gameMode);
+                screenLobby.playerSelections[playerIndex].btTeam.SetActive(isTeamMode && !isTagMenuEnabled);
+                screenLobby.playerSelections[playerIndex].btSkin.SetActive(!isTagMenuEnabled);
+            }
+            
+            return false;
+        }
 
         foreach (PlayersSelection playerSelection in __instance.playerSelections)
         {
@@ -77,10 +97,12 @@ internal static class LobbyPatch
     [HarmonyPrefix]
     private static void GameStatesLobby_AddPlayer_Prefix(ref ALDOKEMAOMB LGACHGEPNNH)
     {
+        Player p = LGACHGEPNNH;
+        //Plugin.LogGlobal.LogWarning($"AddPlayer P{p.nr} controller {p.controller}");
+        
         if (SetTracker.Instance.ActiveTourneyMode is TourneyMode.NONE) return;
         if (SetTracker.Instance.CurrentSet.LastWinnerOverride != Team.NONE) return;
-
-        Player p = LGACHGEPNNH;
+        
         PlayerCharacter characterLock = SetTracker.Instance.CurrentSet.PlayerCharacterLock[p.nr];
         if (characterLock.IsEmpty) return;
         
@@ -124,5 +146,84 @@ internal static class LobbyPatch
     private static void CloseOptions_Postfix()
     {
         Plugin.Instance.ScoreEditMenuOpen = false;
+    }
+    
+    // bool GameStatesLobby::IsStartEnabled()
+    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.DJHHLDPLFMD))]
+    // bool GameStatesLobbySingle::IsStartEnabled()
+    [HarmonyPatch(typeof(HFAEJNGHDDM), nameof(HFAEJNGHDDM.DJHHLDPLFMD))]
+    [HarmonyPrefix]
+    private static bool GameStatesLobby_IsStartEnabled_Prefix(HPNLMFHPHFD __instance, ref bool __result)
+    {
+        ScreenPlayers screenPlayers = __instance.IMLMFFIEEAJ;
+        ScreenLobby screenLobby = screenPlayers as ScreenLobby;
+        if (screenLobby == null) return true;
+
+        for (int playerIndex = 0; playerIndex < 4; playerIndex++)
+        {
+            bool isTagMenuEnabled = screenLobby.playerTagMenus != null && screenLobby.playerTagMenus[playerIndex].gameObject.activeSelf;
+            if (isTagMenuEnabled)
+            {
+                __result = false;
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // void GameStatesLobby::RemovePlayer(Player p)
+    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.GNBKBMENOMO))]
+    [HarmonyPostfix]
+    private static void GameStatesLobby_RemovePlayer_Postfix(HPNLMFHPHFD __instance, ALDOKEMAOMB LGACHGEPNNH)
+    {
+        ScreenPlayers screenPlayers = __instance.IMLMFFIEEAJ;
+        ScreenLobby screenLobby = screenPlayers as ScreenLobby;
+        if (screenLobby == null) return;
+        if (screenLobby.playerTagMenus == null) return;
+
+        Player p = LGACHGEPNNH;
+        screenLobby.OnEject(p.nr);
+    }
+
+    // void GameStatesLobby::UpdatePlayer(Player p, bool play_selection_anim)
+    [HarmonyPatch(typeof(HPNLMFHPHFD), nameof(HPNLMFHPHFD.BDMIDGAHNLA))]
+    [HarmonyPostfix]
+    private static void GameStatesLobby_UpdatePlayer_Postfix(HPNLMFHPHFD __instance, ALDOKEMAOMB LGACHGEPNNH)
+    {
+        ScreenPlayers screenPlayers = __instance.IMLMFFIEEAJ;
+        ScreenLobby screenLobby = screenPlayers as ScreenLobby;
+        if (screenLobby == null) return;
+        if (screenLobby.playerTagMenus == null) return;
+        
+        Player p = LGACHGEPNNH;
+        PlayerTag playerTag = Plugin.Instance.GetPlayerTag(p.nr);
+        if (!p.IsInMatch && !p.IsSpectator) return;
+        if (!p.isLocal) return;
+
+        if (playerTag.IsDefault || p.IsAI)
+        {
+            screenLobby.SetPlayerName(p.nr, $"PLAYER{p.nr+1}");
+            screenLobby.playerSelections[p.nr].btPlayerName.colDefault = PlayerTagMenuLobby.COLOR_TAG_DEFAULT;
+            screenLobby.playerSelections[p.nr].btPlayerName.textMesh.color = PlayerTagMenuLobby.COLOR_TAG_DEFAULT;
+        }
+        else
+        {
+            screenLobby.SetPlayerName(p.nr, playerTag.GetName());
+            screenLobby.playerSelections[p.nr].btPlayerName.colDefault = PlayerTagMenuLobby.COLOR_TAG_CUSTOM;
+            screenLobby.playerSelections[p.nr].btPlayerName.textMesh.color = PlayerTagMenuLobby.COLOR_TAG_CUSTOM;
+        }
+    }
+    
+    // void GameHudPlayerInfo::SetPlayer(Player player, int playerNameSize)
+    [HarmonyPatch(typeof(GameHudPlayerInfo), nameof(GameHudPlayerInfo.SetPlayer))]
+    [HarmonyPostfix]
+    private static void GameHudPlayerInfo_SetPlayer_Postfix(GameHudPlayerInfo __instance, ALDOKEMAOMB player)
+    {
+        Player p = player;
+        if (GameSettings.IsOnline) return;
+        PlayerTag playerTag = Plugin.Instance.GetPlayerTag(p.nr);
+        if (playerTag.IsDefault) return;
+        TextHandler.SetTextBestFont(__instance.lbName, playerTag.GetName());
     }
 }
