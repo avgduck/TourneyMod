@@ -2,6 +2,7 @@ using LLBML.Players;
 using LLBML.Settings;
 using LLBML.States;
 using LLBML.Utils;
+using LLGUI;
 using LLHandlers;
 using LLScreen;
 using TMPro;
@@ -21,6 +22,10 @@ internal class ScreenLobbyTourney : ScreenLobby
     private static readonly Vector2 BT_EDITSCORES_SCALE = new Vector2(220f, 26f);
     private static readonly Vector2 BT_EDITSCORES_POSITION = new Vector2(0f, -346f);
     private const int BT_EDITSCORES_FONT_SIZE = 18;
+    private static readonly Vector2 BT_RPS_POSITION = new Vector2(0f, -346f);
+    private static readonly Vector2 BT_RPS_OFFSET = new Vector2(280f, 0f);
+    private static readonly Vector2 BT_RPS_SCALE = new Vector2(220f, 26f);
+    private const int BT_RPS_FONT_SIZE = 18;
 
     private static readonly Vector2 LOCK_SCALE = new Vector2(128f, 128f);
     private static readonly Vector2 LOCK_POSITION = new Vector2(0f, 60f);
@@ -30,6 +35,8 @@ internal class ScreenLobbyTourney : ScreenLobby
 
     private static readonly Vector2 TIEBREAKER_POSITION = new Vector2(0f, 140f);
     private const int TIEBREAKER_FONT_SIZE = 28;
+    private static readonly Vector2 RPS_WINNER_POSITION = new Vector2(0f, 140f);
+    private const int RPS_WINNER_FONT_SIZE = 28;
     
     private TextMeshProUGUI lbGame;
     private TextMeshProUGUI lbScoreRed;
@@ -37,11 +44,14 @@ internal class ScreenLobbyTourney : ScreenLobby
     private TextMeshProUGUI lbScoreBlue;
     
     private VoteButton btEditScores;
+    private LLButton btRpsRed;
+    private LLButton btRpsBlue;
 
     private StockDisplay[] stockDisplays;
     private Image[] imgsCharacterLock;
 
     private TextMeshProUGUI lbTiebreaker;
+    private TextMeshProUGUI lbRpsWinner;
 
     public override void OnOpen(ScreenType screenTypePrev)
     {
@@ -66,6 +76,24 @@ internal class ScreenLobbyTourney : ScreenLobby
         btEditScores.textMesh.fontSize = BT_EDITSCORES_FONT_SIZE;
         btEditScores.label = "Edit scores";
         btEditScores.onVote = OnVoteEditScores;
+        
+        UIUtils.CreateButton(ref btRpsRed, "btRpsRed", transform, BT_RPS_POSITION - BT_RPS_OFFSET, BT_RPS_SCALE);
+        UIUtils.SetButtonBGVisibility(btRpsRed, false);
+        btRpsRed.textMesh.fontSize = BT_RPS_FONT_SIZE;
+        btRpsRed.textMesh.color = UIUtils.COLOR_TEAM[(int)Team.RED];
+        btRpsRed.colDisabled = Color.gray;
+        btRpsRed.colDefault = UIUtils.COLOR_TEAM[(int)Team.RED];
+        btRpsRed.SetText("Set RPS Winner");
+        btRpsRed.onClick = playerNr => OnClickRps(Team.RED);
+        
+        UIUtils.CreateButton(ref btRpsBlue, "btRpsBlue", transform, BT_RPS_POSITION + BT_RPS_OFFSET, BT_RPS_SCALE);
+        UIUtils.SetButtonBGVisibility(btRpsBlue, false);
+        btRpsBlue.textMesh.fontSize = BT_RPS_FONT_SIZE;
+        btRpsBlue.textMesh.color = UIUtils.COLOR_TEAM[(int)Team.BLUE];
+        btRpsBlue.colDisabled = Color.gray;
+        btRpsBlue.colDefault = UIUtils.COLOR_TEAM[(int)Team.BLUE];
+        btRpsBlue.SetText("Set RPS Winner");
+        btRpsBlue.onClick = playerNr => OnClickRps(Team.BLUE);
 
         stockDisplays = new StockDisplay[4];
         imgsCharacterLock = new Image[4];
@@ -83,6 +111,11 @@ internal class ScreenLobbyTourney : ScreenLobby
         lbTiebreaker.fontSize = TIEBREAKER_FONT_SIZE;
         lbTiebreaker.richText = true;
         lbTiebreaker.alignment = TextAlignmentOptions.Top;
+        
+        UIUtils.CreateText(ref lbRpsWinner, "lbRpsWinner", transform, RPS_WINNER_POSITION);
+        lbRpsWinner.fontSize = RPS_WINNER_FONT_SIZE;
+        lbRpsWinner.richText = true;
+        lbRpsWinner.alignment = TextAlignmentOptions.Top;
         
         UpdateSetCount();
     }
@@ -111,8 +144,13 @@ internal class ScreenLobbyTourney : ScreenLobby
         
         lbScoreRed.SetText(winCounts[0].ToString());
         lbScoreBlue.SetText(winCounts[1].ToString());
+
+        bool showRps = SetTracker.Instance.CurrentSet.IsGame1 && !SetTracker.Instance.CurrentSet.IsTiebreaker;
         
         lbTiebreaker.SetText(SetTracker.Instance.CurrentSet.IsTiebreaker && SetTracker.Instance.CurrentSet.LastWinnerOverride == Team.NONE ? "Tiebreaker!" + (SetTracker.Instance.CurrentSet.StageLock != Stage.NONE ? $"\n<color=\"yellow\">{StringUtils.GetStageReadableName(SetTracker.Instance.CurrentSet.StageLock)}</color>" : "") : "");
+        lbRpsWinner.SetText(showRps ? $"RPS Winner\n<color=#{ColorUtility.ToHtmlStringRGB(UIUtils.COLOR_TEAM[(int)SetTracker.Instance.CurrentSet.RpsWinner])}>{SetTracker.Instance.CurrentSet.RpsWinner}</color>" : "");
+        btRpsRed.SetActive(showRps);
+        btRpsBlue.SetActive(showRps);
     }
 
     internal void UpdateStockDisplays()
@@ -168,5 +206,11 @@ internal class ScreenLobbyTourney : ScreenLobby
     {
         Plugin.Instance.ScoreEditMenuOpen = true;
         GameStates.Send(Msg.SEL_OPTIONS, -1, -1);
+    }
+
+    private void OnClickRps(Team team)
+    {
+        SetTracker.Instance.CurrentSet.RpsWinner = team;
+        UpdateSetCount();
     }
 }

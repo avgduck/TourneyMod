@@ -16,6 +16,7 @@ internal class Set
     internal int[] PlayerStockLock = [0, 0, 0, 0];
     internal Stage StageLock = Stage.NONE;
 
+    internal Team RpsWinner = Team.RED;
     internal bool IsFreePickMode = false;
     internal bool IsFreePickForced => ActiveRuleset.banAmounts.Length == 0;
     

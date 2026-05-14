@@ -31,7 +31,11 @@ internal class StrikeInfo
     {
         if (SetTracker.Instance.CurrentSet.IsGame1)
         {
-            ControlStartTeam = Ruleset.ConvertPlayerTeam(SetTracker.Instance.CurrentSet.ActiveRuleset.game1FirstTeam);
+            Team startTeam = Ruleset.ConvertPlayerTeam(SetTracker.Instance.CurrentSet.ActiveRuleset.game1FirstTeam);
+            Team rpsWinner = SetTracker.Instance.CurrentSet.RpsWinner;
+
+            if (rpsWinner == Team.RED) ControlStartTeam = startTeam;
+            else ControlStartTeam = (startTeam == Team.RED ? Team.BLUE : Team.RED);
         }
         else
         {
