@@ -48,7 +48,7 @@ internal static class ScreenReplacePatch
         {
             ReplaceScreen<ScreenOptions, ScreenInput>(ref __result);
         }
-        else if (screenType == ScreenType.PLAYERS && SetTracker.Instance.IsTrackingSet)
+        else if (screenType == ScreenType.PLAYERS && GameStates.GetCurrent() != GameState.LOBBY_TRAINING && GameStates.GetCurrent() != GameState.LOBBY_ONLINE && SetTracker.Instance.IsTrackingSet)
         {
             if (SetTracker.Instance.ActiveTourneyMode == TourneyMode.NONE)
             {
