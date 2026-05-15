@@ -503,8 +503,8 @@ public class PlayerTagMenuOptions : MonoBehaviour
     {
         if (!shouldMove) return false;
         bool vert = move.y != 0f && Mathf.Abs(move.y) > Mathf.Abs(move.x);
-        // GameStatesOptions.inputConfigControllers[playerIndex].cursor
-        LLCursor cursor = HGFCCNMEEEF.inputConfigControllers[playerIndex].OBELDJGOOIJ;
+        // GameStatesOptions.inputConfigControllers
+        LLCursor cursor = HGFCCNMEEEF.inputConfigControllers.First(inputConfigController => inputConfigController.LNDBODJBNFM == playerIndex).OBELDJGOOIJ;
 
         if (pnBrowse.gameObject.activeSelf)
         {

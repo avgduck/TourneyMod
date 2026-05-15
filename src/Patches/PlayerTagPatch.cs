@@ -86,6 +86,16 @@ public class PlayerTagPatch
         custom.CustomAddController(inputConfigController);
         return false;
     }
+
+    [HarmonyPatch(typeof(ScreenOptions), nameof(ScreenOptions.RemoveController))]
+    [HarmonyPostfix]
+    private static void ScreenOptions_RemoveController_Prefix(ScreenOptions __instance, JBKFDDKLDDG inputConfigController)
+    {
+        ScreenInput screenInput = __instance as ScreenInput;
+        if (screenInput == null) return;
+        
+        screenInput.OnRemoveController(inputConfigController);
+    }
     
     [HarmonyPatch(typeof(InputConfigElement), nameof(InputConfigElement.UpdateLooks))]
     [HarmonyPrefix]

@@ -81,7 +81,7 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
         return playerIndex != -1 && playerTagMenus[playerIndex].DirectMove(move, curFocus, shouldMove);
     }
 
-    private JBKFDDKLDDG GetInputConfigController(LLCursor cursor)
+    internal JBKFDDKLDDG GetInputConfigController(LLCursor cursor)
     {
         // GameStatesOptions.inputConfigControllers
         for (int i = 0; i < HGFCCNMEEEF.inputConfigControllers.Count; i++)
@@ -92,6 +92,11 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
         }
 
         return null;
+    }
+    
+    internal void OnRemoveController(JBKFDDKLDDG inputConfigController)
+    {
+        playerTagMenus[inputConfigController.LNDBODJBNFM].Close();
     }
 
     internal CustomOptionsBarInputConfig AddCustomInputConfigBar(CustomInputConfigBarType customInputConfigBarType, string text)
