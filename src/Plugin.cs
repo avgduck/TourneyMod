@@ -202,15 +202,11 @@ public class Plugin : BaseUnityPlugin
 
     internal void UpdateAllWithTag(PlayerTag playerTag)
     {
-        InputHandler.ForAllControllers(controller =>
+        HGFCCNMEEEF.inputConfigControllers.ForEach(inputConfigController =>
         {
-            Rewired.Player rePlayer = controller.GetInputPlayer();
-            Controller c = Controller.FromNr(rePlayer.id, false);
-            
-            if (rePlayer.id < 0 || rePlayer.id > 4) return;
-            if (GetPlayerTag(c) != playerTag) return;
-            
-            LoadTagConfig(rePlayer, c.GetHardwareName(), c.GetReControllerType());
+            Controller controller = inputConfigController.GDEMBCKIDMA;
+            if (GetPlayerTag(controller) != playerTag) return;
+            LoadTagConfig(controller.rePlayer, controller.GetHardwareName(), controller.GetReControllerType());
         });
     }
 
