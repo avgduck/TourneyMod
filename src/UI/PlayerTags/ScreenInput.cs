@@ -184,6 +184,11 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
             }
         }
 
+        foreach (JBKFDDKLDDG inputConfigController in HGFCCNMEEEF.inputConfigControllers)
+        {
+            ShowConflicts(inputConfigController);
+        }
+
         bool blockGlobalInput = false;
         
         foreach (bool edit in EditingTags)
@@ -198,5 +203,33 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
         UIScreen.blockGlobalInput = blockGlobalInput;
         // GameStatesMenu.SetBackButtonVisible(bool visible)
         IOGKKINMEFB.GMBFKKNCMOO(!blockGlobalInput);
+    }
+
+    private void ShowConflicts(JBKFDDKLDDG inputConfigController)
+    {
+        foreach (OptionsBar bar1 in optionBars)
+        {
+            OptionsBarInputConfig optionsBarInputConfig1 = bar1 as OptionsBarInputConfig;
+            if (optionsBarInputConfig1 == null || optionsBarInputConfig1.inputConfigBarType != InputConfigBarType.ACTION) continue;
+
+            bool conflict = false;
+            string text1 = optionsBarInputConfig1.GetCurControlText(inputConfigController);
+            if (text1 == "-") continue;
+            
+            foreach (OptionsBar bar2 in optionBars)
+            {
+                OptionsBarInputConfig optionsBarInputConfig2 = bar2 as OptionsBarInputConfig;
+                if (optionsBarInputConfig1 == optionsBarInputConfig2 || optionsBarInputConfig2 == null || optionsBarInputConfig2.inputConfigBarType != InputConfigBarType.ACTION) continue;
+
+                string text2 = optionsBarInputConfig2.GetCurControlText(inputConfigController);
+                if (text1 == text2)
+                {
+                    conflict = true;
+                    break;
+                }
+            }
+            
+            optionsBarInputConfig1.SetConflict(inputConfigController, conflict);
+        }
     }
 }
