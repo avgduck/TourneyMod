@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0] - 2026-05-15
+
+### Added
+
+- Add customizable player tag system to input options screen ([#1](https://github.com/avgduck/TourneyMod/issues/1))
+- Add ability to swap inputs in the lobby screen via player tags ([#1](https://github.com/avgduck/TourneyMod/issues/1))
+- Add player tags replacing character name on HUD in local games ([#1](https://github.com/avgduck/TourneyMod/issues/1))
+- Add buttons to select the RPS winner on Game 1 in tourney lobbies ([`73484a6`](https://github.com/avgduck/TourneyMod/commit/73484a66d9ca19b586c918d413ac27b9044f229d))
+
+### Fixed
+
+- Fix rare issue causing missing fonts on custom UI ([`c283f36`](https://github.com/avgduck/TourneyMod/commit/c283f36e08b7fa0fe63a6525c6c1ffaf10a9125a))
+
 ## [1.2.0] - 2026-02-02
 
 ### Added
@@ -74,6 +87,7 @@
 
 _Initial release_
 
+[1.3.0]: https://github.com/avgduck/TourneyMod/releases/tag/v1.3.0
 [1.2.0]: https://github.com/avgduck/TourneyMod/releases/tag/v1.2.0
 [1.1.0]: https://github.com/avgduck/TourneyMod/releases/tag/v1.1.0
 [1.0.1]: https://github.com/avgduck/TourneyMod/releases/tag/v1.0.1

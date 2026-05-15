@@ -14,6 +14,20 @@ All game modes from training to ranked now feature a completely reimagined stage
 
 For quicker friendly matches and training, pressing the "menu" input (START button on controllers) will instantly select the random 3D stage option.
 
+### Revamped Input System with Player Tags
+
+Input binding has been overhauled with a Smash/Rivals-style player tag system! Player tags can be created in game, and they tie directly into the vanilla input binding system for a fast but familiar workflow!
+
+![Player tag input preview](https://raw.githubusercontent.com/avgduck/TourneyMod/master/preview-images/player%20tags%20input.gif)
+
+Player tags can include a different set of bindings for both keyboard and controller, making it easy to create a set of controls that works for your setup.
+
+Player tags can also be selected on the lobby screen, allowing you to swap out bindings mid-set! This is especially powerful for crew battle mode, where swapping pre-made tags lets the action continue with no menuing breaks.
+
+![Player tag lobby preview](https://raw.githubusercontent.com/avgduck/TourneyMod/master/preview-images/player%20tags%20lobby.gif)
+
+Player tags also replace character names on the in-game HUD and results screens for local play, enhancing the spectator experience!
+
 ### Tournament Game Modes
 
 Custom tournament game modes now have a dedicated home on the main menu! This enables the game to be played normally outside of tournament settings. The menu currently features a Local 1v1 tourney mode, a Local Doubles mode, and a Local Crew Battle mode, with a preview for online support!
@@ -64,7 +78,6 @@ The mod comes packaged with a set of default rulesets, but by creating a new fil
 
 TourneyMod is planned to be expanded to enhance the entire tournament experience. This includes:
 
-* Named input profiles
 * Online support for tourney mode striking and set tracking
 * Online resuming with saved stock counts after desync
 
