@@ -1,7 +1,11 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Reflection.Emit;
 using HarmonyLib;
 using LLBML.Players;
 using LLBML.Settings;
+using TourneyMod.PlayerTags;
 using TourneyMod.SetTracking;
 
 namespace TourneyMod.Patches;
@@ -63,5 +67,37 @@ internal static class ScreenResultsPatch
     {
         //while (__result.MoveNext()) yield return __result.Current;
         yield break;
+    }
+    
+    [HarmonyPatch(typeof(PostScreen), nameof(PostScreen.SetResult))]
+    [HarmonyTranspiler]
+    private static IEnumerable<CodeInstruction> PostScreen_SetResult_Transpiler(IEnumerable<CodeInstruction> instructions)
+    {
+        CodeMatcher cm = new CodeMatcher(instructions);
+        cm.End();
+        /*
+         * if (!JOMBNFKIHIC.GDNFJCCCKDM) // GameSettings.isOnline {
+         *      text2 = JPLELOFJOOH.OAGHLPGCAOI(ohnhlliajef.LALEEFJMMLH); // Assets.GetCharacterName(cachedPlayer.character)
+         * }
+         * we're matching the line in the if statement
+         */
+        cm.MatchBack(false,
+            new CodeMatch(OpCodes.Ldloca_S),
+            new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(OHNHLLIAJEF), nameof(OHNHLLIAJEF.LALEEFJMMLH))),
+            new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(JPLELOFJOOH), nameof(JPLELOFJOOH.OAGHLPGCAOI))),
+            new CodeMatch(OpCodes.Stloc_S)
+        );
+        LocalBuilder refCachedPlayer = (LocalBuilder)cm.Instruction.operand; // save address of cachedPlayer
+        cm.Advance(3); // keep character name calls
+        cm.Insert(
+            new CodeInstruction(OpCodes.Ldloca_S, refCachedPlayer),
+            new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(OHNHLLIAJEF), nameof(OHNHLLIAJEF.CJFLMDNNMIE))),
+            Transpilers.EmitDelegate<Func<string, int, string>>((characterName, playerNr) =>
+            {
+                PlayerTag playerTag = Plugin.Instance.GetPlayerTag(playerNr);
+                return playerTag.IsDefault ? characterName : playerTag.GetName();
+            })
+        );
+        return cm.InstructionEnumeration();
     }
 }

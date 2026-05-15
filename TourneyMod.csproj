@@ -29,6 +29,9 @@
       <Reference Include="Assembly-CSharp">
         <HintPath>libs\Assembly-CSharp-publicized.dll</HintPath>
       </Reference>
+      <Reference Include="Assembly-CSharp-firstpass">
+        <HintPath>libs\Assembly-CSharp-firstpass.dll</HintPath>
+      </Reference>
       <Reference Include="LLBModdingLib">
         <HintPath>libs\LLBModdingLib.dll</HintPath>
       </Reference>
