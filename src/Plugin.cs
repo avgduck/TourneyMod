@@ -3,6 +3,7 @@ using System.Linq;
 using BepInEx;
 using BepInEx.Logging;
 using LLBML.Players;
+using LLBML.States;
 using LLBML.Utils;
 using LLHandlers;
 using TourneyMod.Patches;
@@ -202,6 +203,8 @@ public class Plugin : BaseUnityPlugin
 
     internal void UpdateAllWithTag(PlayerTag playerTag)
     {
+        if (GameStates.GetCurrent() != GameState.OPTIONS_INPUT) return;
+        
         HGFCCNMEEEF.inputConfigControllers.ForEach(inputConfigController =>
         {
             Controller controller = inputConfigController.GDEMBCKIDMA;
