@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1] - 2026-05-18
+
+### Fixed
+
+- Fix vanilla input binding bug caused when action's main input is bound to a controller's trigger ([`4da29f1`](https://github.com/avgduck/TourneyMod/commit/4da29f1345802c651871f1d99e5b9860acdb057f))
+- Fix alt input binding conflict color not clearing when swapping selected player tag ([`6d5d544`](https://github.com/avgduck/TourneyMod/commit/6d5d54404fd65ce1485d72457306b44274c7c7ea))
+
 ## [1.3.0] - 2026-05-15
 
 ### Added
@@ -87,6 +94,7 @@
 
 _Initial release_
 
+[1.3.1]: https://github.com/avgduck/TourneyMod/releases/tag/v1.3.1
 [1.3.0]: https://github.com/avgduck/TourneyMod/releases/tag/v1.3.0
 [1.2.0]: https://github.com/avgduck/TourneyMod/releases/tag/v1.2.0
 [1.1.0]: https://github.com/avgduck/TourneyMod/releases/tag/v1.1.0
