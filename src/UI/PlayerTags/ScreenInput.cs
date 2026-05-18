@@ -214,7 +214,6 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
 
             bool conflict = false;
             string text1 = optionsBarInputConfig1.GetCurControlText(inputConfigController);
-            if (text1 == "-") continue;
             
             foreach (OptionsBar bar2 in optionBars)
             {
@@ -222,6 +221,7 @@ public class ScreenInput : ScreenOptions, ICustomScreen<ScreenOptions>
                 if (optionsBarInputConfig1 == optionsBarInputConfig2 || optionsBarInputConfig2 == null || optionsBarInputConfig2.inputConfigBarType != InputConfigBarType.ACTION) continue;
 
                 string text2 = optionsBarInputConfig2.GetCurControlText(inputConfigController);
+                if (text2 == "-") continue;
                 if (text1 == text2)
                 {
                     conflict = true;
