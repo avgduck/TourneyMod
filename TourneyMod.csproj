@@ -25,6 +25,7 @@
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
     </ItemGroup>
 
+    <!-- Copy referenced assemblies into libs directory -->
     <ItemGroup>
       <Reference Include="Assembly-CSharp">
         <HintPath>libs\Assembly-CSharp-publicized.dll</HintPath>
@@ -59,29 +60,30 @@
         <_ReleaseFiles Include="README.md" />
         <_ReleaseFiles Include="CHANGELOG.md" />
     </ItemGroup>
-
+    
+    <!-- Specify property group ProfileFolder in Directory.Build.props -->
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <Copy SourceFiles="bin\Debug\net35\TourneyMod.dll" DestinationFolder="build" />
 
         <ItemGroup>
             <_BuildFiles Include="build\*.*" />
         </ItemGroup>
-        <Copy SourceFiles="@(_BuildFiles)" DestinationFolder="C:\Users\Owner\AppData\Roaming\r2modmanPlus-local\LethalLeagueBlaze\profiles\Dev\BepInEx\plugins\TourneyMod" />
+        <Copy SourceFiles="@(_BuildFiles)" DestinationFolder="$(ProfileFolder)BepInEx\plugins\TourneyMod" />
         
         <ItemGroup>
             <_RuleFiles Include="rulesets-default\*.json" />
         </ItemGroup>
-        <Copy SourceFiles="@(_RuleFiles)" DestinationFolder="C:\Users\Owner\AppData\Roaming\r2modmanPlus-local\LethalLeagueBlaze\profiles\Dev\BepInEx\plugins\TourneyMod\rulesets-default" />
+        <Copy SourceFiles="@(_RuleFiles)" DestinationFolder="$(ProfileFolder)BepInEx\plugins\TourneyMod\rulesets-default" />
         
         <ItemGroup>
             <_AssetFiles Include="assets\*" />
         </ItemGroup>
-        <Copy SourceFiles="@(_AssetFiles)" DestinationFolder="C:\Users\Owner\AppData\Roaming\r2modmanPlus-local\LethalLeagueBlaze\profiles\Dev\BepInEx\plugins\TourneyMod\assets" />
+        <Copy SourceFiles="@(_AssetFiles)" DestinationFolder="$(ProfileFolder)BepInEx\plugins\TourneyMod\assets" />
         
         <ItemGroup>
             <_CursorFiles Include="assets\cursors\*.png" />
         </ItemGroup>
-        <Copy SourceFiles="@(_CursorFiles)" DestinationFolder="C:\Users\Owner\AppData\Roaming\r2modmanPlus-local\LethalLeagueBlaze\profiles\Dev\BepInEx\plugins\TourneyMod\assets\cursors" />
+        <Copy SourceFiles="@(_CursorFiles)" DestinationFolder="$(ProfileFolder)BepInEx\plugins\TourneyMod\assets\cursors" />
 
         <Copy SourceFiles="@(_BuildFiles)" DestinationFolder="release" />
         <Copy SourceFiles="@(_ReleaseFiles)" DestinationFolder="release" />

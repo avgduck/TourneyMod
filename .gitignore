@@ -8,3 +8,4 @@ release/
 .idea/
 libs/
 *.sln.*
+Directory.Build.props
