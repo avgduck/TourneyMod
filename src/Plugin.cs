@@ -2,16 +2,21 @@
 using System.Linq;
 using BepInEx;
 using BepInEx.Logging;
-using LLBML.Players;
 using LLBML.States;
 using LLBML.Utils;
 using LLHandlers;
+using Rewired;
 using TourneyMod.Patches;
 using TourneyMod.PlayerTags;
 using TourneyMod.Rulesets;
 using TourneyMod.SetTracking;
 using TourneyMod.StageStriking;
 using TourneyMod.UI;
+using UnityEngine;
+using Controller = LLHandlers.Controller;
+using ControllerType = Rewired.ControllerType;
+using InputAction = LLHandlers.InputAction;
+using Player = LLBML.Players.Player;
 
 namespace TourneyMod;
 
@@ -156,6 +161,7 @@ public class Plugin : BaseUnityPlugin
             SelectedPlayerTagKeyboard = playerTag;
             LoadTagConfig(rePlayer, c.GetHardwareName(), c.GetReControllerType());
             LoadTagMovementKeys();
+            LoadTagTauntKeys();
             Configs.SelectedTagKeyboard.Value = playerTag.GetName();
             Plugin.LogGlobal.LogInfo($"Setting keyboard selected player tag '{playerTag.GetName()}'");
             return;
@@ -198,7 +204,104 @@ public class Plugin : BaseUnityPlugin
 
     internal void LoadTagMovementKeys()
     {
-        InputHandler.SetMovementKeys(SelectedPlayerTagKeyboard.GetMovementKeys());
+        //InputHandler.SetMovementKeys(SelectedPlayerTagKeyboard.GetMovementKeys());
+        SetCustomMovementKeys(SelectedPlayerTagKeyboard.GetCustomMovementKeys());
+    }
+
+    internal void LoadTagTauntKeys()
+    {
+        SetCustomTauntKeys(SelectedPlayerTagKeyboard.GetCustomTauntKeys());
+    }
+
+    internal KeyCode[][] GetCustomMovementKeys(MovementKeys mk)
+    {
+        switch (mk)
+        {
+            case MovementKeys.ARROWS:
+                return
+                [
+                    [KeyCode.LeftArrow, KeyCode.Joystick8Button19],
+                    [KeyCode.RightArrow, KeyCode.Joystick8Button19],
+                    [KeyCode.UpArrow, KeyCode.Joystick8Button19],
+                    [KeyCode.DownArrow, KeyCode.Joystick8Button19]
+                ];
+            case MovementKeys.WASD:
+                return
+                [
+                    [KeyCode.A, KeyCode.Joystick8Button19],
+                    [KeyCode.D, KeyCode.Joystick8Button19],
+                    [KeyCode.W, KeyCode.Joystick8Button19],
+                    [KeyCode.S, KeyCode.Joystick8Button19]
+                ];
+            case MovementKeys.ZQSD:
+                return
+                [
+                    [KeyCode.Q, KeyCode.Joystick8Button19],
+                    [KeyCode.D, KeyCode.Joystick8Button19],
+                    [KeyCode.Z, KeyCode.Joystick8Button19],
+                    [KeyCode.S, KeyCode.Joystick8Button19]
+                ];
+            case MovementKeys.NUMPAD:
+                return
+                [
+                    [KeyCode.Keypad4, KeyCode.Joystick8Button19],
+                    [KeyCode.Keypad6, KeyCode.Joystick8Button19],
+                    [KeyCode.Keypad8, KeyCode.Joystick8Button19],
+                    [KeyCode.Keypad5, KeyCode.Joystick8Button19]
+                ];
+            default:
+                return null;
+        }
+    }
+
+    internal void SetCustomMovementKeys(KeyCode[][] customMovementKeys)
+    {
+        if (customMovementKeys == null)
+        {
+            return;
+        }
+        
+        int[] actions = [InputAction.LEFT, InputAction.RIGHT, InputAction.UP, InputAction.DOWN];
+        ControllerMap map = Controller.mouseKeyboard.GetMap();
+        InputConfigAssignment inputConfigAssignment = new InputConfigAssignment();
+        
+        for (int i = 0; i < 4; i++)
+        {
+            inputConfigAssignment.inputAction = actions[i];
+            inputConfigAssignment.keyCode = customMovementKeys[i][0];
+            inputConfigAssignment.altInput = false;
+            // InputConfig.SetAssignment(...)
+            PPHBCKEFJEP.IJJPHFJAMGK(map, ControllerType.Keyboard, inputConfigAssignment);
+
+            inputConfigAssignment.keyCode = customMovementKeys[i][1];
+            inputConfigAssignment.altInput = true;
+            PPHBCKEFJEP.IJJPHFJAMGK(map, ControllerType.Keyboard, inputConfigAssignment);
+        }
+    }
+
+    internal void SetCustomTauntKeys(KeyCode[] customTauntKeys)
+    {
+        if (customTauntKeys == null)
+        {
+            return;
+        }
+
+        int[] actions = [InputAction.EXPRESS_UP, InputAction.EXPRESS_LEFT, InputAction.EXPRESS_RIGHT, InputAction.EXPRESS_DOWN];
+        ControllerMap map = Controller.mouseKeyboard.GetMap();
+        InputConfigAssignment inputConfigAssignment = new InputConfigAssignment();
+        
+        for (int i = 0; i < 4; i++)
+        {
+            inputConfigAssignment.inputAction = actions[i];
+            inputConfigAssignment.keyCode = customTauntKeys[i];
+            inputConfigAssignment.altInput = false;
+            // InputConfig.SetAssignment(...)
+            PPHBCKEFJEP.IJJPHFJAMGK(map, ControllerType.Keyboard, inputConfigAssignment);
+
+            inputConfigAssignment.keyCode = KeyCode.Joystick8Button19;
+            inputConfigAssignment.altInput = true;
+            PPHBCKEFJEP.IJJPHFJAMGK(map, ControllerType.Keyboard, inputConfigAssignment);
+        }
     }
 
     internal void UpdateAllWithTag(PlayerTag playerTag)
