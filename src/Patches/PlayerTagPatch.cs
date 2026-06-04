@@ -186,7 +186,7 @@ public class PlayerTagPatch
             Plugin.Instance.SetCustomTauntKeys(Plugin.Instance.SelectedPlayerTagKeyboard.GetCustomTauntKeys());
         }
         */
-        if (controller.IncludesMouse()) playerTag.SetMovementKeys(InputHandler.movementKeys);
+        //if (controller.IncludesMouse()) playerTag.SetMovementKeys(InputHandler.movementKeys);
         
         // InputConfig.GetInputConfig(...)
         playerTag.SetBindings(controller.GetHardwareName(), PPHBCKEFJEP.JMNLMPPOEDC(__instance.PIPEFDJDICP));
