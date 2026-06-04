@@ -293,13 +293,13 @@ public class Plugin : BaseUnityPlugin
         for (int i = 0; i < 4; i++)
         {
             inputConfigAssignment.inputAction = actions[i];
-            inputConfigAssignment.keyCode = customTauntKeys[i];
-            inputConfigAssignment.altInput = false;
-            // InputConfig.SetAssignment(...)
-            PPHBCKEFJEP.IJJPHFJAMGK(map, ControllerType.Keyboard, inputConfigAssignment);
-
             inputConfigAssignment.keyCode = KeyCode.Joystick8Button19;
             inputConfigAssignment.altInput = true;
+            // InputConfig.SetAssignment(...)
+            PPHBCKEFJEP.IJJPHFJAMGK(map, ControllerType.Keyboard, inputConfigAssignment);
+            
+            inputConfigAssignment.keyCode = customTauntKeys[i];
+            inputConfigAssignment.altInput = false;
             PPHBCKEFJEP.IJJPHFJAMGK(map, ControllerType.Keyboard, inputConfigAssignment);
         }
     }
