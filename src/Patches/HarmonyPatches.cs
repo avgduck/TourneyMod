@@ -20,6 +20,8 @@ internal static class HarmonyPatches
         Plugin.LogGlobal.LogInfo("Stage select patch applied");
         harmony.PatchAll(typeof(LobbyPatch));
         Plugin.LogGlobal.LogInfo("Lobby patch applied");
+        harmony.PatchAll(typeof(GameHudPatch));
+        Plugin.LogGlobal.LogInfo("Game HUD patch applied");
         
         harmony.PatchAll(typeof(CursorPatch));
         Plugin.LogGlobal.LogInfo("Cursor patch applied");
