@@ -181,7 +181,7 @@ internal class ScreenMenuRulesets : ScreenUnlocksStages, ICustomScreen<ScreenUnl
         }
         else
         {
-            s += $"<size={FONTSIZE_HEADER}pt>({ruleset.game1FirstTeam} starts for Game 1)</size>\n";
+            s += $"<size={FONTSIZE_HEADER}pt>({(ruleset.game1FirstTeam == PlayerTeam.RED ? "RPS winner" : "RPS loser")} starts Game 1)</size>\n";
             int gameIndex = 0;
             foreach (int[] banNums in ruleset.banAmounts)
             {
