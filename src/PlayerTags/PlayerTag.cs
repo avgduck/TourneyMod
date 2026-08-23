@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using LLHandlers;
-using UnityEngine;
 
 namespace TourneyMod.PlayerTags;
 
@@ -15,19 +14,7 @@ public class PlayerTag
         name = "";
         isEditing = false;
         inputBindings = new Dictionary<string, List<InputConfigAssignment>>();
-        movementKeys = MovementKeys.NONE;
-        customMovementKeys = [
-            [KeyCode.LeftArrow, KeyCode.Joystick8Button19],
-            [KeyCode.RightArrow, KeyCode.Joystick8Button19],
-            [KeyCode.UpArrow, KeyCode.Joystick8Button19],
-            [KeyCode.DownArrow, KeyCode.Joystick8Button19]
-        ];
-        customTauntKeys = [
-            KeyCode.Alpha1,
-            KeyCode.Alpha2,
-            KeyCode.Alpha3,
-            KeyCode.Alpha4
-        ];
+        movementKeys = MovementKeys.ARROWS;
     }
 
     internal PlayerTag()
@@ -41,8 +28,6 @@ public class PlayerTag
     private bool isEditing;
 
     public MovementKeys movementKeys;
-    public KeyCode[][] customMovementKeys;
-    public KeyCode[] customTauntKeys;
     public Dictionary<string, List<InputConfigAssignment>> inputBindings;
 
     internal void SetName(string name)
@@ -66,52 +51,20 @@ public class PlayerTag
         return isEditing;
     }
 
-    internal KeyCode[][] GetCustomMovementKeys()
+    internal MovementKeys GetMovementKeys()
     {
-        if (customMovementKeys == null || customMovementKeys.Length != 4)
+        if (movementKeys == MovementKeys.NONE)
         {
-            if (movementKeys != MovementKeys.NONE)
-            {
-                if (!IsDefault) Plugin.LogGlobal.LogWarning($"Tag '{name}' migrating keyboard movement keys to new system");
-                SetCustomMovementKeys(Plugin.Instance.GetCustomMovementKeys(movementKeys));
-            }
-            else
-            {
-                if (!IsDefault) Plugin.LogGlobal.LogWarning($"Tag '{name}' keyboard custom movement keys not found: creating defaults");
-                SetCustomMovementKeys(Plugin.Instance.GetCustomMovementKeys(MovementKeys.ARROWS));
-            }
+            if (!IsDefault) Plugin.LogGlobal.LogWarning($"Tag '{name}' keyboard movement keys not found: creating defaults");
+            SetMovementKeys(MovementKeys.ARROWS);
         }
 
-        return customMovementKeys;
+        return movementKeys;
     }
 
     internal void SetMovementKeys(MovementKeys mk)
     {
-        //movementKeys = mk;
-        SetCustomMovementKeys(Plugin.Instance.GetCustomMovementKeys(mk));
-        if (!IsDefault) PlayerTagIO.SavePlayerTag(this);
-    }
-
-    internal void SetCustomMovementKeys(KeyCode[][] cmk)
-    {
-        movementKeys = MovementKeys.NONE;
-        customMovementKeys = cmk;
-        if (!IsDefault) PlayerTagIO.SavePlayerTag(this);
-    }
-
-    internal KeyCode[] GetCustomTauntKeys()
-    {
-        if (customTauntKeys == null || customTauntKeys.Length != 4)
-        {
-            SetCustomTauntKeys([KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4]);
-        }
-
-        return customTauntKeys;
-    }
-
-    internal void SetCustomTauntKeys(KeyCode[] ctk)
-    {
-        customTauntKeys = ctk;
+        movementKeys = mk;
         if (!IsDefault) PlayerTagIO.SavePlayerTag(this);
     }
 

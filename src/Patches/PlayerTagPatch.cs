@@ -141,7 +141,6 @@ public class PlayerTagPatch
     {
         Plugin.Instance.LoadTagConfig(rePlayer, hardwareName, controllerType);
         Plugin.Instance.LoadTagMovementKeys();
-        Plugin.Instance.LoadTagTauntKeys();
     }
 
     [HarmonyPatch(typeof(JBKFDDKLDDG), nameof(JBKFDDKLDDG.HHBBAKCECEP))]
@@ -158,8 +157,8 @@ public class PlayerTagPatch
         
         Controller controller = __instance.GDEMBCKIDMA;
         PlayerTag playerTag = Plugin.Instance.GetPlayerTag(controller);
-        //if (controller.IncludesMouse()) playerTag.SetMovementKeys(InputHandler.movementKeys);
         // InputConfig.GetInputConfig(...)
+        if (controller.IncludesMouse()) playerTag.SetMovementKeys(InputHandler.movementKeys);
         playerTag.SetBindings(controller.GetHardwareName(), PPHBCKEFJEP.JMNLMPPOEDC(__instance.PIPEFDJDICP));
     }
     
@@ -177,28 +176,10 @@ public class PlayerTagPatch
         
         Controller controller = __instance.GDEMBCKIDMA;
         PlayerTag playerTag = Plugin.Instance.GetPlayerTag(controller);
-        
-        /*
-        //if (!controller.IncludesMouse()) InputHandler.SetMovementKeys(Plugin.Instance.SelectedPlayerTagKeyboard.GetMovementKeys());
-        if (!controller.IncludesMouse())
-        {
-            Plugin.Instance.SetCustomMovementKeys(Plugin.Instance.SelectedPlayerTagKeyboard.GetCustomMovementKeys());
-            Plugin.Instance.SetCustomTauntKeys(Plugin.Instance.SelectedPlayerTagKeyboard.GetCustomTauntKeys());
-        }
-        */
-        //if (controller.IncludesMouse()) playerTag.SetMovementKeys(InputHandler.movementKeys);
-        
         // InputConfig.GetInputConfig(...)
+        if (!controller.IncludesMouse()) InputHandler.SetMovementKeys(Plugin.Instance.SelectedPlayerTagKeyboard.GetMovementKeys());
+        if (controller.IncludesMouse()) playerTag.SetMovementKeys(InputHandler.movementKeys);
         playerTag.SetBindings(controller.GetHardwareName(), PPHBCKEFJEP.JMNLMPPOEDC(__instance.PIPEFDJDICP));
-    }
-
-    [HarmonyPatch(typeof(InputHandler), nameof(InputHandler.SetMovementKeys))]
-    [HarmonyPrefix]
-    private static bool InputHandler_SetMovementKeys_Prefix()
-    {
-        Plugin.Instance.LoadTagMovementKeys();
-        Plugin.Instance.LoadTagTauntKeys();
-        return false;
     }
 
     /*
