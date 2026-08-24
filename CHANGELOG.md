@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.2] - 2026-08-23
+
+### Added
+
+- Add set count to boombox HUD in tournament game modes ([`57a9c67`](https://github.com/avgduck/TourneyMod/commit/57a9c6713c47291367c2afe9a72f5d752cb0c344))
+
+### Changed
+
+- Update Mach (UK) default ruleset ban order ([`9cffad3`](https://github.com/avgduck/TourneyMod/commit/9cffad3bffa7a5ba06661b9212dc3e941d1a41ee))
+- Adjust ruleset ban order description text to use "RPS winner/loser" wording for Game 1 ([`55a9112`](https://github.com/avgduck/TourneyMod/commit/55a91128921bb6fa46a0f9e2c38cf120a92cae46))
+
+### Fixed
+
+- Fix text rendering issue on stage select screen ([`047fc26`](https://github.com/avgduck/TourneyMod/commit/047fc26e377d06699f7467c7f09bcba332076115))
+
 ## [1.3.1] - 2026-05-18
 
 ### Fixed
@@ -94,6 +109,7 @@
 
 _Initial release_
 
+[1.3.2]: https://github.com/avgduck/TourneyMod/releases/tag/v1.3.2
 [1.3.1]: https://github.com/avgduck/TourneyMod/releases/tag/v1.3.1
 [1.3.0]: https://github.com/avgduck/TourneyMod/releases/tag/v1.3.0
 [1.2.0]: https://github.com/avgduck/TourneyMod/releases/tag/v1.2.0
