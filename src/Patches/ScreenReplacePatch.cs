@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using HarmonyLib;
@@ -180,5 +181,26 @@ internal static class ScreenReplacePatch
     private static void GameStatesMenu_JumpTo_Prefix(ref ScreenType FJOFNHPCBPD)
     {
         if (FJOFNHPCBPD == ScreenType.MENU_ONLINE && Plugin.Instance.TourneyMenuOpen) FJOFNHPCBPD = ScreenType.MENU_VERSUS;
+    }
+
+    // Fix the stage select screen text rendering issue
+    // Currently the only known replicable way of triggering the bug is entering the story mode
+    // Doing so replaces the existing camera in the title scene (with orthographic=true) and sets the new one to false
+    // This isn't undone when you leave story mode, so this will undo it every time we return to the main menu
+    [HarmonyPatch(typeof(IOGKKINMEFB), nameof(IOGKKINMEFB.CNewState))]
+    [HarmonyPostfix]
+    private static IEnumerator GameStatesMenu_CNewState_Postfix(IEnumerator __result)
+    {
+        while (__result.MoveNext()) yield return __result.Current;
+
+        UIScreen.activeCamera.orthographic = true;
+        Camera[] componentsInChildren = UIScreen.activeCamera.GetComponentsInChildren<Camera>();
+        for (int i = 0; i < componentsInChildren.Length; i++)
+        {
+            if ((componentsInChildren[i].cullingMask & 512) != 0)
+            {
+                componentsInChildren[i].orthographic = true;
+            }
+        }
     }
 }
